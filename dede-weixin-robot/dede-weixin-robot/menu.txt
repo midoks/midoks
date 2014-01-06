@@ -1,0 +1,6 @@
+<m:top name='DEDE微信机器人' c='1,' display='block' rank='0'>
+<m:item name='微信设置' link='../plus/dede-weixin-robot/admin.php?action=weixin_robot_setting' rank='0' target='main' />
+<m:item name='通信记录' link='../plus/dede-weixin-robot/admin.php?action=weixin_robot_stat' rank='1' target='main' />
+<m:item name='微信统计' link='../plus/dede-weixin-robot/admin.php?action=weixin_robot_count' rank='2' target='main' />
+<m:item name='微信自定义设置' link='../plus/dede-weixin-robot/admin.php?action=weixin_robot_menu_setting' rank='3' target='main' />
+</m:top>
