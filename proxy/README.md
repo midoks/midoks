@@ -1,2 +1,2 @@
-<<在openshift配置的proxy>>
+《在openshift配置的proxy》
 ==========================
