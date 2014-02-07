@@ -15,3 +15,5 @@
 	- 对file_get_contents用法使用
 - mysqlstatus.php
 	- 查看当前的mysql运行状态
+- MemCacheStuts.php
+	- 查看Memcache在线状态
