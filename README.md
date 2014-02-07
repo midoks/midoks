@@ -7,6 +7,11 @@
 - [我的博客](http://midoks.cachecha.com)
 - [我的微博](http://weibo.com/u/1504761980)
 
+### 目录解释
+- dede-weixin-robot 
+	- DEDE微信机器人插件
+- midoks_weixin_robot
+	- DISCUZ微信机器人插件
 
 ### 文件解释
 - PHPproxy.php
