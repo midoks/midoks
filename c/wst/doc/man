@@ -1,0 +1,5 @@
+"-c|--clients <n>        	Run <n> HTTP clients at once. Default one.\n"
+"-t|--time <sec>         	Run benchmark for <sec> seconds. Default 30.\n"
+"-v|--version            	Display program version.\n"
+"-k|--keep <sec>			keep-alive <n> sec\n"
+"-p|--proxy <server:port> 	Use proxy server for request.\n"

@@ -1,0 +1,31 @@
+#一般不变变量
+PREFIX = /usr/local
+CC = gcc
+RM = -rm -rf
+
+#变量
+OBJECTS = wst.c socket.c
+E_OBJECTS = $(OBJECTS:%.c=%.o)
+
+#命令执行
+all: main install
+
+%.o: %.c
+	$(CC) -c $< -o $@
+
+#命令安装
+#文档写入
+install: main
+#	install -s wst $(PREFIX)/bin
+
+main: $(E_OBJECTS)
+	$(CC) $(E_OBJECTS) -o main 
+
+
+
+
+
+.PHONY:	clean
+clean:
+	$(RM) -rf *.o
+	#rm -rf $(PREFIX)/bin/wst
