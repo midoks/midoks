@@ -16,4 +16,4 @@
 		- ln -s /bin/true /sbin/modprobe
 		- rm -f /sbin/sysctl
 		- ln -s /bin/true /sbin/sysctl
-		- sysctl  -p
+		- sysctl  -p (使你设置生效)
