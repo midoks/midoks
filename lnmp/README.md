@@ -17,3 +17,10 @@
 		- rm -f /sbin/sysctl
 		- ln -s /bin/true /sbin/sysctl
 		- sysctl  -p (使你设置生效)
+- nginx.conf
+	- nginx配置文件
+### 安装之前
+
+- 下载文件
+
+### 安装时
