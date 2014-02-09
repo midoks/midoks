@@ -9,6 +9,11 @@
 
 
 ### 文件解释
- 	- sysctl.conf
-		- 内核优化参数
-
+- sysctl.conf
+	- 内核优化参数
+		note:如果你使用VPS的时,也许并不能直接使用。你要使用一下命令进行修复
+		rm -f /sbin/modprobe
+		ln -s /bin/true /sbin/modprobe
+		rm -f /sbin/sysctl
+		ln -s /bin/true /sbin/sysctl
+		
