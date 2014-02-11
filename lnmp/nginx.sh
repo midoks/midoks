@@ -1,11 +1,15 @@
-tar zxvf pcre-8.10.tar.gz
+#! /bin/sh
+
+cd ./source
+
+tar zxvf "pcre-8.10.tar.gz"
 cd pcre-8.10/
 ./configure
 make && make install
 cd ../
 
 echo "Nginx install"
-tar zxvf nginx-1.5.9.tar.gz
+tar zxvf "nginx-1.5.9.tar.gz"
 cd nginx-1.5.9/
 ./configure \
 --user=nginx \
@@ -16,4 +20,6 @@ cd nginx-1.5.9/
 --with-http_realip_module \
 --with-http_image_filter_module
 make && make install
+cd ../
+
 cd ../
