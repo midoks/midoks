@@ -4,7 +4,7 @@
 # The Nginx Logs Path
 
 #生成的日志文件名字
-logs_name="pifa360"
+logs_name="[you web site log name]"
 #要切割的日志
 logs_file="/usr/local/nginx/logs/"
 #日志PID
