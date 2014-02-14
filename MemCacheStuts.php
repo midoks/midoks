@@ -44,6 +44,7 @@ class MemCacheStuts{
 <html>
 <head>
 	<title>MemCache服务器运行状态online</title>
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
 <script type="text/javascript" src="http://libs.baidu.com/jquery/1.7.2/jquery.min.js"></script>
 <style>
 *{font-size:14px;margin:0px;padding:0px;}
