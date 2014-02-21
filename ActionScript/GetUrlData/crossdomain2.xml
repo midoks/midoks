@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cross-domain-policy>
+   <allow-access-from domain="blog.sina.com.cn"/>
+   <allow-access-from domain="control.blog.sina.com.cn"/>
+   <allow-access-from domain="sjs.sinajs.cn"/>
+   <allow-access-from domain="simg.sinajs.cn"/>
+   <allow-access-from domain="icp.api.sina.com.cn"/>
+   <allow-access-from domain="icp.api.cws.sina.com.cn"/>
+
+   <allow-access-from domain="api.blog.sina.com.cn"/>
+   <allow-access-from domain="blog.2008.sina.com.cn"/>
+   <allow-access-from domain="blogimg.sinajs.cn"/>
+   <allow-access-from domain="blogjs.sinajs.cn"/>
+   <allow-access-from domain="blogold.sinajs.cn"/>
+   <allow-access-from domain="blog.photo.sina.com.cn"/>
+   <allow-access-from domain="photo.sina.com.cn"/>
+   <allow-access-from domain="blog.sports.sina.com.cn"/>
+   <allow-access-from domain="circle.blog.sina.com.cn"/>
+   <allow-access-from domain="photo.blog.sina.com.cn"/>
+   <allow-access-from domain="widget.say-on.com"/>
+   <allow-access-from domain="edu.photo.sina.com.cn"/>
+   <allow-access-from domain="baby.photo.sina.com.cn"/>
+</cross-domain-policy>

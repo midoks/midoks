@@ -1,0 +1,57 @@
+<html>
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=utf-8">
+		<title>js+flash 获取网页数据</title>
+		<script type="text/javascript" src="GetUrlData/GetUrlData.js"></script>
+	</head>
+	<body>
+		<!--<embed id="movieId" 
+			src="GetUrlData/GetUrlData.swf" 
+			loop="false" 
+			menu="false" 
+			quality="best" 
+			bgcolor="#ffffff" 
+			width="200" 
+			height="200" 
+			name="movieId" 
+			align="middle" 
+			allowscriptaccess="always" 
+			allowfullscreen="false" 
+			type="application/x-shockwave-flash" 
+			pluginspage="http://www.macromedia.com/go/getflashplayer" 
+			flashvars="id=123" 
+			wmode="transparent" 
+		/>-->
+		<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
+             id="movieId" width="500" height="375"
+             codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab">
+         <param name="movie" value="GetUrlData/GetUrlData.swf" />
+         <param name="quality" value="high" />
+         <param name="bgcolor" value="#869ca7" />
+         <param name="allowScriptAccess" value="always" />
+         <embed src="GetUrlData/GetUrlData.swf" quality="high" bgcolor="#869ca7"
+             width="500" height="375" name="movieId" align="middle"
+             play="true" loop="false" quality="high" allowScriptAccess="always"
+             type="application/x-shockwave-flash"
+             pluginspage="http://www.macromedia.com/go/getflashplayer" />
+		<!-- </embed> -->
+     </object>
+		
+		<script>
+			//实例化对象	
+			/*setInterval(function(){
+				GetUrlData.test('123');
+			},'1000');*/
+			//GetUrlData.test('http://www.baidu.com');
+			//GetUrlData.test2();
+			var timer = setInterval(function(){
+				var d =  GetUrlData.url;
+				GetUrlData.test2('123wokao');
+				if(d !=''){
+					clearInterval(timer);
+				}
+			},'1000');
+			//console.log(GetUrlData.test2());
+		</script>
+	</body>
+</html>

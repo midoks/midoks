@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=utf-8">
+		<title>js+flash 获取网页数据</title>
+		<script type="text/javascript" src="GetUrlData/GetUrlData.js"></script>
+	</head>
+	<body>
+		<script>
+			/**
+			 *	网络操作
+			 */
+			//根文件crossdomain.xml
+			function getURL1(){
+				G('http://api.bz').get('str',function(e){
+					console.log(e);		
+				});
+			}
+			//没有根文件crossdomain.xml
+			function getURL2(){
+				G('http://www.baidu.com').get('str',function(e){
+					console.log(e);
+				});
+			}
+
+			/**
+			 *	本地操作
+			 */
+			//JSON
+			function json(){
+				G('json.txt').get('json',function(e){
+					console.log(e);
+				});
+			}
+
+			//str
+			function str(){
+				G('json.txt').get('str',function(e){
+					console.log(e);
+				});
+			}
+
+			//xml
+			function xml(){
+				G('crossdomain2.xml').get('xml',function(e){
+					var t = e.getElementsByTagName('cross-domain-policy');
+					console.log(t);
+				});
+			}
+	</script>
+	<div style="float:left;">
+		<a href="javascript:getURL1()">aa</a>||<a href="javascript:getURL2()">bb</a>
+		<hr/>
+		<a href="javascript:json()">json数据</a>||<a href="javascript:str()">str数据</a>||
+				<a href="javascript:xml()">xml数据</a>
+	</div>
+	</body>
+</html>
