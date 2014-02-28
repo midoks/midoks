@@ -25,7 +25,8 @@ cd php-5.5.7/
 --with-xmlrpc \
 --enable-zip \
 --enable-soap \
---enable-fpm
+--enable-fpm \
+--with-apxs2=/usr/local/apache/bin/apxs
 make && make install
 cd ../
 
