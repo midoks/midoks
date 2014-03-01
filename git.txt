@@ -1,0 +1,27 @@
+//Git使用方法
+
+git config --global user.name midoks
+git config --global user.email midoks@163.com
+git config --global alias.ci commit
+
+ssh -T git@github.com
+ssh -Tv git@github.com
+
+ssh-keygen
+ssh-keygen -C "midoks@163.com"
+
+git init 	--初始化项目
+git clone 	--从服务器上克隆到本地
+git add <文件名> --添加本地文件
+git rm <文件名> (完全消失)
+git rm --cached <文件名> (系统中还是存在)
+
+git commit -m "修改的消息" --提交修改
+git push --tags --将修改推到服务器
+git branch 	--提交修改
+			-a 查看本地branch
+			-d 删除
+git checkout master 切换分支
+
+git push origin master 把本地提交到github上
+git fetch origin master 更新github在本地文件上了
