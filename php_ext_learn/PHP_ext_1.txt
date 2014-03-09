@@ -1,0 +1,293 @@
+ZTS 宏定义
+
+#define TSRMLS_D 	void ***tsrm_ls
+#define TSRMLS_DD 	, void ***tsrm_ls
+#define TSRMLS_C	void tsrmls_ls
+#define TSRMLS_CC	, tsrml_ls
+
+变量的结构
+
+typedef struct _zval_struct{
+	zval_value	value;
+	zend_uint 	refcount;
+	zend_uchar 	type;
+	zend_uchar 	is_ref;
+}
+
+typedef union _zvalue_value{
+	long				lval;
+	double				dval;
+	struct{
+		char *val;
+		int	 *len;
+	}					str;
+	HashTable			*ht;
+	zend_object_value	obj;
+} zvalue_value;
+
+-----------------------------------
+zhed定义了8中数据类型:
+IS_NULL
+IS_BOOL
+IS_DOUBLE
+IS_STRING
+IS_ARRAY
+IS_OBJECT
+IS_RESOURCE
+
+-----------------------------------
+
+void desc_zval(zval *foo)
+{
+	if(Z_TYPE_P(foo) == IS_NULL){
+		php_printf("The variable is null");
+	}else{
+		php_printf("The variable is of type %d", Z_TYPE_P(foo));
+	}
+}
+
+Z_TYPE		--- 取得变量的类型(非指针)
+Z_TYPE_P	--- 取得变量的类型(一级间访)
+Z_TYPE_PP	--- 取得变量的类型(和两级间访指针)
+-----------------------------------------------------------------
+获取变量的值
+
+void get_zval(zval boolzval, zval *longzval, zval **doublezval){
+	if(Z_TYPE(boolzval) == IS_BOOL){
+		php_printf("The value of the boolean is: %s\n", Z_BVAL(boolzval) ? "true":"false");
+	}
+
+	if(Z_TYPE_P(longzval) == IS_LONG){
+		php_printf("The value of the long is: %ld\n", Z_LVAL_P(longzval));
+	}
+
+	if(Z_TYPE_PP(double) == IS_DOUBLE){
+		php_printf("The value of the double is: %f\n", Z_DVAL_PP(doublezval));
+	}
+}
+
+多余简单的标量类型,boolean, long, double, 宏简写:BVAL,LVAL,DVAL.
+
+Z_BVAL		--- 获取BOOL值
+Z_BVAL_P	--- 获取BOOL值(一级间访)
+Z_BVAL_PP	--- 获取BOOL值(二级级间访)
+
+Z_LVAL		--- 获取long值
+Z_LVAL_P	---	获取long值(一级间访)
+Z_LVAL_PP	--- 获取long值(二级间访)
+
+Z_DVAL		--- 获取double值
+Z_DVAL_P	---	获取double值(一级间访)
+Z_DVAL_PP	--- 获取double值(二级间访)
+
+Z_STRVAL	--- 获取string值
+Z_STRVAL_P	---	获取string值(一级间访)
+Z_STRVAL_PP --- 获取string值(二级简访)
+
+由于字符串变量包含两个成员,因此他有一对分别表示char *(STRVAL)和 int(STRLEN)成员:
+
+void display_string(zval *zstr){
+	if(Z_TYPE_P(zstr) != IS_STRING){
+		php_printf("The wrong datatype was passed!\n");
+		return;
+	}
+	PHPWRITE(Z_STRVAL_P(zstr), Z_STRLEN_P(zstr));
+}
+
+------------------------------------
+数组数据类型以HashTable * 存储,可以使用: 
+Z_ARRVAL(zv),
+Z_ARRVAL_P(pzv),
+Z_ARRVAL_PP(ppzv)
+
+对象的内部结构比较复杂,他有较多访问宏:
+OBJ_HANDLE 返回处理标示,
+OBJ_HT	返回处理器表,
+OBJCE 用于类定义,
+OBJPROP 用于访问属性的HashTable,
+OBJ_HADNLER 用于维护OBJ_HT表中的一个特殊处理器方法
+
+------------------------------------------------------
+数据的创建
+
+zval *str;
+malloc(sizeof(str));	--不合法
+MAKE_STD_ZVAL(str);		--这个宏将会一种优化的方式在其他zval附近为其分配内存,自动 \
+的处理超出内存错误,并初始化新zval的refcount和is_ref属性.
+
+填充数据值
+
+ZVAL_NULL(pvz);			<-->		Z_TYPE_P(pzv) = IS_NULL;
+ZVAL_BOOL(pvz, b);		<-->		Z_TYPE_P(pzv) = IS_BOOL;
+									ZBVAL_P(pzv) = b ? 1 : 0;
+ZVAL_TRUE(pvz);			<-->		ZVAL_BOOL(pzv, 1);
+ZVAL_FALSE(pvz);		<-->		ZVAL_BOOL(pzv, 0);
+ZVAL_LONG(pzv, 1)		<-->		Z_TYPE_P(pzv) = IS_LONG;
+									Z_LVAL_P(pzv) = l;
+ZVAL_DOUBLE(pzv, d);	<-->		Z_TYPE_P(pzv) = IS_DOUBLE;
+									Z_DVAL_P(pzv) = d;
+
+ZVAL_STRINGL(pzv, str, len, dup);	<-->	Z_TYPE_P(pzv) = IS_STRING;
+											Z_STRLEN_P(pzv) = len;
+											if(dup){
+												Z_STRVAL_P(pzv) = estrndup(str, len + 1);
+											}else{
+												Z_STRVAL_P(pzv) = str;
+											}
+
+ZVAL_STRING(pzv, str, dup);			<-->	ZVAL_STRINGL(pzw, str, strlen(str), dup);
+ZVAL_RESOURCE(pzv, res);			<-->	Z_TYPE_P(pzv) = IS_RESOURCE;
+											Z_RESVAL_P(pzv) = res;
+
+----------------------------------------------------------------------------------
+
+struct _zend_execution_global{
+	....
+	HashTable symbol_table;
+	HashTable *active_symbol_table;
+	....	
+}
+
+symbol_table	EG(symbol_table) 	--> 它永远都是全局变量作用域,和用户空间的$GLOBALS变量相似.
+
+active_symbol_table	EG(active_symbol_table)	-->	表示此刻激活的变量作用域
+
+-----------------------------------------------------------------------------
+赋值
+<?php $foo = 'bar'; ?>
+/* C实现 */
+
+{
+	zval *fooval;
+
+	MAKE_STD_ZVAL(fooval);
+	ZVAL_STRING(fooval, "bar", 1);
+	ZEND_SET_SYMBOL(EG(active_symbal_table), "foo", fooval);
+}
+
+数据取回
+{
+	zval **fooval;
+	if(zend_hash_find(EG(active_symbol_table),
+			"foo", sizeof("foo"), (void **)&fooval) == SUCCESS)
+	{
+		php_printf("Got the value of $foo!");
+	}else{
+		php_printf("$foo is not defined");
+	}
+}
+
+类型转换
+{
+	switch(Z_TYPE_P(value))
+	{
+		case IS_NULL:
+			/* 什么都没有 */
+			break;
+		case IS_BOOL:
+			if(Z_BVAL_P(value)){
+				php_printf("1");
+			}
+			break;
+		case IS_LONG:
+			php_printf("%ld", Z_LVAL_P(value));
+			break;
+		case IS_DOUBLE:
+			php_printf("%f", Z_DVAL_P(value));
+			break;
+		case IS_STRING:
+			PHPWRITE(Z_STRVAL_P(value), Z_STRLEN_P(value));
+			break;
+		case IS_RESOURCE:
+			php_printf("Resource #%ld", Z_RESVAL_P(value));
+			break;
+		case IS_ARRAY:
+			php_printf("Array");
+			break;
+		case IS_OBJECT:
+			php_printf("Object");
+			break;
+		default:
+			/* 在实际应用中,永远不会出现
+			*  假设它会出现
+			*/
+			php_printf("Unknown");
+			break;
+	}
+}
+
+
+void display_zval(zval *val)
+{
+	convert_to_string(val);
+	PHPWRITE(Z_STRVAL_P(val), Z_STRLEN_P(val));
+}
+
+conver_to_resource(),它没有意义,应该资源类型的定义就是不能映射到真是用户控件表示的值.
+
+----------------------------------------------------------------------------------------
+内存管理
+
+<?php $str = "hello world";?>
+
+{
+	char *str;
+	str = strdup("hello world");
+	if(!str){
+		fprintf(stderr, "Unable to allocate memory");
+	}
+}
+
+传统的内存管理函数 malloc(), free(), strdup(), realloc(), calloc()等
+不会被PHP源代码直接使用,本章将解释这么做的原因
+
+释放分配的内存
+
+1.在典型的客服端应用中,小的不频繁的泄露是可以容忍的。
+2.在长时间运行的服务端守护进程,包括apache这样的webserver, 进程被设计为运行
+很长的周期,通常是无限期的。
+
+
+PHP的完美解决方案是编写良好,干净的,一致的代码,保证它们绝对正确,不过在PHP解释器这样的环境中,这只是解决方案的一半。
+
+错误处理
+
+为了提供从用户脚本的激活请求和所在的扩展函数中跳出的能力,需要存在一种
+方法跳出整个激活请求,Zend引擎中的处理方式是在请求开始的地方设置一个跳
+出地址,在所有的die()/exit()调用后,或者碰到一些关键性错误(E_EROOR)时,执
+行longjmp()转向到预先设置的跳出地址.
+
+
+虽然这种跳出处理简化了程序流程,但它存在一个问题:资源清理代码(比如free())调用
+会被跳过,会因此带来泄露.考虑下面简化的引擎处理函数调用的代码:
+void call_function(const char *fname, int fname_len TSRMLS_DC)
+{
+	zend_function *fe;
+	char *lcase_fname;
+
+	/* PHP函数是大小写不敏感的,为了简化在函数表中对它们的定位
+	所有的函数名都隐式的翻译为小写 */
+	lcase_fname = estrndup(fname, fname_len);
+	zend_str_tolower(lcase_fname, fname_len);
+	
+	if(zend_hash_find(EG(function_table, lcase_fname, fname_len+1, 
+			(void **)&fe)) == FAILURE){
+		zend_execute(fe->op_array TSRMLS_CC);
+	}else{
+		php_error_docref(NULL TSRMLS_CC, E_ERROR,
+				"Call to undefined function: %s()", fname);
+	}
+	efree(lcase_fname);
+}
+
+	当php_error_docref()一行执行到时,内部的处理器看到错误级别是关键性的
+就调用longjmp()中断当前程序流,离开call_function(),这样就不能达到efree(lcase_fname)
+一行.那你就可能会想,想把efree行移动到php_error_docref()上面,但是如果这个call_function()
+调用进入第一个条件分支呢(查找了函数名,正常执行)?还有一点,fname自己是一个分配中的字符串,并且
+它在错误消息中被使用,在使用完之前你不能释放它.
+ * [
+ 	php_error_docref()函数是一个内部等价于trigger_error().第一个参数是一个可选的文档应用,
+如果在php.ini中启用它将被追加到docref.root后面.第三个参数可以是任意的E_*族常量标记错误的严重
+程度.第四个参数和后面的参数是符合printf()样式的格式串和可变参列表.
+ ]
+

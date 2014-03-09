@@ -1,0 +1,147 @@
+ 由于请求跳出(故障)产生的内存泄露的解决方案是Zend内存管理(ZendMM)层.引擎
+的这一部分扮演了相当于操作系统通常扮演的角色,分配内存给调用引用.不同的是
+站在进程空间请求的认知角度,它足够底层,当请求die的时候,它可以执行和OS的进
+程die时所做的相同的事情.也就是说它会隐式的释放所有请求拥有的内存空间.下图
+展示了在php进程中ZendMM和OS的关系:
+ 除了提供隐式的内存清理,ZendMM还通过php.ini的设置memory_limit控制了每个请求
+的内存使用.如果脚本尝试请求超过系统允许的,或超过单进程内存限制剩余量的内存,
+ZendMM会自动的引发一个E_ERROR消息,并开始跳出进程.一个额外的好处是多数时候
+内存分配的结果不需要检查,因为如果失败会立即longjmp()跳出到引擎的终止部分.
+ 在php内部代码和OS真实的内存管理层之间hook的完成,最复杂的是要求所有内部的内
+存分配要从一组函数中选择.例如,分配一个16字节的内存块不是使用malloc(16),php
+代码应该使用emalloc(16).除了执行真正的内存分配任务,ZendMM还要标记内存块所
+绑定请求的相关信息,以便在请求被故障跳出时,ZendMM可以隐式的释放它(分配的内存)
+ 很多时候内存需要分配,并使用超过单请求声明周期的时间.这种分配我们称为持久化
+还是不需要,因此ZendMM暴露了一些帮助宏,由它们来替代其他的内存分配函数,但是在
+末尾增加了附加的参数来标记是否持久化.
+ 如果你真的想要持久化的分配,这个参数应该被设置为1,这种情况下内存分配的请求
+将会传递给传统的malloc()族分配器.如果运行时逻辑确定这个块不需要持久化 
+则这个参数设置为0, 调用将会被转向到单请求内存分配器函数.
+ 例如,pemalloc(buffer_len, 1)映射到malloc(buffer_len),而pemalloc(buffer, 0)
+映射到emalloc(buffer_len),如下:
+
+#define in Zend/zend_alloc.h:
+
+#define pemalloc(size, perisistent) \
+	((persistent) ? malloc(size) : emalloc(size))
+
+----------------------------------------------------------------------------
+ZendMM提供的分配函数列表如下:
+
+传统分配器 										PHP中的分配器
+						
+void *malloc(size_t count);						void *emalloc(size_t count);
+												void *pemalloc(size_t count, char persistent);
+void *calloc(size_t count);						void *ecalloc(size_t count);
+												void *pecalloc(size_t count, char persistent);
+void *realloc(void *ptr, size_t count);			void *erealloc(void *ptr, size_t count);
+												void *perealloc(void *ptr, size_t count, char persistent);
+void *strdup(void *ptr);						void *estrdup(void *ptr);
+												void *pestrdup(void *ptr, char persistent);
+void free(void *ptr);							void efree(void *ptr);
+												void pefree(void *ptr, char persistent);
+
+------------------------------------------------------------------------------------------------------
+	你可能注意到了,pefree要求传递持久化标记.这是因为在pefree()调用时,它并不知道ptr是否是持久分配的.在
+废持久分配的指针上条用free()可能导致双重的free,而在持久化的分配上调用efree()通常会导致段错误,因为内存
+管理器尝试查看管理信息,而它不存在.你的代码需要记住它分配的数据结构是不是持久化的.
+	除了核心的分配器外,ZendMM还增加了特殊的函数:
+void *estrndup(void *ptr, int len);
+	它分配len+1字节的内存,并从ptr拷贝len个字节到新分配的快中.estrndup()的行为大致如下:
+
+void *strndup(void *ptr, ine len)
+{
+	char *dst = emalloc(len+1);
+	memcpy(dst, ptr, len);
+	dst[len] = 0;
+	return dst;
+}
+
+	终止NULL字节被悄悄的放倒了缓冲区末尾,这样做确保了所有使用strndup()进行字符串赋值的函数
+不用担心将结果缓冲区传递给期望NULL终止字符串的函数(比如printf())时产生错误.在使用estrndup()
+拷贝非字符串数据时,这个最后一个字节将被浪费,但是相比带来的方便,这点小浪费就不算什么了.
+------------------------------------------------------------------------------------------
+
+void *safe_emalloc(size_t size, size_t count, size_t addtl);
+void *safe_pemalloc(size_t size, size_t count, size_t addtl, char persistent);
+
+	这两个函数分配的内存大小事((size *count) + addtl)的结果.你可能会问,"为什么要扩充这样一个函数?
+为什么不是使用emalloc/pemalloc,然后自己计算呢?"。理由来源它的名字'安全'.尽管这种情况很少可能发生,但
+仍然是有可能的,当计算的结果溢出所在主机平台的整形限制时,结果会很糟糕.可能导致分配负的字节数,更糟的
+是分配一个正值得内存大小,但却小于所请求的大小。safe_emalloc()通过检查整形溢出避免了这种类型的陷阱,
+如果发生溢出,它出显式的报告失败.
+-------------------------------------------------------------------------------------------------
+引用计数
+	在PHP这样长时间运行的多请求进程中谨慎的分配和释放内存非常重要,但这只是一个半工作.为了让高并发的
+服务器更加有效,每个请求需要使用尽可能少的内存,最小化不需要的数据拷贝,考虑小面的php代码片段:
+<?php
+	$a = "hello world";
+	$b = $a;
+	unset($a);
+?>
+
+{
+	zval *hval;
+	MAKE_STD_ZVAL(hval);
+	ZVAL_STRING(hval, "hello world");
+	zend_hash_add(EG(active_symbol_table), "a", sizeof("a"),
+				&hval, sizeof(zval *), NULL);
+	//引用计数+1
+	ZVAL_ADDREF(hval);
+	zend_hash_add(EG(active_symbol_table), "b", sizeof("b"),
+				&hval, sizeof(zval *), NULL);
+}
+
+
+写时复制
+<?php
+	$a=1;
+	$b = $a;
+	$b += 5;
+?>
+
+zval *get_var_and_setparate(char *varname, int varname_len TSRMLS_DC)
+{
+	zval **varval, *varcopy;
+	if(zend_hash_find(EG(active_symbol_table),
+			varname, varname_len+1, (void **)&varval) == FAILURE){
+		//变量不存在
+		return NULL;
+	}
+
+	if((*varval)->refcount < 2){
+		/* 变量名只有一个引用,不需要隔离 */
+		return *varval;
+	}
+
+	/* 其他情况,对 zval * 做一次浅拷贝 */
+	MAKE_STD_ZVAL(varcopy);
+	varcopy = *varval;
+
+	/* 对zval *进行一次深拷贝 */
+	zval_copy_ctor(varcopy);
+
+	/* 破坏varname和varval之间的关系,这一步会将varval的引用计数减1 */
+	zend_hash_del(EG(active_symbol_table), varname, varname_len);
+
+	/* 初始化新创建的值引用计数,并为新创建的值和varname建立关联 */
+	varcopy->refcount = 1;
+	varcopy->is_ref = 0;
+	zend_hash_add(EG(active_symbol_table), varname, varname_len+1, 
+			&varcopy, sizeof(zval *), NULL);
+
+	/* 返回新的zval* */
+	return varcopy;
+}
+
+写时修改
+
+<?php
+	$a = 1;
+	$b = &$a;
+	$b += 5;
+?>
+
+
+..
+
