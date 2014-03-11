@@ -1,0 +1,242 @@
+/* 走进扩展 */
+
+	在用户空间和扩展代码之间最快捷的连接就PHP_FUNCTION().首先在你的文件
+sample.c文件顶部, #include "php_sample.h"之后增加下面代码:
+
+PHP_FUNCTION(sample_hello_world)
+{
+	php_printf("Hello World!\n");
+}
+
+#define PHP_FUNCTION(name) \
+	void zif_##name(INTERNAL_FUNCTION_PARAMETERS);
+------------------------------------------------------
+
+	这种情况下,它就等于:
+void zif_sample_hello_world(zval *return_value,
+	char return_value_used, zval *this_ptr TSRMLS_DC);
+
+------------------------------------------------------
+	当然,只定义函数还不够,引擎需要知道函数的地址以及应该暴露给用空间的函数
+名.这通过下一个代码块完成,你需要在PHP_FUNCTION()快后面增加:
+
+static function_entry php_sample_functions[] = {
+	PHP_FE(sample_hello_world, NULL)
+	{NULL, NULL, NULL}
+}
+
+	php_sample_functions向量是一个简单的NULL结束向量,它会随着你向扩展中增减
+功能而变大.每个你要暴露出去的函数都需要的在这个向量中给出的函数都需要在这个
+向量中给出说明.展开PHP_FE()宏如下:
+{"sample_hello_world", zif_sample_hello_world, NULL},
+---------------------------------------------------------------------------
+Zend 内部函数
+	内部函数名前缀"zif_"是Zend内部函数的命名标准,他用来避免可能的符号冲突.比如
+用户空间的strlen()函数并没有实现为void strlen(INTERNAL_FUNCTION_PARAMETERS),因
+为它会和C库的strlen冲突.
+	zif_的前缀也并不能完全避免名字冲突的问题.因此,PHP提供了可以使用任意名字定义
+内部函数的宏:PHP_NAMED_FUNCTION();例如
+PHP_NAMED_FUNCTION(zif_sample_hello_world)等同于前面使用的
+PHP_FUNCTION(sample_hello_world)
+	当使用PHP_NAMED_FUNCTION定义实现时,在function_entry向量中,可以对应使用
+PHP_NAMED_FE()宏.因此,如果你定义了自己的函数
+PHP_NAMED_FE(sample_hello_world, purplefunc, NULL),而不是使用
+PHP_FE(sample_hello_world, NULL).
+	我们可以在ext/standard/file.c中查看fopen()函数的实现,它实际上使用
+PHP_NAMED_FUNCTION(php_if_fopen)定义.从用户空间角度来看,它并不关心函数是什么东西,
+只是简单的调用fopen().
+--------------------------------------------------------------------------------
+函数别名
+	有时一个函数可能会有不止一个名字,回想一下,普通的函数内部定义是用户空间函数名加
+上zif_前缀,我们可以看到用PHP_NAMED_FE()宏可以很容易的创建这个可选隐射.
+
+PHP_FE(sample_hello_world, NULL)
+PHP_NAMED_FE(sample_hi, zif_sample_hello_world, NULL)
+	
+	PHP_FE()宏将用户空间函数名sample_hello_world和PHP_FUNCTION(sample_hello_world)
+展开而来的zif_sample_hello_world关联起来.PHP_NAME_FE()宏则将用户空间函数名sample_hi
+和同一个内部实现关联起来.
+	现在,假设Zend引擎发生了一个大的变更,内部函数的前缀从zif_修改为pif_了.这个时候,你的
+扩展就不能工作了,应为当到达PHP_NAMED_FE()时,发现zif_sample_hello_world没有定义.
+	这种情况并不常见,但非常麻烦,可是使用PHP_FNAME()宏展开sample_hello_world避免这个问题:
+	
+PHP_NAMED_FE(sample_hi, PHP_FNAME(sample_hello_world), NULL)
+
+	这种情况下,即便函数前缀被修改,扩展的zend_function_entry也会使用宏扩展自动的更新.
+	现在,你这样做已经可以工作了,但是我们已经不需要这样做了.php暴露了另外一个宏,专门
+设计用于创建函数别名.前面的例子可以如下重写:
+
+PHP_FAILAS(sample_hi, sample_hello_world, NULL)
+	实际上这是官方的创建函数别名的方法,在PHP源码树中时常会看到它.
+
+------------------------------------------------------------------------------
+返回值
+	
+	用户空间函数利用return关键字向它的调用空间回传信息,这一点和C语言的语法相同.
+	例如:
+
+function sample_long(){
+	return 42;
+}
+$bar = sample_long();
+	当sample_long()调用时,返回42并设置到$bar变量中,在C语言中等价代码如下:
+
+int sample_long(void){
+	return 42;
+}
+
+void_main(void){
+	int bar = sample_long();
+}
+
+	当然,在C语言中你总是知道被调用的函数是什么,并且基于函数原型返回,因此相应
+的你要定义返回结构存储的变量.在PHP用户空间处理时,变量类型是动态的,转而依赖于
+zval的类型.
+----------------------------------------------------------------------------
+return_value 变量
+	你可能认为你的内部函数应该直接返回一个zval,或者说分配一个zval内存空间并如下
+返回zval *.
+
+PHP_FUNCTION(sample_long_wrong)
+{
+	zval *retval;
+	MAKE_STD_ZVAL(retval);
+	ZVAL_LONG(retval, 42);
+
+	return retval;
+}
+	不幸的是,这样做是不正确的.并不是强制每个函数实现分配zval并返回它.而是Zend引擎在函数
+调用之前预先分配这个空间.接着将zval的类型初始化IS_NULL,并将值作为参数名return_value传递
+下面是正确的做法:
+
+PHP_FUNCTION(sample_long)
+{
+	ZVAL_LONG(return_value, 42);
+	return;
+}
+
+	要注意的是PHP_FUNCTION()实现并不会直接返回任何值.取而代之的是直接将恰当的数据弹出到
+return_value参数中,Zend引擎会在内部函数执行完成后处理它.
+	友情提示:ZVAL_LONG()宏是对多个赋值操作的一个封装:
+Z_TYPE_P(return_value) = IS_LONG;
+Z_LVAL_P(return_value) = 42;
+	或者更直接点:
+return_value->type =IS_LONG;
+return_value->value.lval = 42;
+ * {
+ 	return_value的is_ref和refcount属性不应该被内部函数直接修改.这些值由Zend引擎在调用你的
+函数时初始化并处理}
+	
+static function_entry php_sample_functions[] = {
+	PHP_FE(sample_hello_world, NULL)
+	PHP_FE(sample_long, NULL)
+	{NULL, NULL, NULL}
+}
+---------------------------------------------------------------------
+包装更紧凑的宏
+	在代码可读性和可维护性方面,ZVAL_*()中有重复的部分:return_value变量.
+这种情况下,将宏的ZVAL替换RETVAL,我们就可以在调用时省略return_value了.
+	前面的例子中,sample_long()的实现代码可以缩减到下面的样子:
+PHP_FUNCTION(sample_long)
+{
+	RETVAL_LONG(42);
+	return;
+}
+--------------------------------------------------------------------
+下表列出了Zend引擎中RETVAL一族的宏.除了两个特殊的,RETVAL宏除了删除了return_value参数之外,
+和对应的ZVAL族宏相同.
+
+普通的ZVAL宏								return_value专用宏
+			
+ZVAL_NULL(return_value)						RETVAL_NULL()
+ZVAL_BOOL(return_value, bval)				RETVAL_BOOL(bval)
+ZVAL_TRUE(return_value)						RETVAL_TRUE
+ZVAL_FALSE(return_value)					RETVAL_FALSE
+ZVAL_LONG(return_value, lval)				RETVAL_LONG(lval)
+ZVAL_DOUBLE(return_value, dval)				RETVAL_DOUBLE(dval)
+ZVAL_STRING(return_value, str, dup)			RETVAL_STRING(str, dup)
+ZVAL_STRINGL(return_value, str, len, dup)	RETVAL_STRING(str, len, dup)
+ZVAL_RESOURCE(return_value, rval)			RETVAL_RESOURCE(rval)
+
+---------------------------------------------------------------------
+return_value_used参数使用
+
+function sample_array_range(){
+	$ret = array();
+	for($i=0;$i<1000;$++){
+		$ret[] = $i;
+	}
+	return $ret;
+}
+sample_array_range();
+
+PHP_FUNCTION(sample_array_range){
+	if(return_value_used){
+		int i;
+		array_init(return_value);
+		for(i=0;i<1000;i++){
+			add_next_index_long(return_value, 1);
+		}
+		return;
+	}else{
+		/* 提示错误 */
+		php_error_docref(NULL TSRMLS_CC, E_NOTICE,
+			"Static return-only function called without processing output");
+			RETURN_NULL();
+	}
+
+}
+---------------------------------------------------------------------------
+返回引用值
+
+function &sample_reference_a(){
+	/* 如果全局空间没有变量$a, 就以初始值NULL创建它 */
+	if(!isset($_GLOBALS['a'])){
+		return $GLOBALS['a'];
+	}
+}
+$a = 'Foo';
+$b = sample_reference_a();
+$b = 'Bar';
+
+------------
+#if (PHP_MAJOR_VERSION >5) || ((PHP_MAJOR_VERSION == 5) && \
+	PHP_MINOR_VERSION > 0)
+
+PHP_FUNCTION(sample_reference_a)
+{
+	zval **a_ptr, *a;
+	/* 从全局符号表查找变量$a */
+	if(zend_hash_find(&EG(symbol_table), "a", sizeof("a"), &a, 
+				(void **)&a_ptr) == SUCCESS){
+		a = *a_ptr;
+	}else{
+		/* 如果不存在$GLOBALS['a']则创建它 */
+		ALLOC_INIT_ZVAL(a);
+		zend_hash_add(&EG(symbol_table), "a", sizeof("a"), &a,
+						sizeof(zval *), NULL);
+	}
+
+	/* 废弃旧的返回值 */
+	zval_ptr_dtor(return_value_ptr);
+
+	if(!a->is_ref (&& a->refcount)>1){
+		/* $a需要写时复制,在使用之前,必选先隔离 */
+		zval *newa;
+		MAKE_STD_ZVAL(newa);
+		*new = *a;
+		zval_copy_ctor(newa);
+		newa->is_ref = 0;
+		newa->refcount = 1;
+		zend_hash_update(&EG(symbol_table), "a", sizeof("a"),
+				&newa, sizeof(zval *), NULL);
+		a = newa;
+	}
+	/* 将新的返回值设置为引用方式并增加refcount */
+	a->is_ref = 1;
+	a->refcount++;
+	*return_value_ptr = a;
+}
+#endif /* PHP >= 5.1.0 */
+
+---------------------------------------------------------------------------

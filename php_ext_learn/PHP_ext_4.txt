@@ -1,0 +1,278 @@
+接受参数
+
+	除了预览的例外,现在的扩展函数都很简单,只有返回.然而,多数函数并非只有一
+个目的.你通常会传递一些参数,并希望接受到基于值和其他附加处理的有用的响应
+
+zend_parse_parameters()的自动类型转换
+	和上一章你看到的返回值一样,参数的值也是围绕着对zval引用的简访问展开的.
+获取这些zval *的值最简单的方法就是使用zend_parse_parameters()函数.
+	调用zend_parse_parameters()几乎总是以ZEND_NUM_ARGS()宏接着是无所不在的
+TSRMLS_CC.ZEND_NUM_ARGS()从名字上可以猜到,它返回int型的实际传递的参数个数,
+由于zend_parse_parameters()内部工作的方法,你可能不需要了解这个值,因此现在只
+需要传递它.
+	zend_parse_parameters的下一个参数是格式串参数,它是由Zend引擎支持的基础
+类型描述字符组成的字符序列,用来描述要接受的函数参数.下表是基础的类型字符:
+	
+	类型字符						用户空间数据类型
+	b								Boolean
+	l								Interger
+	d								Floating point
+	s								String
+	r								Resource
+	a								Array
+	o								Object instance
+	O								Object instance of a specified type
+	z								Non-specific zval
+	Z								Deferenced non-specific zval
+----------------------------------------------------------------------
+zend_parse_parameters()剩下的参数依赖于你的格式串中所指定的类型描述.对于
+简单类型,直接解引用为C语言的基础类型.例如,long数据类型如下解除:
+PHP_FUNCTION(sample_getlong)
+{
+	long foo;
+	if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, 
+				"l", &foo) == FAILURE){
+		RETURN_NULL();			
+	}
+
+	php_printf("The integer value of the parameter you \
+		passed is: %ld\n", foo);
+
+	RETURN_TRUE;
+}
+-------------------------------------------------------------------------
+s和O类型需要单独说明,因为他们一次调用需要两个参数.
+
+function sample_hello_world($name){
+	echo "hello $name\n";
+}
+
+/* 在C中,你将使用zend_parse_parameters()函数接受一个字符串 */
+PHP_FUNCTION(sample_hello_world)
+{
+	char *name;
+	int name_len;
+
+	if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", 
+					&name, &name_len)){
+		RETURN_NULL();				
+	}
+	php_printf("hello");
+	PHPWRITE(name, name_len);
+	php_printf("!\n");
+}
+
+-------------------------------------------------
+含义											类型修改符				
+
+接下来是可选参数了,当制定它时,所有之前的参数
+都被认为是必须的,所有后续的参数都被认为是可选的.	|
+
+!之前的一个修饰符对应的参数如果是NULL,提供的内部
+变量将被设置为真实的NULL指针.						!
+
+/之前的一个修饰符对应的参数制定为写时拷贝,它将自动
+的隔离到新的zval(is_ref=0,refcount=1)				/
+
+------------------------------------------------------------
+可选参数
+
+function sample_hello_world($name, $greeting="Mr./Ms."){
+	echo "Hello $greeting $name!\n";
+}
+
+sample_hello_world("Ginger Rogers", 'Ms.');
+sample_hello_world("Fred Astaire");
+	
+	当不传递第二参数时,使用默认值.在C语言实现中,可选参数也是以类似的方式指定.
+
+PHP_FUNCTION(sample_hello_world)
+{
+	char *name;
+	int name_len;
+	
+	char *greeting = "Mr./Mrs.";
+	int greeting_len = sizeof("Mr./Mrs.") - 1;
+	
+	/* 如果调用时美誉传递第二参数,则greeting和greeting_len保持不变 */
+	if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s|s",
+			&name, &name_len, &greeting, &greeting_len) == FAILURE){
+		RETURN_NULL();	
+	}
+
+	php_printf("Hello ");
+	PHPWRITE(greeting, greeting_len);
+
+	php_printf(" ");
+	PHPWRITE(name, name_len);
+	php_printf("!\n");
+}
+	除非调用时提供了可选参数的值,否则不会修改它的初始值,因此,为可选参数设置
+初始值非常重要.多数情况下,他的初始默认值是NULL/0,不过有时候,比如上面的例子,
+默认的是有意义的其他值.
+--------------------------------------------------------------------------
+强制隔离
+
+zend_get_arguments()
+
+PHP_FUNCTION(sample_onearg)
+{
+	zval *firstarg;
+
+	if(zend_get_parameters(ZEND_NUM_ARGS(), 1, &firsting)
+			== FAILURE)
+	{
+		php_error_docref(NULL TSRMLS_CC, E_WARNING,
+			"Expected as least 1 parameter.");
+		RETURN_NULL();
+	}
+	
+	/* 其他执行 */
+}
+
+zend_get_parameters_ex()
+
+PHP_FUNCTION(sample_onearg)
+{
+	zval **firsting;
+	if(zend_get_parameters_ex(1, &firstarg) == FAILURE){
+		WRONG_PARAM_COUNT;
+	}
+
+	/* 其他程序执行 */
+}
+
+处理任意数目的参数
+
+PHP_FUNCTION(var_dump)
+{
+	int i, argc = ZEND_NUM_ARGS();
+	zval ***args;
+	
+	args = (zval ***)safe_emalloc(argc, sizeof(zval **), 0);
+	if(ZEND_NUM_ARGS == 0 || 
+		zend_get_parameters_array_ex(argc, args) == FAILURE)
+	{
+		efree(args);
+		WRONG_PARAM_COUNT;
+	}
+
+	for(i=0, i<argc, i++){
+		php_var_dump(args[i], TSRMLS_CC);
+	}
+	efree(args);
+
+}
+
+---------------------------------------------------------------------------
+参数信息和类型
+
+PHP_FUNCTION(sample_count_array)
+{
+	zval *arr;
+	if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,
+		"a", &arr) == FAILURE)
+	{
+		RETURN_NULL();
+	}
+	RETURN_LONG(zend_hash_num_elements(Z_ARRVAL_P(arr)));
+}
+
+ZEND HASH API
+
+4个主要的函数用于插入和更新:
+int zend_hash_add(HashTable *ht, char *arKey, uint nKeyLen,
+		void **pData, uint nDataSize, void *pDest);
+
+int zend_hash_update(HashTable *ht, char *arKey, uint nKeyLen,
+		void *pData, uint nDataSize, void **pDest);
+
+int zend_hash_index_update(HashTable *ht, char *arKey, uint nKeyLen,
+		oid *pData, uint nDataSize, void **pDest);
+	
+int zend_hash_next_index_insert(HashTable *ht, char *arKey, uint nKeyLen,
+		oid *pData, uint nDataSize, void **pDest);
+
+	对于上面的这些插入和更新函数,如果给pDest传递了值,则pDest指向的void *数据
+元素将被填充为指向被拷贝数据的指针.这个参数和你已经见过的zend_hash_find()的
+pDest参数是相同的用法(也会有相同的结果).
+----------------------------------------------------------------------
+zend_hash_add(fooHashTable, "bar", sizeof("bar"), &barzval, sizeof(zval *), NULL);
+	zend_hash_add和zend_hash_update()唯一区别就是key存在,zend_hash_add()将会失败。
+----------------------------------------------------------------------
+找回
+
+int zend_hash_find(HashTable *ht, char *arKey, uint nKeyLength
+			void **pData);
+
+int zend_hash_index_find(HashTable *ht, ulong h, void **pData);
+
+---------------------------------------------------------------------
+快速的填充和取回
+
+ulong zend_get_hash_value(char *arKey, uint nKeyLen);
+	在相同的关联key上执行多次操作时,可以先使用zend_get_hash_value()计算出哈希值
+.它的结果可以被传递给一组"快速"的函数,它们的行为与对应的非快速版本一致,但是使用
+预先计算好的哈希值,而不是每次重新计算.
+	
+int zend_hash_quick_add(HashTable *ht, char *arKey, uint nKeyLen, ulong hashval,
+		void *pData, uint nDataSize, void **pDest);
+
+int zend_hash_quick_update(HashTable *ht, char *arKey, uint nKeyLen, ulong hashval
+		void *pData, uint nDataSize, void **pDest);
+	
+int zend_hash_quick_exists(HashTable *ht, char *arKey, uint nKeyLen, ulong hashval);
+
+
+-----------------------------------------------------------------------------------
+拷贝和合并
+
+typedef void (*copy_ctor_func_t)(void *pElement);
+
+void zend_hash_copy(HashTable *target, HashTable *source,
+			copy_ctor_func_t pCopyConstructor,
+			void *tmp, uint size);
+
+
+void zend_hash_merge(HashTable *target, HashTable *source,
+			copy_ctor_func_t pCopyConstructor,
+			void *tmp, uint size, int overwrite);
+
+---------------------------------------------------------
+使用Hash Apply迭代
+
+	就像用户空间一样,有多种方式去迭代数据集合.首先,组简单的方法就是类似用户
+空间的foreach()结构,使用回调系统.系统涉及两个部分,一部分是你要编写的回调函数
+它扮演的角色相当于foreach循环内嵌的代码,另一部分则是对3个Hash应用API函数的调
+用.
+
+typedef int (*apply_func_t)(void *pDest TSRMLS_CC);
+
+void zend_hash_apply(HashTable *ht,
+		apply_func_t apply_func TSRMLS_DC);
+
+
+	Hash apply族函数中最简单的格式是通过迭代ht,当前迭代到的元素指针作为参数pDest
+传递,调用apply_func.
+
+typedef int (*apply_func_arg_t)(void *pDest,
+						void *argument TSRMLS_DC);
+
+void zend_hash_apply_with_argument(HashTable *ht,
+			apply_func_arg_t apply_func, void *data TSRMLS_DC);
+
+	下一个Hash apply的格式是与迭代元素一起传递另一个参数.这通常用于多
+目的的Hash apply函数,它的行为依赖于额外的参数而不同.
+	回调函数并不关心使用哪个迭代函数,它只有3中可能的返回值:
+	
+常量							含义
+
+ZEND_HASH_APPLY_KEEP 			返回这个值将完成当前值将完成当前循环,并继续迭代
+								HashTable中的下一个值.这等价于在foreach()控制块中
+								执行continue;
+	
+ZEND_HASH_APPLY_STOP			返回这个值将中断迭代,这等价在foreach()控制块中执行break;
+
+ZEND_HASH_APPLY_REMOVE			类似于ZEND_HASH_APPLY_KEEP,这个返回值将跳到下一次迭代.
+								不过,这个返回值同时会导致从目标HashTable中删除当前元素.
+
