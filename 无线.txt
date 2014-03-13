@@ -1,0 +1,24 @@
+//设置无线wifi
+netsh wlan set hostednetwork mode=allow ssid=jssy key=cjs149012
+
+//
+netsh wlan start hostednetwork
+
+//刷新置无线wifi
+netsh wlan refresh hostednetwork key
+
+//显示计算机上一系列可见的无线网络。
+netsh wlan show networks
+
+//显示无线 LAN 的当前全局设置。
+netsh wlan show settings
+
+//显示是启用还是禁用无线跟踪。
+netsh wlan show tracing
+
+
+//指定是否允许或禁止客户端计算机存储和使用共享网络身份验证的用户凭据。
+netsh wlan set allowexplicitcreds allow=yes
+
+//显示无线托管网络的设置，包括所连接的用户列表
+netsh wlan show hostednetwork
