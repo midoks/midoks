@@ -1,0 +1,464 @@
+foreach 循环
+
+<?php
+foreach($arr as $val){
+	echo "The value is:$val\n";
+}
+
+int php_sample_print_zval(zval **val TSRMLS_DC)
+{
+	/* 复制一份zval,使得原来的结构不被破坏 */
+	zval tmpcopy = **val;
+
+	zval_copy_ctor(&tmpcopy);
+
+	/* 重置引用计数并进行类型转换 */
+	INIT_PZVAL(&tmpcopy);
+
+	convert_to_string(&tmpcopy);
+	/* 输出 */
+
+	php_printf("The value is: ");
+	PHPWRITE(Z_STRVAL(tmpcopy), Z_STRLEN(tmpcopy));
+
+	php_printf("\n");
+
+	/* 释放拷贝 */
+	zval_dtor(&tmpcopy);
+	return ZEND_HASH_APPLY_KEEP;
+}
+?>
+
+---------------------------------------------------------------
+我们使用下面的函数进行迭代:
+zend_hash_apply(arrht, php_sample_print_zval TSRMLS_CC);
+
+typedef int (*apply_func_args_t)(void *pDest,
+		int num_args, va_list args, zend_hash_key *hash_key);
+
+void zend_hash_apply_with_arguments(HashTable *ht, 
+	apply_func_args_t apply_func, int numargs, ...);
+
+	为了在循环过程中和值一起接受key,就必须使用zend_hash_apply()的第三种
+格式.例如,扩展上面的支持,支持key输出:
+
+<?php
+foreach($arr as $k=>$v){
+	echo "The value of $k is: $v \n";
+}
+	当前的迭代回调无法处理$key的获取.切换zend_hash_apply_with_arguments(),
+回调函数的原型和实现修改如下:
+	
+int php_sample_print_zval_and_key(zval **val,
+	int num_args, va_list args, zend_hash_key *hash_key)
+{
+	/* 复制zval以使原来的内容不被破坏 */
+	zval tmpcopy = **val;
+	/* 输出函数需要tsrm_ls */
+	TSRMLS_FETCH();
+
+	zval_copy_ctor(&tmpcopy);
+	/* 重置引用计数并 */
+	INIT_PZVAL(&tmpcopy);
+
+	/* 输出 */
+
+	php_printf("The value of ");
+
+	if(hash_key->nKeyLength){
+		/* 关联类型的Key */
+		PHPWIRTE(hash_key->arKey, hash_key->nKeyLength);
+	}else{
+		/* 数值key */
+		php_printf("%ld", hash_key->h);
+	}
+
+	php_printf(" is: ");
+	PHPWRITE(Z_STRVAL(tmpcopy), Z_STRLEN(tmpcopy));
+
+	php_printf("\n");
+
+	/* 释放拷贝 */
+	zval_dtor(&tmpcopy);
+
+	/* 继续 */
+	return ZEND_HASH_APPLY_KEEP;
+}
+
+
+/* 向前推移的迭代 */
+	
+	我们也可以不使用回调进行HashTable的迭代.此时,你就需要记得HashTable中一个常常被
+忽略的概念:内部指针.
+	在用户空间,函数reset(),key(),current(),next(),prev(),each(),end()可以访问数组内
+的元素,它们依赖于一个不可访问的"当前"位置
+
+
+<?php
+	$arr = array('a'=>1, 'b'=>2, 'c'=>3);
+	reset($arr);
+	while(list($key, $val) == each($arr)){
+		/*  */
+	}
+	reset($arr);
+	$firstkey = key($arr);
+	$firstval = current($arr);
+	$bval = next($arr);
+	$cval = next($arr);
+?>
+
+	这些函数都是对同名的Zend Hash API函数的分装.
+/* reset */
+void zend_hash_internal_pointer_reset(HashTable *ht);
+
+/* key */
+int zend_hash_get_current_key(HashTable *ht,
+	char **strIdx, uint *strIdxLen,
+	ulong *numIdx, zend_bool duplicate);
+
+/* current */
+int zend_hash_get_current_data(HashTable *ht, void **pData);
+
+/* next()/each() */
+int zend_hash_move_forward(HashTable *ht);
+
+/* prev() */
+int zend_hash_move_backwards(HashTable *ht);
+
+/* end() */
+void zend_hash_internal_pointer_end(HashTable *ht);
+
+/* Other */
+int zend_hash_get_current_key_type(HashTable *ht);
+int zend_hash_has_more_elements(HashTable *ht);
+
+	通过向前移动的方式实现的迭代实际上和foreach()循环更加相似,下面是对
+前面printt_zval_and_key实例的再次实现:
+
+void php_sample_print_var_hash(HashTable *arrht)
+{
+	for(zend_hash_internal_pointer_reset(arrht));
+	zend_hash_has_more_elements(arrht) == SUCCESS;
+	zend_hash_move_forward(arrht)){
+		char *key;
+		uint keylen;
+		ulong idx;
+		int type;
+		zval **ppzval, tmpcopy;
+
+		type = zend_hash_get_current_key_ex(arrht, &key, &keylen, &idx, 0, NULL);
+
+		if(zend_hash_get_current_data(arrht, (void**) &ppzval) ==FAILURE){
+			/* 应该永远不会失败,因为key是已知的. */
+		}
+
+		/* 复制zval以使原来的内容不被破坏 */
+		tmpcopy = **ppzval;
+		zval_copy_ctor(&tmpcopy);
+		convert_to_string(&tmpcopy);
+
+		/* 输出 */
+		php_printf("The value of ");
+		if(type == HASH_KEY_IS_STRING){
+			/* 关联类型,输出字符串key */
+			/* 	译注:这里传递给PHPWRITE的keylen应该要减一才合适,因为HashTable的key长度
+				包含末尾的NULL字节,而正常的php字符串长度不包含这个NULL字节,不过这里
+				打印通常不会有问题,因为NULL字节一般打印出是空的
+			*/
+
+		}else{
+			/* 数值key */
+			php_printf("%ld", idx);
+		}
+
+		php_printf(" is: ");
+		PHPWRITE(Z_STRVAL(tmpcopy), Z_STRLEN(tmpcopy));
+		php_printf("\n");
+
+		/* 释放拷贝 */
+		zval_dtor(&tmpcopy);
+	}
+}
+	
+	这个代码片段对你说应该是比较熟悉的了.没有接触过的是zend_hash_get_current_key()
+的返回值.调用时,这个函数可能返回下表中3个返回值之:
+	
+常量					含义
+
+HASH_KEY_IS_STRING		当前元素是关联索引的;因此指向元素key名字的指针间被
+						设置到strldxLen中.如果指定了duplicate标记,key的值
+						将在设置的strldx之前使用estrndup复制一份.这样做,调用
+						方就需要显示的释放这个复制出来的字符串.
+
+HASH_KEY_IS_LONG		当前元素是数值索引,索引的数值将被设置到numldx中
+
+HASH_KEY_NON_EXISTANT 	内部指针到达了HashTable内容的末尾.此刻已经没有其他
+						key或数据可用了.
+	
+------------------------------------------------------------------------------
+
+保留内部指针
+	在迭代HashTable时,尤其是当它包含用户空间变量时,少数情况下碰到循环引用或者说
+自交的循环.如果一个迭代上下文的循坏开始后,HashTable的内部指针被调整,接着内部启
+动了对同一个HashTable的迭代循坏,它就会擦掉原来的当前指针位置,内部的迭代将导致外部
+的迭代被异常终止.
+	对于使用zend_hash_apply样式的实现以及自定义的向前移动的用法,均可以通过外部的
+HashPosition变量的方式来解决这个问题.
+	前面列出的zend_hash_*()均有对应的zend_hash_*_ex()实现,它们可以接受一个
+HashPosition类型的参数.因为HashPosition变量很少在短生命周期的循环之外使用,因为此
+将它定义为直接变量就足够了.接着可以取地址进行使用,如下实例:
+
+void php_sample_print_var_hash(HashTable *arrht){
+	HashPosition pos;
+	for(zend_hash_internal_pointer_reset_ex(arrht, &pos);
+	zend_hash_has_more_elements_ex(arrht, &po) == SUCCUESS;
+	zend_hash_move_forward_ex(arrht, &pos)){
+		char *key;
+		uint keylen;
+		ulong idx;
+		int type;
+		zval *ppzval, tmpcopy;
+		
+		type = zend_hash_get_current_key_ex(arrht,
+					&key, &keylen
+					&inx, 0, &pos);
+
+		if(zend_hash_get_current_data_ex(arrht,
+					(void**)&ppzval), &pos) == FAILURE){
+			/* 应该永远不会失败,因为key已知是存在的 */
+			continue;			
+		}
+
+
+		tmpcopy = **ppzval;
+		zval_copy_ctor(&tmpcopy);
+
+		/* 重置应用计数并进行类型转换 */
+		INIT_PZVAL(&tmpcopy);
+		
+		convert_to_string(&tmpcopy);
+
+		/* 输出 */
+
+		php_printf("The value of ");
+		if(type == HASH_KEY_IS_STRING){
+			/* 关联方式的字符串key */
+			PHPWRITE(key, keylen);
+		}else{
+			/* 数值key */
+			php_printf("%ld", idx);
+		}
+
+		php_printf(" is: ");
+		PHPWRITE(Z_STRVAL(tmpcopy), Z_STRLEN(tmpcopy));
+		php_printf("\n");
+		zval_dtor(&tmpcopy);
+	}
+}
+
+通过这个鞋轻微的修改,HashTable真正的内存指针将被保留,它就可以保持为刚刚进入
+函数时的状态不变.在用户空间变量的HashTable(数组)上工作时,这些额外的步骤很可能
+就是决定脚本执行结果是否预期一致的关键点.
+
+
+-------------------------------------------------------------------
+析构
+	你需要关注你析构函数只有4个,前两个用于从一个HashTable中移除单个元素:
+int zend_hash_del(HashTable *ht, char *arKey, uint nKeyLen);
+int zend_hash_index_del(HashTable *ht, ulong h);
+
+	你应该猜到,这里体现了HashTable独立的索引设计,它为关联和数值方式的索引
+元素分别提供了删除函数,两者均应该返回SUCCESS或FAILURE.
+	回顾前面,当一个元素从HashTable中移除时,HashTable的析构函数将被调用,传递
+的参数是指向元素的指针.
+void zend_hash_clean(HashTable *ht);
+
+	要完全清空HashTables时,最快的方式是调用zend_hash_clean(),它将会迭代所有
+的元素调用zend_hash_del();
+
+	通常,清理HashTable时,他会希望将它整个都清理掉,调用zend_hash_destroy()将
+会执行zend_hash_clean()的所有步骤,同时还会释放zend_hash_init()分配的其他结构.
+	小面的代码演示了一个完整的HashTable声明周期:
+
+int sample_strec_handler(int argc, char ** argv TSRMLS_DC)
+{
+	HashTable *ht;
+	/* 分配一块内存用于HashTable结构 */
+	ALLOC_HASHTABLE(ht);
+
+	/* 初始化HashTable的内部状态 */
+	if(zend_hash_init(ht, argc, NULL, ZVAL_PTR_DTOR, 0) == FAILURE){
+		FREE_HASHTABLE(ht);
+		return FAILURE;
+	}
+
+	/* 将传入的字符串数组,顺次以字符串的zval *放入到HashTable中 */
+	while(argc){
+		zval *value;
+		MAKE_STD_ZVAL(value);
+		ZVAL_STRING(value, argv[argc], 1);
+		argv++;
+		if(zend_hash_next_index_insert(ht, (void**)&value),
+			sizeof(zval *)==FAILURE){
+				/* 添加失败则静默的跳过 */
+				zval_ptr_dtor(&value);
+		}
+	}
+
+	/* 执行一些其他工作(业务) */
+	process_hashtable(ht);
+	/* 销毁HashTable, 释放所有需要的zval */
+	zend_hash_destroy(ht);
+
+	/* 释放HashTable自身 */
+	FREE_HASHTABLE(ht);
+	return SUCCUESS;
+}
+---------------------------------------------------------------------------
+排序,比较
+	在Zend Hash API中还存在其他一些回调.第一个是用来处理同一个HashTable中两
+个元素或者不同HashTable相同位置元素的比较的:
+typedef int (*compare_func_t)(void *a, void *b TSRMLS_CC);
+
+	就像用户空间的usort回调一样,这个函数期望你使用自己的逻辑比较两个a和b,返回
+-1表示a小于b,返回1表示b小a,返回0表示两者相等.
+int zend_hash_minmax(HashTale *ht, compare_func_t compar, int flag, 
+		void **pData TSRMLS_DC);
+	使用这个回调的最简单的API函数是zend_hash_minmax(),顾名思义,它将
+基于多次对比较回调的调用,最终返回HashTable的最大值/最小值元素.flag为
+0返回最小值,flag非0时返回最大值.
+	下面的例子中,对以注册的用户空间函数以函数名排序,并返回(函数名)最小和最大的
+函数(大小写不敏感):
+
+int fname_compare(zend_function *a, zend_function *b TSRMLS_DC){
+	return strcasecmp(a->common.function_name, b->common.function_name);
+}
+
+void php_sample_funcname_sort(TSRMLS_D)
+{
+	zend_function *fe;
+	if(zend_hash_minmax(EG(function_table), fname_compare,
+		0, (void **) == SUCCESS))
+	{
+		php_printf("Min function: %s\n", fe->common.function_name);
+	}
+
+	if(zend_hash_minmax(EG(function_table), fname_compare,
+		1, (void **)&fe) == SUCCESS)
+	{
+		php_printf("Max function: %s\n", fe->common.function_name);
+	}
+}
+
+译注:	原书中的实例在译者的环境(php-5.4.9)中不能运行,经过跟踪检查,发现
+zend_hash_minmax传递的fname_compare的两个参数类型是Bucket **,而非这里的
+zend_function *,为了避免读者疑惑,下面给出译者修改后的实例参考.
+
+static int sample_fname_compare(Bucket **p1, Bucket **p2 TSRMLS_DC)
+{
+	zend_function *zf1,zf2;
+	zf1 = (zend_function)(*p1)->pData;
+	zf2 = (zend_function)(*p2)->pData;
+	return strcasecmp(zf1->common.function_name,  zf2->common.function_name);
+}
+
+PHP_FUNCTION(sample_function_sort)
+{
+	zend_function *zf;
+	if(zend_hash_minmax(EG(function_table), (compare_func_t)sample_fname_compare, 0, (void **)&zf TSRMLS_CC) 
+		== SUCCESS)
+	{
+		php_printf("Min function: %s\n", zf->common.function_name);
+	}
+
+	if(zend_hash_minmax(EG(function_table), (compare_func_t)sample_fname_compare, 
+			1, (void **)&zf TSRMLS_CC)==SUCCESS)
+	{
+		php_printf("Max function: %s\n", zf->common.function_name);
+	}
+	RETURN_TRUE;
+}
+	哈希比较函数还会用于zend_hash_compare()中,它会评估两个HashTable的每个元素比较,
+如果hta大于htb,返回1，如果htb大于hta,返回1,如果hta大于hta,返回-1,如果两者相等,返回
+0.
+int zend_hash_compare(HashTable *hta, HashTable *htb,
+	compare_func_, zend_bool ordered TSRMLS_DC);
+
+-----------------------------------------------------
+zval *数组API
+-------------
+简单的数组创建
+
+	为了辅助这些常见的HashTable的创建和操作,PHP API暴露了一些简单的宏和辅助
+函数,我们从array_init(zval *arrval)开始看.这个函数分配了一个HashTable,以适
+用于用户空间变量哈希的参数调用zend_hash_init();这将创建的结构设置到zval *
+中.
+	这种不需要特殊的析构函数,因为在zval最后一个refcount失去后,通过调用
+zval_dtor()/zval_ptr_dtor(),引擎会自动的调用zend_hash_destory()和FREE_HASHTABLE().
+	联合array_init()方法和第6章"返回值"中已经学习的从函数返回值得技术:
+PHP_FUNCTION(sample_array)
+{
+	array_init(return_value);
+}
+	因为return_value是一个预分配的zval *,因此不需要在它上面做其他工作.并且由于它
+唯一的引用就是你的函数返回,因此不要担心它的清理.
+--------------------------------------------------------------------------------
+简单的数组构造
+	
+	和所有的HashTable一样,你需要迭代增加元素来构造数组.由于用户空间变量的特殊性,
+你需要回到你已经知道的C语言中的基础数据类型.中3种格式的函数: add_assoc_*(),
+add_index_*(),add_next_index_*(),对于已知的ZVAL_*(),RETVAL_*(),RETURN_*()宏所支
+持的每种数据类型,都有对应的这个3各种格式的函数.例如:
+
+add_assoc_long(zval *arrval, char *key, long lval);
+add_index_long(zval *arrval, ulong idx, long lval);
+add_next_index_long(zval *arrval, long lval);
+
+	每种情况中,数组zval *都是第一个参数,接着是关联key名或树枝下标,或者对于next_index
+变种来说,两者都不需要.最后是数据元素自身,最终它将被包装为一个新分配的zval *,并使用
+zend_hash_update(),zend_hash_index_update(),zend_hash_next_index_insert()增加到数组中.
+
+	add_assoc_*()函数变种以及他们的函数原型如下.其他两种格式则将assoc替换为index或
+next_index,并对应调转key/index参数即可.
+
+add_assoc_null(zval *aval, char *key);
+add_assoc_bool(zval *aval, zend_bool bval);
+add_assoc_double(zval *aval, char *key, double dval);
+add_assoc_string(zval *aval, char *key, double dval);
+add_assoc_string(zval *aval, char *key, char *strval, int dup, double dval);
+add_assoc_zval(zval *aval, char *key, zval *value);
+	
+	这些函数的最后一个版本允许你自己准备一个任意类型(包括资源,对象,数组)的zval,
+将它增加到数组中.现在尝试在你的sample_array()函数中做一些额外的工作.
+
+PHP_FUNCTION(sample_array)
+{
+	zval *subarray;
+
+	array_init(return_value);
+	/* 增加一些标量值 */
+
+	add_assoc_long(return_value, "life", 42);
+	add_index_bool(return_value, 123, 1);
+	add_next_index_double(return_value, 3.1415);
+	
+	/* 增加一个静态字符串,由php去复制 */
+	add_next_index_string(return_value, "Foo", 1);
+	/* 手动复制的字符串 */
+	add_next_index_string(return_value, estrdup("Bar"), 0);
+
+	/* 创建一个子数组 */
+	MAKE_STD_ZVAL(subarray);
+	array_init(subarray);
+
+	/* 增加一些数值 */
+	add_next_index_long(subarray, 1);
+	add_next_index_long(subarray, 20);
+	add_next_index_long(subarray, 300);
+
+	/* 将子数组放入到父数组中 */
+	add_index_zval(return_value, 444, subarray);
+}
+
+
+
