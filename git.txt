@@ -25,3 +25,5 @@ git checkout master 切换分支
 
 git push origin master 把本地提交到github上
 git fetch origin master 更新github在本地文件上了
+
+git merge origin/master 把更新的内容合并到本地分支
