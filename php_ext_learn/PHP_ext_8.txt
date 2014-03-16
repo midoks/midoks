@@ -1,0 +1,219 @@
+使用实例工作
+
+宏				含义
+
+Z_OBJPROP(zv)	获取内建属性HashTable *
+Z_OBJCE(zv)		获取关联的zend_class_entry *
+
+--------------------------------------------------------------------------
+创建实例
+
+	要注意,object_init_ext函数并不会调用构造器.当在内部函数中实例化对象时,
+构造器必须手动调用.下面的过程函数重演了new关键字的功能逻辑:
+	
+PHP_FUNCTION(sample2_new)
+{
+	int argc = ZEND_NUM_ARGS();
+	zval ***argv = safe_emalloc(sizeof(zval ***), argc, 0);
+
+	zend_class_entry *ce;
+
+	if(argc ==0 ||
+		zend_get_parameters_array_ex(argc, argv) == FAILURE){
+		efree(argv);
+		WRONG_PARM_COUNT;
+	}
+	
+	/* 第一个参数是类名 */
+	SEPARATE_ZVAL(argv[0]);
+	convert_to_string(*argv[0]);
+
+	/* 类名存储为小写 */
+	php_strtolower(Z_STRVAL_PP(argv[0]), Z_STRLEN_PP(argv[0]));
+
+	if(zend_hash_find(EG(class_table),
+			Z_STRVAL_PP(argv[0]), Z_STRLEN_PP(argv[0]+1), (void **)&ce) == FAILURE)
+	{
+		php_error_docref(NULL TSRMLS_CC, E_WARNING,
+			"Class %s does not exist.",
+			Z_STRVAL_PP(argv[0]));
+
+		zval_ptr_dtor(argv[0]);
+		efree(argv);
+		RETURN_FALSE;
+	
+	}
+
+	object_init_ex(return_value, ce);
+
+	/* 如果有构造器则调用, 额外的参数将传递给构造器 */
+	
+	if(zend_hash_exists(&ce->function_table,
+		Z_STRVAL_PP(arg[0]), Z_STRLEN_PP(arg[0]+1)))
+	{
+		zval *ctor, *dummy = NULL;
+		MAKE_STD_ZVAL(ctor);
+		array_init(ctor);
+		zval_add_ref(argv[0]);
+		add_next_index_zval(ctor, *argv[0]);
+		zval_add_ref(argv[0]);
+		add_next_index_zval(ctor, *argv[0]);
+
+		if(call_user_function_ex(&ce->function_table, NULL, ctor,
+				&dummy,	/* 不关心返回值 */
+				argc - 1, argv + 1, /参数/
+				0, NULL TSRLS_CC) == FAULURE){
+			php_error_docref(NULL TSRMLS_CC, E_WARNING,
+				"Unable to call constructor");		
+				
+		}
+
+		if(dummy){
+			zval_ptr_dtor(&dummy);
+		}
+
+		zval_ptr_dtor(&ctor);
+	}
+
+	zval_ptr_dtor(argv[0]);
+	efree(argv);
+}
+
+	不要忘了在php_sample2_functions中增加一个引用.它是你的扩展的过程函数列表,而不是类
+方法的列表.为了使用php_strtorlower()函数,还需要增加#include "ext/standard/php_string.h"
+	这个函数是目前你实现的最复杂的一个,其中有几个全新的特性.首先就是SEPARATE_ZVAL(),
+实际上它的功能已经实现过很多次,利用zval_copy_ctor()赋值值到一个临时的结构体,避免修改原
+始的内容.不过它是一个宏版本的封装.
+	php_strtolower()用于将类名装换为小写,这样做是为了达到php类名和函数名不区分大小写的目的.
+这只是附录B中列出的众多PHPAPI工具函数的其中一个.
+	EG(class_table)是一个全局变量,所有的zend_class_entry定义都注册到它里面.要注意的是在
+ZE1(php4)中这个HashTable存储了一级间访问的zend_class_entry *结构体.而ZE2(php5)中,它被储存为
+两级间访.这应该不会是一个问题,因为对这个HashTable的直接访问并不常见,但知道这一点总归是有
+好处的.
+	call_user_function_ex()是你将在第20章"高级嵌入式"中看到的ZENDAPI调用的一部分.这里你将
+从zend_get_parameters_ex()接收到zval ** 参数栈第一个元素拿走,这样做就是为了原封不动的将
+剩余的参数传递给构造器.
+	note:原著中的代码在译者的环境(php-5.4.5)中不能运行,需要将zend_class_entry *ce修改为二
+级间访.下面给出译者测试通过的代码.
+
+PHP_FUNCTION(sample_new)
+{
+	int argc = ZEND_NUM_ARGS();
+	zal **argv = safe_emalloc(sizeof(zval **), argc, 0);
+
+	zend_class_entry **ce;	/* 译注:这里的译者的环境(php-5.4.9)是二级间访 */
+
+	/* 数组方式读取所有传入参数 */
+	if( argc = 0 ||
+		zend_get_parameters_array_ex(argc, argv) == FAILURE)
+	{
+		efree(argv);
+		WRONG_PARAM_COUNT;
+	}
+
+	/* 隔离第一个参数(隔离为了使下面的类型装换不影响原始数据) */
+	SEPARATE_ZVAL(argv[0]);
+
+	/* 将第一个参数转换为字符串类型,并转为小写(因为php的类名是不区分大小写的) */
+	convert_to_string(*arg[0]);
+
+	php_strtolower(Z_STRVAL_PP(argv[0], Z_STRLEN_PP(argv[0])));
+
+	/* 在类的HashTable中查找提供的类是否存在,如果存在,ce中就得到了对应的zend_class_entry* */
+	if(zend_hash_find(EG(class_table), Z_STRVAL_PP(argv[0]), 
+		Z_STRLEN_PP(argv[0]+1), (void **)&ce) == FAILURE){
+
+		php_error_docref(NULL TSRMLS_CC, E_WARINING, "Class %s does not exists.",
+			Z_STRVAL_PP(argv[0]));
+			zval_ptr_dtor(argv[0]);
+			efree(argv);
+			RETURN_FALSE;
+	}
+
+	/* 将返回值初始化为查找的类的对象 */
+	object_init_ex(return_value, *ce);
+
+	/* 检查类是否有构造器 */
+	if(zend_hash_exists(&(*ce)->function_table, Z_STRVAL_PP(argv[0]), 
+		Z_STRLEN_PP(argv[0]), Z_STRLEN_PP(argv[0])+1))
+	{
+		zval *ctor, *dummy = NULL;
+
+		/**
+		 * 将ctor够着为一个数组,对应的用户空间形式为: array(argv[0], argv[0]);
+		 * 实际上对应于用户空间调用类的静态方法时$function的参数形式:
+		 * array(类名,方法名);
+		 */
+		 MAKE_STD_ZVAL(ctor);
+		 array_init(ctor);
+		 zval_add_ref(argv[0]);
+		 add_next_index_zval(ctor, *argv[0]);
+		 zval_add_ref(argv[0]);
+		 add_next_index_zval(ctor, *argv[0]);
+		 
+		 /* 调用函数 */
+		if(call_user_function_ex(&(*ce)->function_table, NULL, ctor, &dummy, 
+			argc-1, argv+1, 0, NULL TSRMLSS_CC) == FAILURE)
+		{
+			php_error_docref(NULL TSRMLS_CC, E_WARINING, "Unable to call constructor");	
+		}
+
+		/* 如果有返回值直接析构丢弃 */
+		if(dummy)
+		{
+			zval_ptr_dtor(&dummy);
+		}
+
+		/* 析构临时使用(用描述所调用方法名)的数组 */
+		zval_ptr_dtor(&ctor);
+	}
+
+	/* 析构临时隔离出来的第一各参数(类名) */
+
+	zval_ptr_dtor(argv[0]);
+
+	/* 释放实参列表空间 */
+	efree(argv);
+}
+
+-------------------------------------------------------------------------------
+接受实例
+
+	有时你的函数或方法需要接受用户空间的对象参数.对于这种目的,zend_parse_parameters()
+提供了两种格式的修饰符.第一种是o(小写字母o),它将验证传递的参数是否是对象,并将它设置到
+传递zval **中.下面是这种方式的一个简单的用户空间函数实例,它返回传入对象的类名.
+PHP_FUNCITON(sample_class_getname)
+{
+	zval *object;
+	zend_class_entry *objce;
+
+	if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "o",
+		&objvar) == FAILURE)
+	{
+		RETURN_NULL();
+	}
+	
+	objce = Z_OBJCE_P(objvar);
+	RETURN_STRINGL(objce->name, objce->name_length, 1);
+}
+	
+	第二种修饰是O(大写字母O),它不仅允许zend_parse_parameters()验证zval *的类型,
+还可以验证所传递对象的类.要做到这一点,就需要传递一个zval **容易以及一个
+zend_class_entry *用来验证,比如下面的实现就期望传入的是Sample2_FirstClass类的
+实例:
+
+PHP_FUNCTION(sample2_reload)
+{
+	zval *objvar;
+	if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "O",
+		&objvar, php_sample2_firstclass_entry) == FAILURE)
+	{
+		RETURN_NULL();
+	}
+
+	/* 调用假想的"reload"函数 */
+	RETURN_BOOL(php_sample2_fc_reload(objvar TSRMLS_CC));
+}
+
+
+

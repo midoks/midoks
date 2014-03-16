@@ -1,0 +1,93 @@
+资源数据类型
+	迄今为止,你都是工作在非常基础的用户空间数据类型上,字符串,数值,TRUE/FALSE
+等值.即使上一张你已经开始接触数组了,但也只是收集这些基础类型的数组.
+---------------------------------------------------------------------
+复杂的结构体
+	现实世界中,你通常需要在更加复杂的数据集合下工作,通常涉及到晦涩的结构
+体指针.一个常见的晦涩的结构体指针实例就是stdio的文件描述符,即使是在C语言
+中也是一个指针.
+
+#include <stdio.h>
+int main(void)
+{
+	FILE *fd;
+	fd = fopen("/home/jdoe/.plan", "r");
+	fclose(fd);
+	return 0;
+}
+
+	stdio的文件描述符合其他多数文件描述符一致,都像是一个书签.你扩展的调用
+应用仅需要在feof(), fread(), fwrite(). fclose()这样的实现函数调用时传递这
+个值.有时,这个书签必须是用户空间代码可访问的;因此,就需要在标准的PHP变量或
+者说zval *中表示它的方法.
+	这里就需要一种新的数据类型.RESOURCE数据类型在zval *中储存一个简单的整
+型值,使用作为以注册资源的索引用来查找.资源条目包含了资源索引表示内部数据类
+型,以及存储资源数据的指针等信息.
+---------------------------------------------------------------------------
+定义资源类型
+	
+	为了使注册的资源条目所包含的资源信息更加明确,需要定义资源的类型.首先在你的
+sample.c中已有的函数实现下增加下面的代码片段
+
+static int le_sample_descriptor;
+
+PHP_MINIT_FUNCTION(sample)
+{
+	le_sample_descriptor = zend_register_list_destructors_ex(
+			NULL, NULL, PHP_SAMPLE_DESCRIPTOR_RES_NAME,
+			module_number);
+	return SUCCESS;
+}
+	
+	接下来,滚动到你的代码文件末尾,修改sample_module_entry结构体,将NULL
+/* MINIT */一行替换下面的内容.就像你给这个结构中增加函数列表结构一样,
+你需要的确定确认这一行末尾保留一个逗号.
+
+PHP_MINIT(sample), /* MINIT */
+	
+	最后,你需要在php_sample.h中定义PHP_SAMPLE_DESCRIPTOR_RES_NAME,将下面
+的代码放到你的其他商量定义下面:
+
+#define PHP_SAMPLE_DESCRIPTOR_RES_NAME "File Descriptor"
+
+	这里需要知道的非常重要的一点是MINIT函数在你的扩展第一次加载时执行一次,
+它会在所有请求到达之前被执行,这里我们利用这个机会注册了析构函数,不过他们是
+NULL值,不过在通过一个唯一整型ID足以知道一个资源类型时,你很快就会修改它.
+
+--------------------------------------------------------------------------
+注册资源
+	现在引擎已经知道了你要储存一些资源数据,是时候给用户空间的代码一种方式去
+产生实际的资源了,要做到这一点,需要如下重新实现fopen()命令:
+	
+PHP_FUNCTION(sample_fopen)
+{
+	FILE *fp;
+	char *filename, *mode;
+	int filename_len, mode_len;
+
+	if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "ss", 
+			&filenmae, &filename_len, &mode, &mode_len) == FAILURE){
+		RETURN_NULL();
+	}
+
+	if(!filename_len || !mode_len)
+	{
+		php_error_docref(NULL TSRMLS_CC, E_WARING,
+				"Invalid filename or mode length");
+		RETURN_FALSE;
+	}
+
+	fp = fopen(filename, mode);
+	if(!fp)
+	{
+		php_error_docref(NULL TSRMLS_CC, E_WARNING,
+			"Unable to open %s using mode %s",
+			filename, mode);
+
+		RETURN_FALSE;
+	}
+
+	ZEND_REGISTER_RESOURCE(return_value, fp,
+		le_sampel_descriptor);
+}
+

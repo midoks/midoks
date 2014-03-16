@@ -1,0 +1,154 @@
+实现类
+
+定义类条目
+
+<?php
+class Sample2_FirstClass{
+}
+?>
+zend_class_entry *php_sample2_firstclass_entry;
+
+PHP_MINIT_FUNCTION(sample2)
+{
+	zend_class_entry ce; /* 临时变量 */
+
+	/* 注册类 */
+	INIT_CLASS_ENTRY(ce, "Sample2_FirstClass", NULL);
+	
+	php_sample2_firstclass_entry = 
+	zend_register_internal_class(&ce TSRMLS_CC);
+	return SUCCESS;
+}
+	构建这个扩展,测试get_decalared_classes(),将会看到Sample2_FirstClass现在
+在用用户空间可用了.
+---------------------------------------------------------------------------
+定义方法的实现
+	此刻,你实现的只是一个stdClass,当然它是可用的.但实际上你是希望你的你的类
+可以做一些事情的.
+	要达成这个目的,你就需要回到第五章学到另外一个知识了.将传递给
+INIT_CLASS_ENTRY()的NULL替换为php_sample2_firstclass_functions,并直接在MINIT
+函数上面如下定义这个结构:
+
+static function_entry php_sample2_firstclass_functions[] = {
+	{NULL, NULL, NULL}
+},
+	看起来熟悉吗?当然.这和你原来定义过程函数的结构相同.甚至,设置这个结构的方式
+也很相似:
+
+PHP_NAMED_FE(method1, PHP_FN(Sample2_FirstClass_method1), NULL);
+	当然,你也可以选用PHP_FE(method1, NULL).不过回顾一下第五章,这样做期望找到
+的函数实现的名字是zif_method1,它可能潜在的回合其他的method1()实现冲突.为了函数
+的名字空间安全,我们将类名作为方法名的前缀.
+	PHP_FALIAS(method1, Sample2_FirstClass_method1, NULL)的格式也是可以的;但他
+有点不直观,你以后回过头来看代码的时候可能回产生疑问"为什么当时没有使用PHP_FE()?"
+	现在,你已经将一个函数列表附加到类的定义上了,是时候定义一些方法了.在
+php_sample2_firstclass_functions结构上面创建下面的函数:
+
+PHP_FUNCTION(Sample2_FirstClass_countProps)
+{
+	RETURN_LONG(zend_hash_num_elements(Z_OBJPROP(getThis())));
+}
+	响应的,在它的函数列表中增加一条PHP_NAMED_FE()条目:
+
+static function_entry php_sample2_firstclass_functions[] = {
+	PHP_NAMED_FE(countprops,
+		PHP_FN(Sample_FirstClass_countProps), NULL)
+	{NULL, NULL, NULL}
+};
+
+	要注意,这里暴露给用户空间的函数名是全部小写的.为了确保方法和函数名
+都是大小写不敏感的,就要求内部函数给出全部小写的名字.
+	这里唯一的新元素就是getThis(),在所有的php版本中,它都会被解析为一个
+宏,暂开this_ptr. this_ptr从本质上来说就和用户空间对象方法中的$this含义
+相同.如果没有可用的对象实例,比如方法被静态化调用,则getThis()返回NULL.
+
+	对象方法的数据返回语义和过程函数一致,参数接受以及arg_info都是同一套
+东西.
+
+PHP_FUNCTION(Sample2_FirstClass_sayHello)
+{
+	char *name;
+	int name_len;
+
+	if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s",
+		&name, &name_len) == FAILURE)
+	{
+		RETURN_NULL;		
+	}
+
+	php_printf("Hello");
+
+	PHPWRITE(name, name_len);
+	php_printf("!\n You called an object method\n");
+	RETURN_TRUE;
+}
+---------------------------------------------------------------------------------
+构造器
+	
+	你的类构造器可以和其他的普通类方法一样实现,它的命名遵循也遵循相同的规则.特别之
+处在于需要将构造器命名为类型.其他两个ZE1魔术方法_sleep()和__wakeup()也可以以这中方式
+实现.
+
+继承
+	php4中,内部对象之间的继承是不完善的,最好避免使用.如果你确实必须继承其他对象,需要
+复制下面的ZE1代码:
+
+void php_sample2_inherit_from_class(zend_class_entry *ce,
+		zend_class_entry *parent_ce){
+
+	zend_hash_merge(&ce->function_table, &parent_ce->function_table,
+			(void (*) (void *)function_add_ref),
+			NULL,sizeof(zval *), 0)
+	{
+		ce->parent = parent_ce;
+	}
+
+	if(!ce->handle_propery_get){
+		ce->handle_property_get = parent_ce->handle_property_get;
+	}
+
+	if(!ce->handle_property_set){
+		ce->handle_property_set = parent_ce->handle_property_set;
+	}
+
+	if(!ce->handle_function_call)
+	{
+		ce->handle_function_call = parent_ce->handle_function_call;
+	}
+
+	if(!zend_hash_exists(&ce->function_table,
+		ce->name, ce->name_length +1))
+	{
+		zend_function *fe;
+		if(zend_hash_find(&parent_ce->function_table,
+			parent_ce->name, parent_ce->name_length +1,
+			(void **)fe) == SUCCESS)
+		{
+			zend_hash_update(&ce->function_table,
+				ce->name, ce->name_length+1,fe, sizeof(zend_function),
+				NULL);
+
+			function_add_ref(fe);
+		}
+	}
+}
+
+	定义这样一个函数,你就可以在MINIT中zend_register_internal_class下面对其进行
+调用:
+
+INIT_CLASS_ENTRY(ce, "Sample2_FirstClass", NULL);
+/* 假定php_saple2_ancestor是一个已经注册的zend_class_entry */
+
+php_sample2_firstclass_entry = 
+	zend_register_internal_class(&ce TSRMLS_CC);
+
+php_sample2_inherit_from_class(php_sample2_firstclass_entry,
+	php_sample2_ancestor);
+	
+	尽管这种方式的继承可以工作,但还是应该避免ZE1中的继承,因为它并没有
+设计内部对象的继承处理,对于php中对数OOP实践,ZE2和它修订的对象模型是健
+壮的,鼓励所有的OOP相关人物都直接使用它来处理.
+	
+
+
+------
