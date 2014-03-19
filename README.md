@@ -22,3 +22,5 @@
 	- 查看当前的mysql运行状态
 - MemCacheStuts.php
 	- 查看Memcache在线状态
+- DelBom.php
+	- 删除文件Bom信息
