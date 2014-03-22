@@ -50,7 +50,7 @@ class db{
 	}
 }
 //获取系统的运行变量
-if($_POST['type'] == 'variable'){
+if(isset($_POST['type']) && $_POST['type'] == 'variable'){
 	$tmp = $_POST;
 	$db = new db($tmp['localhost'],$tmp['port'],$tmp['user'],$tmp['pwd']);
 	//$db = new db('127.0.0.1', '3306', 'root', '');//localhost
@@ -60,7 +60,7 @@ if($_POST['type'] == 'variable'){
 	exit;
 }
 //获取系统的运行的状态
-if($_POST['type'] == 'status'){
+if(isset($_POST['type']) && $_POST['type'] == 'status'){
 	$tmp = $_POST;
 	$db = new db($tmp['localhost'],$tmp['port'],$tmp['user'],$tmp['pwd']);
 	//$db = new db('127.0.0.1', '3306', 'root', '');//localhost
