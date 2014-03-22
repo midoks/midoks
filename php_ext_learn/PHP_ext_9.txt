@@ -1,0 +1,137 @@
+访问属性
+
+	你已经看到了,类方法可以同过getThis()获取当前对象实例.将这个宏的结果或
+其他包含对象实例的zval *与Z_OBJPROP_P()宏组合,得到HashTable *就包含了该对
+象的所有属性.
+	对象的属性列表是一个包含zval *的HashTable *,它只是另外一种放在特殊位置
+的用户空间变量列表.和使用zend_hash_find(EG(active_symbol_table),...)从当前
+作用域获取变量一样,你也可以使用第8章"在数组和HashTable上工作"中学习的
+zend_hash-API去获取或设置对象的属性
+	假如,假设在变量rcvdclass这个zval *中包含的是Sample2_FirstClass的实例,
+下面的代码块就可以从它的标准属性HashTable中取到属性foo.
+
+zval **fooval;
+if(zend_hash_find(Z_OBJPROP_P(rcvdclass),
+	"foo", sizeof("foo"), (void **)&fooval) == FAILURE)
+{
+	/* $rcvdclass->foo doesn't exist */
+	return ;
+}
+	要向属性表中增加元素,则是这个过程的逆向过程,调用
+zend_hash_add()去增加元素,或者也可以使用将第8章介绍数据时
+介绍add_assoc_*()族函数的assoc替换为property来处理对象.
+	相面的果照器函数为Sample2_FirstClass的实例提供了一些
+预先设置的默认属性:
+
+PHP_NAME_FUNCTION(php_sample2_fc_ctor)
+{
+	/* 为了简洁,同时演示函数名是任意的,这里实现的函数名并不是类名 */
+	zval *objvar = getThis();
+
+	if(!objvar){
+		php_error_docref(NULL TSRMLS_CC, E_WARNING,
+			"Constructor called statically");
+		RETURN_FALSE;
+	}
+
+	add_property_long(objvar, "life", 42);
+	add_property_double(objvar, "pi", 3.1415926535);
+}
+
+	现在可以通过php_sample2_firstclass_function列表将它连接对象
+的构造器:
+
+PHP_NAME_FE(sample2_firstclass, php_sample2_fc_ctor, NULL)
+
+	译注:由于前面的sample_new()工厂函数call_user_function_ex()调用构造器时
+使用的是静态方法的调用格式,因此,如果是使用了这个工厂函数触发的构造器调用,
+getThis()就不会有期望的结果.因此译者对例子进行了响应的修改,读者如果在这块
+遇到问题可以参考译者的代码.
+
+PHP_FUNCTION(sample_new)
+{
+	int argc = ZEND_NUM_ARGS();
+	zval ***argv = safe_emalloc(sizeof(zval **), argc, 0);
+	zend_class_entry **ce; /* 译注:这里在译者的环境(php-5.4.9)是二级间访 */
+
+	/* 数组方式读取所有传入参数 */
+	if(argc == 0 ||
+		zend_get_parameters_array_ex(argc, argv) == FAILURE)
+	{
+		efree(argv);
+		WRONG_PARAM_COUNT;
+	}
+
+	/* 隔离第一个参数(隔离为了使下面的类型装换不影响原始数据) */
+
+	SEPARATE_ZVAL(argv[0]);
+
+	/* 将第一个参数转换为字符串类型,并转为小写(因为php的类名是不区分大小的) */
+	php_strtolower(Z_STRVAL_PP(argv[0], Z_STRLEN_PP(argv[0])));
+
+	/* 在类的HashTable中查找提供的类是否存在,如果存在,ce中就得到了对应的zend_class_entry* */
+	if(zend_hash_find(EG(class_table), Z_STRVAL_PP(argv[0], 
+		Z_STRLEN_PP(argv[0])+1, (void **)&ce))==FAILURE)
+	{
+		php_error_docref(NULL TSRMLS_CC, E_WARINING, "Class %s does not exist.",
+			ZSTRVAL_PP(argv[0]));
+		zval_ptr_dtor(argv[0]);
+		efree(argv);
+		RETURN_FALSE;
+	}
+
+	/* 将返回值初始化为查找的类的对象 */
+
+	object_init_ex(return_value, *ce);
+
+	/* 检查类是否有构造器 */
+
+	if(zend_hash_exists(&(*ce)>function_table, Z_STRVAL_PP(argv[0]), Z_STRLEN_PP(argv[0]) + 1))
+	{
+#define DYNAMIC_CONSTRUCTOR
+#ifndef DYNAMIC_CONSTRUCTOR
+		zval *ctor;
+#endif
+		zval *dummy = NULL;
+ifndef DYNAMIC_CONSTRUCTOR
+		/**
+		 * 将ctor构造为一个数组,对应的用户空间形式为: array(argv[0], argv[0]);
+		 * 实际上对应于用户空间调用类的静态方法是$funcname的参数形式:
+		 * array(类名, 方法名);
+		 */
+
+		MAKE_STD_ZVAL(ctor);
+		array_init(ctor);
+		zval_add_ref(argv[0]);
+		add_next_index_zval(ctor, *argv[0]);
+		zval_add_ref(argv[0]);
+		add_next_index_zval(ctor, *argv[0]);
+#endif
+		/* 调用函数 */
+		if(call_user_function_ex(&(*ce)->function_table,
+#ifndef DYNAMIC_CONSTRUCTOR
+			NULL, ctor,
+#else
+			&return_value, *argv[0],
+#endif
+			&dummy, argc-1,argv+1, 0, NULL TSRMLS_CC) == FAILURE)
+		{
+			php_error_docref(NULL TSRMLS_CC, E_WARINING, "Unable to call constructor");
+		}
+
+		/* 如果有返回值直接析构丢弃 */
+		if(dummy){
+			zval_ptr_dtor(&dummy);
+		}
+
+#ifndef DYNAMIC_CONSTRUCTOR
+		/* 析构掉临时使用(用描述所调用方法名)的数组 */
+		zval_ptr_dtor(&ctor);
+#endif
+	}
+
+	/* 析构临时隔离出来的第一个参数(类名) */
+	zval_ptr_dtor(argv[0]);
+	/* 释放实例参数列表空间 */
+	efree(argv);
+}

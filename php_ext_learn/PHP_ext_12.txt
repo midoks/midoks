@@ -1,0 +1,485 @@
+进化史
+	在php5对象变量中有两个关键的组件.第一个是一个数值的标识,它和第9章"资
+源数据类型"中介绍的数值资源ID非常相似,扮演了一个用来在对应表中查找对象实
+例的key的角色.在这个实例表中的元素包含了到zend_class_entry()的引用以及内
+部的属性表.
+	第二个元素是对象变量的句柄表,使用它可以自定义zend引擎对实例的处理方
+式.在本章后面你将会看到这个句柄表.
+
+zend_class_entry
+	类条目是你在用户空间定义的类的内部表示.正如你在前一章所见,这个结构通过
+调用INIT_CLASS_ENTRY()初始化,参数为类名和它的函数表.接着在MINIT阶段使用
+zend_register_internal_class()注册.
+
+zend_class_entry *php_sample_sc_entry;
+
+#define PHP_SAMPLES_SC_NAME "Sample3_SecondClass"
+
+static function_entry php_sample3_sc_function[] = {
+	{NULL, NULL, NULL}
+}
+
+PHP_MINIT_FUNCTION(sample3)
+{
+	zend_class_entry ce;
+	INIT_CLASS_ENTRY(ce, PHP_SAMPLE3_SC_NAME, php_sample_sc_functions);
+
+	php_sample3_sc_entry  = 
+		zend_register_internal_class(&ce TSRMLS_CC);
+
+	return SUCCESS;
+}
+
+------------------------------------------------------------------------
+方法
+	如果你已经阅读了上一章,你可能就会"到现在为止看起来几乎一样啊?",到现在为
+止,你是对的.现在我们开始定义一些对象方法.你将开始看到一些非常确定的并且大受
+欢迎的不同.
+PHP_METHOD(Sample3_SecondClass, helloworld)
+{
+	php_printf("Hello World\n");
+}
+
+	在Zend引擎2中引入了PHP_METHOD()宏,它是对PHP_FUNCTION()宏的封装,将类名和
+方法名联合起来,不用像php4中手动定义.通过使用这个宏,在扩展你的代码和其他维护
+者的代码和名字空间解析规范就保持一致了.
+
+
+定义
+	定义一个方法的实现,和其他函数一样,只不过是将它连接到类的函数表中.除了
+用于实现PHP_METHOD()宏,还有一些新的宏可以用在函数列表的定义中.
+	PHP_ME(classname, methodname, arg_info, flags)
+
+	PHP_ME()相比于第五章"你的第一个扩展"中介绍的PHP_FE()宏,增加了一个
+classname参数,以及末尾的一个flags参数(用来提供public,protected,private,
+static等访问控制,以及abstract和其他一些选项).比如要定义helloworld方法,
+就可以如下定义:
+
+PHP_ME(Sample3_SecondClass, helloworld, NULL, ZEND_ACC_PUBLIC);
+
+PHP_MALIAS(classname, name, alias, arg_info, flags);
+	和PHP_FALIAS()宏很像,这个宏允许你给alias参数描述的方法(同一个类的)实
+现提供一个name指定的新名字.例如,你要复制的helloWorld方法则可以如下定义
+
+PHP_MALIAS(Sample3_SecondClass, sayHi, helloworld,
+	NULL, ZEND_ACC_PUBLIC);
+
+PHP_ABSTRACT_ME(classname, methodname, arg_info);
+	
+	内部类中的抽象方法很想用户空间的抽象方法.在父类中它只是一个占位符,
+期望它的子类提供真正的实现.你将在结构一节中使用这个宏,接口是一个特殊的
+class_entry().
+
+	PHP_ME_MAPPING(methodname, functionname, arg_info)
+	最后一种方法定义的宏是针对同时暴露OOP和非OOP接口的扩展(比如mysqli既有
+过程化的mysqli_query(),也有面向对象的MySQLite::query(),它们都使用了相同
+的实现.)的.假定你已经有了一个过程化函数,比如第五章写的sample_hello_world(),
+你就可以使用这个宏一下面的方式将它附加为一个类的方法(要注意,映射的方法总是
+public,非static,非final的):
+
+PHP_ME_MAPPING(hello, sample_hello_world, NULL)
+
+	现在为止,你看到的方法定义都使用了ZEND_ACC_PUBLIC作为它的flags参数.实际
+上,这个值可以是下面两张表的任意值得位域运算组合,并且它还可以和本章后面"特
+殊方法"一节要介绍的一个特殊方法标记使用位域运算组合.
+
+类型标记								含义
+
+ZEND_ACC_STATIC							方法可以静态调用.实际上,这就表示,方法如果通过实例
+										调用,$this或者更确切的说this_ptr,并不会被设置到实
+										例作用域中
+
+ZEND_ACC_ABSTRACT						方法并不是真正的实现.当前方法应该在被直接调用之前
+										被之类覆写
+
+ZEND_ACC_FINAL							方法不能被子类覆写
+
+-----------------------------------------------------------------------------------------
+可见性标记								含义
+
+ZEND_ACC_PUBLIC 						可以在对象外任何作用域调用.这和PHP4方法的可见性是
+										一样的
+
+ZEND_ACC_PROTECTED						只能在类中或者他的子类中调用
+
+ZEND_ACC_PRIVATE 						只能在类中调用
+
+	比如,由于你前面定义的Sample3_SecondClass::helloworld()方法不需要
+对象实例,你就可以将它的定义从简单的ZEND_ACC_PUBLIC修改为
+ZEND_ACC_PUBLIC|ZEND_ACC_STATIC,这样引擎知道了就不会去提供(实例)了.
+
+魔术方法
+	除了ZE1的魔术方法外,ZE2新增了很多魔术方法,如下表(或者可以在
+http://www.php.net/language.oop.magic中找到)
+
+方法							用法
+__construct()					可选的自动调用的对象构造器(之前定
+								义的是和类名一致的方法).如果
+								__construct()和classname()两种实现
+								都存在,在实例化的过程中,将优化调用
+								__construct()
+
+__destruct()					当实例离开作用域,或者请求整个终止,都
+								将导致隐式的调用实例__destruct()方法
+								去处理一些清理工作,比如关闭文件或网络
+								句柄.
+
+__clone()						默认情况下,所有的实例都是真正的引用传值.
+								在PHP5中,要想真正的拷贝一个对象实例,就要
+								使用clone关键字.当在一个对象实例上调用
+								clone关键字时,__clone()方法就会隐含的被
+								执行,它允许对象去复制一些需要的内部资源数
+								据.
+
+__toString()					在用文本表示一个对象时,不如当直接在对象上使用
+								echo或print()语句时,__toString()方法将自动的被
+								引擎调用.类如果实现这个魔术方法,应该返回一个包
+								含描述对象的当前状态的字符串.
+
+__get($var)						如果脚本中请求一个对象不可见的属性(不存在或者由
+								于访问控制导致不可见)时,__get()魔术方法将被调用,
+								唯一的参数是所请求的属性名.实现可以使用它自己的
+								内部逻辑去确定最合理的返回值返回.
+
+__set($var, $value);			和__get()很像,__set()提供了与之相反的能力,它用来
+								处理复制给对象的不可见属性时的逻辑.__set()的实现
+								可以选择隐式的在标准属性表中创建这些变量,以其他存
+								储机制设置值,后者直接抛出错误并丢弃值.
+
+
+__call($fname, $args);			调用对象的未定义方法时可以通过使用__call()魔术方法
+								实现漂亮处理,这个方法接受两个参数:被调用的方法名,
+								包含调用时传递的所有实参的数值索引的数组.
+
+__isset($varname);				php5.1.0之后,isset($obj->prop)的调用不仅是检查$obj
+								中是否有prop这个属性,它还会调用$obj中定义的__isset()
+								方法,动态的评估尝试使用动态的__get()和__set()方法是否
+								能成功读写属性
+
+__unset($varname);				类似于__isset(),php5.1.0为unset()函数引入一个简单的
+								OOP接口,它可以用于对象属性,虽然可能在对象的标准属性
+								表中并不存在,但它可能对于__get()和__set()的动态属性
+								空间是有意义的,因此引入__unset()来解决这个问题.
+
+-----------------------------------------------------------------------------------
+	还有其他的魔术方法功能,它们可以通过某些接口来使用,比如ArrayAccess接口以及一些SPL
+接口.
+	在一个内部对象的实现中,每个这样的"魔术方法"都可以和其他方法一样实现,只要在对象的
+方法列表中正确的定义PHP_ME()以及PUBLIC访问修饰符即可.对于__get(),__set(),__call(),
+__isset()以及__unset(),它们要求传递参数,你必须定义恰当的arg_info结构来指出方法需要
+一个或两个参数.下面的代码片段展示了这些木梳函数的arg_info和它们对应的PHP_ME()条目:
+
+static 
+	ZEND_BEGIN_ARG_INFO_EX(php_sample3_one_arg, 0, 0, 1)
+	ZEND_END_ARG_INFO()
+static
+	ZEND_BEGIN_ARG_INFO_EX(php_sample3_two_args, 0, 0, 2)
+	ZEND_END_ARG_INFO()
+
+static function_entry php_sample3_sc_function[] = {
+	PHP_ME(Sample3_SecondClass, __construct, NULL,
+					ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
+
+	PHP_ME(Sample3_SecondClass, __clone, NULL,
+					ZEND_ACC_PUBIC|ZEND_ACC_CLONE)
+
+	PHP_ME(Sample3_SecondClass, __clone, NULL
+					ZEND_ACC_PUBLIC|ZEND_ACC_CLONE)
+
+	PHP_ME(Sample3_SecondClass, __toString, NULL
+					ZEND_ACC_PUBLIC)
+
+	PHP_ME(Sample3_SecondClass, _get, php_sample3_one_arg,
+					ZEND_ACC_PUBLIC)
+
+	PHP_ME(Sample3_SecondClass, _set, php_sample3_two_arg,
+					ZEND_ACC_PUBLIC)
+
+	PHP_ME(Sample3_SecondClass, _call, php_sample3_one_arg,
+					ZEND_ACC_PUBLIC)
+
+	PHP_ME(Sample3_SecondClass, _isset, php_sample3_one_arg,
+					ZEND_ACC_PUBLIC)
+
+	PHP_ME(Sample3_SecondClass, unset, php_sample3_one_arg,
+					ZEND_ACC_PUBLIC)
+	
+	{NULL, NULL, NULL}
+}
+	要注意__construct, __destruct, __clone使用位域运算符增加了额外的常量.
+这三个访问修饰符对于方法而言是特殊的,它们不能被用于其他地方.
+------------------------------------------------------------------------
+
+属性
+	php5中对象属性的访问控制与方法的可见性有所不同,在标准性表中定义一个
+公开属性时,就像你通常期望的,你可以使用zend_hash_add()或add_property_*()族
+函数.
+	对于受保护的和私有的属性,则需要使用新的ZEND_API函数:
+
+void zend_mangle_property_name(
+	char **dest, int *dest_length,
+	char *class, int class_length,
+	char *prop, int prop_length,
+	int persistent)
+
+	这个函数会分配一块新的内存,构造一个"\0classname\0propname"格式的字符串.
+如果类名是特定的类名,比如Sample3_SecondClass,则属性的可见性为private,只能
+在Sample3_SecondClass对象实例内部可见.
+	如果类名指定为*,则属性的可见性是protected,它可以被对象实例所属类的所有
+祖先和后辈.实际上,属性可以以下面方式整加到对象上:
+	
+void php_sample3_addprops(zval *objvar)
+{
+	char *propname;
+	int propname_len;
+
+	/* public */
+	add_protected_long(objvar, "Chapter", 11);
+	zend_mangle_property_name(&propname, &propname_len,
+		"*", 1, "Title", sizeof("Title")-1, 0);
+
+	add_property_string_ex(objvar, propname, propname_len,
+		"PHP5 Objects", 1 TSRMLS_CC);
+
+	efree(propname);
+
+	/* propname */
+	zend_mangle_property_name(&propname, &propname_len,
+		"Sample3_SecondClass", sizeof("Sample3_SecondClass")-1,
+		"Section", sizeof("Section")-1, 0);
+
+	add_property_string_ex(objvar, propname, propname_len,
+		"Properties", 1 TSRMLS_CC);
+
+	efree(propname);
+}
+
+----------------------------------------------------------------------
+	通过_ex()版的add_property_*()族函数,可以明确标记属性名的长度.这里需要
+的,因为在protected和private属性名字中包含NULL字节,而strlen()认为NULL字节是
+字符串终止标记,这样将导致属性名被认为是空的.要注意的是_ex()版本的
+add_property_*()函数还要求显示的传递TSRMLS_CC.而通常宏扩展隐式的传递的.
+	定义类常量和定义类属性非常相似.两者的关键不同点在于它们的持久性,因为
+属性的生命周期是伴随的实例的,它发生在请求中,而常量是和类定义在一起的,只能
+在MINIT阶段定义.
+	由于标准的zval *维护宏的函数假定了非持久性,所以你需要手动写不少代码.
+考虑下面的函数
+
+void php_sample3_register_constants(zend_class_entry *ce)
+{
+	zval *constval;
+
+	/* 基本的标量可以使用Z_*()去设置它们的值 */
+	constval = pemalloc(sizeof(zval), 1);
+	INIT_PZVAL(constval);
+	ZVAL_DOUBLE(constval, 2.7182818284);
+
+	zend_hash_add(&ce->constants_table, "E", sizeof("E"),
+			(void *)&constval, sizeof(zval *), NULL);
+
+	/* 字符串需要额外的空间分配 */
+	constval = pemalloc(sizeof(zval), 1);
+	INIT_PZVAL(constval);
+	Z_TYPE_P(constval) = IS_STRING;
+	Z_STRLEN_P(constval) = sizeof("Hello World") - 1;
+	Z_STRVAL_P(constval) = pemalloc(Z_STRLEN_P(constval) + 1, 1);
+
+	zend_hash_add(&ce->constants_table, "GREETING", sizeof("GREETING"),
+				(void *)&constval, sizeof(zval *), NULL);
+	
+	/* Objects, Arrays, and Resource can't be constants */
+}
+
+PHP_MINIT_FUNCTION(sample3)
+{
+	zend_class_entry ce;
+	INIT_CLASS_ENTRY(ce, PHP_SAMPLE3_SC_NAME, php_sample3_sc_function);
+
+	php_sample3_sc_entry = 
+		zend_register_internal_class(&ce TSRMLS_CC);
+
+	php_sample3_sc_constants(php_sample3_sc_entry);
+
+	php_sample3_register_constants(php_sample3_sc_entry);
+	return SUCCESS;
+}
+	在这之下,这些类常量就可以访问了,分别是:Sample3_SecondClass::E和
+Sample3_SecondClass::GREETING.
+-------------------------------------------------------------------------
+接口
+	接口的定义和类的定义除了几个差异外基本一致.首先是所有的方法都定义为
+抽象的,这可以通过PHP_ABSTRACT_ME()宏来完成.
+static function_entry php_sample3_iface_methods[] = {
+	PHP_ABSTRACT_ME(Sample3_Interface, workerOne, NULL)
+	PHP_ABSTRACT_ME(Sample3_Interface, workerTwo, NULL)
+	PHP_ABSTRACT_ME(Sample3_Interface, workerThree, NULL)
+	(NULL, NULL, NULL)
+}
+
+	由于这些方法是抽象的,所以不需要实现.接下来的第二个差异就是注册.和一个
+实际的类注册类似,首先调用INIT_CLASS_ENTRY和zend_register_internal_class.
+	当类(zend_class_entry)可用时,最后一部就是标记这个类是接口,实现方法如下:
+zend_class_entry *php_sample3_iface_entry;
+
+PHP_MINIT_FUNCTION(sample3)
+{
+	zend_class_entry ce;
+	INIT_CLASS_ENTRY(ce, "Sample3_Interface",
+		php_sample3_iface_methods);
+
+	php_sample3_iface_entry =
+		zend_register_internal_class(&ce TSRMLS_CC);
+	php_sample3_iface_entry->ce_flags |= ZEND_ACC_INTERFACE;
+}
+
+PHP_METHOD(Sample3_SecondClass)
+{
+	php_printf("Working Hard.\n");	
+}
+
+PHP_METHOD(Sample3_SecondClass, workerTwo)
+{
+	php_printf("Hardly Working.\n");
+}
+
+PHP_METHOD(Sample3_SecondClass, workerThree)
+{
+	php_printf("Going wee-wee-wee all the way home.\n");
+}
+	接着在php_sample3_sc_function列表中定义它们:
+
+PHP_ME(Sample3_SecondClass, workerOne, NULL, ZEND_ACC_PUBLIC);
+PHP_ME(Sample3_SecondClass, workerTwo, NULL, ZEND_ACC_PUBLIC);
+PHP_ME(Sample3_SecondClass, workerThree, NULL, ZEND_ACC_PUBLIC);
+	
+	最后,定义你新注册的类实现php_sample3_iface_entry接口:
+
+PHP_MINIT_FUNCITON(sample3)
+{
+	zend_class_entry ce;
+	INIT_CLASS_ENTRY(ce, "Sample3_Interface",
+			php_sample3_iface_method3);
+	
+	php_sample2_iface_entry->ce |= ZEND_ACC_INTERFACE;
+
+	/* 注册实现接口的类 */
+	INIT_CLASS_ENTRY(ce, PHP_SAMPLE3_SC_NAME,
+			php_sample3_sc_function);
+
+	php_sample3_sc_entry = 
+			zend_register_internal_class(&ce TSRMLS_CC);
+
+	php_sample3_register_constants(php_sample3_sc_entry);
+
+	/* 声明实现关系 */
+	zend_class_implements(php_sample3_sc_entry TSRMLS_CC,
+			1, php_sample3_iface_entry);
+	return SUCCESS;
+}
+	如果Sample3_SecondClass实现了其他接口,比如ArrayAccess,就需要将对应的类
+(zend_class_entry)作为附加参数增加到zend_class_implements()调用中,并将现在
+传递为数字1的参数值相应的增大为2:
+
+zend_class_implements(php_sample3_sc_entry TSRMLS_CC,
+	2, php_sample3_iface_entry, php_other_interface_entry);
+
+句柄
+	ZE2并没有把所有的对象实例看做是相同的,它为每个对象实例关联了句柄表.当在
+一个对象上执行特定的操作时,引擎调用对象的句柄表中自定义的行为.
+
+标准句柄
+	默认情况下,每个对象都被赋予了std_object_handlers这个内建句柄表.
+std_object_handlers中对应的句柄方法以及它们的行为定义如下:
+
+void add_ref(zval *object TSRMLS_DC);
+
+	当对象值得refcount增加时被调用,比如,当一个对象变量赋值给新的变量时,add_ref
+和del_ref函数的默认行为都是貂整内部对象储存的refcount.
+
+void del_ref(zval *object TSRMLS_DC);
+	和add_ref类似,这个方法也修改refcount时调用,通常是在unset()对象变量时发生的.
+
+zend_object_value clone_obj(zval *object TSRMLS_DC);
+
+	用于利用已有的对象实例创建一个新的实例,默认行为是创建一个新的对象实例,将
+它和原来的句柄表关联,拷贝属性表,如果该对象的类定义了__clone()方法,则调用它让
+新的对象执行一些附加的复制工作.
+
+zval *read_property(zval *obj, zval *prop, int type TSRMLS_DC);
+void write_property(zval *obj, zval *prop, zval *value TSRMLS_DC);
+	在用户空间尝试以$obj->prop方式访问,去读写对象的属性时,read_property/
+write_property对应的被调用,默认的处理时首先在标准属性表中查找属性.如果属性没有
+定义,则检查是否存在__get()或__set()魔术方法,如果有则调用该方法.
+	
+zval **get_property_ptr_ptr()是read_property()的一个变种,它的含义是允许调用
+作用域直接将当前的zval *替换为新的.默认的行为是返回标准属性表中该属性的指针
+地址.如果不存在,并且没有__get()/__set()默认,则隐式创建并返回指针,如果存在__get()
+或__set()方法,则导致这个句柄失败,使得引擎而单独的read_property和write_property
+调用.
+
+zval *read_dimension(zval *obj, zval *idx, int type TSRMLS_DC);
+void write_dimension(zval *obj, zval *idx, zval *value TSRMLS_DC);
+
+	read_dimension()和write_dimension()类似于对应read_propery()和write_property();
+不过他们在使用$obj['idx']方式将对象作为数组访问时被触发.如果对象的类没有实现
+ArrayAccess接口,默认的行为是触发一个错误;否则它就会调用魔术方法offsetget($idx)或
+offsetset($idx, $value);
+
+zval *get(zval *obj TSRMLS_DC);
+void set(zval *obj, zval *value TSRMLS_DC)
+	在设置或取回对象的值时,则会在对象上调用get()或set()方法.对象自身作为第一个参数
+被传递.对于set(),新的值作为第二个参数传递;实际上,这些方法被用于算数运算中.这些操作
+没有默认处理器.
+
+int has_property(zval *obj, zval *prop, int chk_type TSRMLS_DC);
+
+	当一个对象属性上调用isset()时,这个句柄被调用.默认情况下标准的处理会检查prop指
+定的属性名,在php5.1.0中如果没有找到这个属性,并且定义了__isset()方法,则会调用这个
+方法.chk_type参数的值如果是2则仅需要属性存在,如果chk_type值为0,则必须存在并且不能
+是IS_NULL的值,如果chk_type值为1,则属性必须存在并且必须是非FALSE.
+
+int has_dimension(zval *obj, zval *idx, int chk_type TSRMLS_DC)
+	当将对象看做数组调用isset()时(比如isset($obj['idx'])),使用这个处理器.默认的标
+准处理器会检查对象是否实现了ArrayAccess接口,如果实现了,则调用offsetexists($idx)方
+法.如果没有找到(指调用offsetexists()),则和没有实现offsetexitsts()方法一样,返回0.
+否则offsetget($idx)方法并测试返回值,检查值是非FALSE才返回TRUE(1);
+	
+void unset_property(zval *obj, zval *prop TSRMLS_DC)
+	这两个方法在尝试卸载对象属性时(或将对象以数组方式应用调用unset()时)被调用.
+unset_property()处理器要么从标准属表删除属性(如果存在),要么就尝试调用实现的
+__unset($prop)方法(php5.1.0),unset_dimension()则在类实现了ArrayAccess时,调用
+offsetunset($idex)方法.
+	
+HashTable *get_properties(zval *obj TSRMLS_DC)
+
+	当内部函数使用Z_OBJPROP()宏从标准属性表中读取属性时,实际上是调用了这个处理器
+.php对象的默认处理器是解开并返回Z_OBJ_P(object)->properties,它是真正的标准属性表
+
+union _zend_function *get_method(zval **obj_ptr, char *method_name, 
+	int methodname_len TSRMLS_CC);
+
+	这个处理器在解析类的function_table中的对象方法时被调用.如果在主的
+function_table中不存在方法,则默认的处理器返回一个指向对对象的__call($name, 
+$args)方法包装的zend_function *指针.
+	
+int call_method(char *method, INTERNAL_FUNCTION_PARAMETERS)
+	定义为ZEND_OVERLOADED_FUNCTION类型的函数将以call_method处理器的方式执行.默认
+情况下,这个情况下,这个处理器是未定义的.
+
+union _zend_function *get_constructor(zval *obj TSRMLS_DC)
+
+	类似于get_method()处理器,这个处理器返回一个对对应对象方法的引用.类的
+zend_class_entry中构造器是特殊方式储存的,这使得它比较特殊.对这个方法的重写非常
+少见.
+
+zend_class_entry *get_class_entry(zval *obj TSRMLS_DC)
+
+	和get_constructor()类似,这个处理器也很少被重写.它的目的是将一个对象实例映射
+回它原来的类定义.
+
+int get_class_name(zval *object, char **name, 
+	zend_uint *len, int parent TSRMLS_DC)
+
+	get_class_entry()就是get_class_name()其中的一步,在得到对象的zend_object
+后,它将对象的类名或它的父类名(这依赖于从参数parent的值)复制一份返回.返回的类名
+拷贝必须使用非持久化存储(emalloc).

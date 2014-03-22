@@ -1,0 +1,233 @@
+常量
+	向用户脚本暴露信息更好的方法是使用扩展定义脚本可以在运行时访问的常量,
+并可以通过这些常量改变扩展某些行为.在用户空间中,我们使用define()函数定义
+常量;内部,则是和它非常相似的REGISTER_*_CONSTANT()一族的宏.
+	对数常量是你想要它们在所有脚本中初始化为相同值得数据.它们是在MINIT函
+数中定义的.
+
+PHP_MINIT_FUNCTION(sample4)
+{
+	REGISTER_STRING_CONSTANT("SAMPLE4_VERSION",
+		PHP_SAMPLE4_EXTVER, CONST_CS | CONST_PERSISTENT);
+
+	RETURN SUCCESS;
+}
+
+	这个宏的第一个参数是要暴露给用户空间的商量名.在这个例子中,用户空间
+就可以执行echo SAMPLE4_VERSION;得到输出1.0.这里有一点要特别注意,
+REGISTER_*_CONSTANT()一族的宏使用了sizeof()调用去确定常量名的长度.也就
+是说只能使用字面量值.如果使用char *变量则会导致不正确的结构(sizeof(char *))
+在32位平台上通常是4,而不是真正字符串的长度.
+	下一个参数是常量的值.多数情况下,它只需要一个参数,不过,对于STRINGL版本,
+你还需要一个参数去指定长度.在注册字符串常量中,字符串的值并不会拷贝到常量中.
+只是引用它.也就是说需要在持久化内存中为其分配内存空间,并在对应的SHUTDOWN阶段
+释放它们.
+	最后一个参数是一个有两个可选值得位域操作结构.CONST_CS标记说明该常量打下写
+敏感.对于用户空间定义的常量以及几乎所有的内部常量来说,这都是默认行为.只有极少数
+情况,比如TRUE,FALSE,NULL,在注册时省略了这个标记用以说明它们是不区分大小写的.
+	注册常量时的第二个标记死持久化标记.当在MINIT中定义常量时,它们必须被构建为
+跨请求的持久化常量.但是,如果在请求中定义常量,如果在RINIT中,你可能就需要省略这个
+标记以允许引擎在请求结束时销毁该常量了.
+	下面是4个可用常量注册宏的原型.一定要记住,名字参数必须是字符串字面量而不能是
+char *变量:
+
+REGISTER_LONG_CONSTANT(char *name, long lval, int flags);
+REGISTER_DOUBLE_CONSTANT(char *name, double dval, int flags);
+REGISTER_STRING_CONSTANT(char *name, char *value, int flags);
+REGISTER_STRINGL_CONSTANT(char *name, char *value, int value_len, int flags);
+
+	如果字符串必须从变量名初始化,比如在循环中,你可以使用如下的函数调用
+(上面的宏就是映射到这些函数中的):
+
+void zend_register_long_constant(char *name, uint name_len,
+		long lval, int flags, int module_number TSRMLS_DC)
+
+void zend_register_double_constant(char *name, uint name_len,
+		double dval, int flags, int module_number TSRMLS_DC)
+
+void zend_register_string_constant(char *name, uint name_len,
+		char *strval, int flags, int module_number TSRMLS_DC)
+	
+void zend_register_stringl_constant(char *name, uint name_len,
+		char *strval, uint strlen, int flags, 
+		int module_number TSRMLS_DC)
+--------------------------------------------------------------
+	此时,名字参数的长度可以直接由调用作用域提供.你应该注意到,这次
+就必须显式的传递TSRMLS_CC参数了,并且,这里还引入了另外一个参数.
+	module_number是在你的扩展被加载或被卸载时传递给你的信息.你不用
+关心它的值,只需要传递它就可以了.在MINIT和RINT函数原型中都提供了它,
+因此,在你定义常量的时候,它就是可用的.下面的函数版的常量注册例子:
+
+PHP_MINIT_FUNCTION(sample4)
+{
+	register_string_constant("SAMPLE4_VERSION",
+		sizeof("SAMPLE4_VERSION"),
+		PHP_SAMPLE4_EXTVER,
+		CONST_CS | CONST_PERSISTENT,
+		module_number TSRMLS_CC);
+	
+	return SUCCESS;
+}
+	
+	要注意当sizeof()用于确定SAMPLE4_VERSION的长度时,这里并没有减1.常量的
+名字是包含它的终止NULL的.如果使用strlen()确定长度,要记得给加1以使其包含终止
+的NULL.
+	除了数组和对象,其他的类型都可以被注册,但是应为在ZEND API中不存在这些
+类型的宏或函数,你就需要手动的定义常量.安装下面的范本,仅需要在使用时修改去
+修改恰当类型的zval*即可:
+
+void php_sample4_register_boolean_constant(char *name, uint len,
+	zend_bool bval, int flags, int module_number TSRMLS_DC)
+{
+	zend_constant c;
+	
+	ZVAL_BOOL(&c.vlaue, bval);
+	c.flags = CONST_CS | CONST_PERSISTENT;
+	c.name = zend_strndup(name, len-1);
+	c.name_len = len;
+	c.module_number = module_number;
+	zend_register_constant(&c TSRMLS_CC);
+}
+----------------------------------------------------------------------
+扩展的全局空间
+	如果可以保证任何时刻一个进程只有一个php脚本在执行,你的扩展就可以随意
+的定义全局变量并去访问它们,因为已知在opcode执行过程中不会有其他脚本被执行.
+对于非线程sapi,这是可行的,因为所有的进程空间中都只能同时执行一个代码路径.
+	然而在线程sapi中,可能会有两个或更多的线程同时读或更糟糕的情况是同时写
+相同的值.为了解决这个问题,就引入了一个扩展的空间概念,它为每个扩展的数据提
+供一个唯一的数据存储桶.
+-------------------------------------------------------------------------
+定义扩展的全局空间
+	要给你的扩展申请一块存储的桶,首先就需要子在php_sample4.h上的一个标准
+结构体中定义所有你的全局变量.比如,假设你的扩展要保存一个计数器,保持对某个
+方法在请求内被调用次数的跟踪,你就需要定义一个结构体包含一个unsigned long:
+
+ZEND_BEGIN_MODULE_GLOBALS(sample4)
+	unsigned long counter;
+ZEND_END_MODULE_GLOBAL(sample4)
+
+	ZEND_BEGIN_MODULE_GLOBALS和ZEND_END_MODULE_GLOBALS宏为
+扩展全局变量结构的定义提供了统一的框架.如果你看过这个块的展开形式,就
+可以很容易的理解它了:
+
+typedef struct _zend_sample4_globals{
+	unsigned long counter;
+} zend_sample4_globals;
+
+	你可以像在其他的C语言结构体中增加成员一样,为它增加其他成员.
+仙子阿,你有了存储桶的(数据结构)定义,接下来要做的就是声明一个这
+个类型的变量,你需要在扩展的sample4.c文件中, 
+#include "php_sample4.h" 语句下一行声明它:
+ZEND_DECLARE_MODULE_GLOBALS(sample4);
+	它将根据是否启用了线程安全,被解析为两种不同的格式.对于非线
+程安全构建,比如apache1, apache2-prefork,cgi,cli以等等,它是直接
+在真正的全局域声明了一个zend_sample4_globals结构体的直接值:
+	
+zend_sample4_globals sample4_globals;
+	这和你在其他单线程应用中声明的全局变量没有什么差异.计数器的值
+直接通过sample4_globals.counter访问.而对于线程安全构建,则是另一种
+处理,它只是声明了一个整型值,以后它将扮演到真实数据的引用的角色:
+
+int sample4_global_id;
+
+	设置这个ID就代表声明你的扩展全局变量到引擎中.通过提供的信息,引擎
+将在每个新的线程产生时分配一块内存专门用于线程服务请求时的私有储存空
+间.在你的MINIT函数中增加下面的代码块:
+
+#ifdef ZTS
+	ts_allocate_id(&sample4_globals_id, sizeof(zend_sample4_globals),
+			NULL, NULL);
+	
+#endif
+
+	注意,这个语句被包裹子在一个ifdef中,以放置在没有启用Zend线程安全(ZTS)
+时执行它.这是因为sample4_globals_id只在线程环境下会被声明,非线程环境的构
+建则使用的是sample4_globals变量的直接值.
+-----------------------------------------------------------------------
+每个线程的初始化和终止
+	在非线程构建中,你的zend_sample4_global结构体在一个进程中只有一份拷贝.
+你可以给它设置初始值或在MINIT或RINT中为其分配资源,进行初始化,在MSHUTDOWN
+和RSHUTDOWN阶段如果需要,则进行相应的释放.
+	然而,对于线程构建,每次一个新的线程产生时,都分配一个新的结构体.实际上,
+这在webserver启动时可能会发生很多次,而在webserver进程的整个生命周期中,你可
+能会发生百千次.为了知道怎么样初始化和终止你的扩展全局空间,引擎需要执行一些
+回调函数.这就是上面的例子中你传递给ts_allocate_id()的NULL参数;在你的MINIT
+函数上面增加下面的两个函数:
+static void php_sample4_globals_ctor(
+	zend_sample4_globals *sample4_globals TSRMLS_CC)
+{
+	/* 在线程产生使初始化一个新的zend_sample4_globals结构体 */
+	sample4_globals->counter = 0;
+}
+
+static void php_sample4_globals_dtor(
+	zend_sample4_globals *sample4_globals TSRMLS_DC)
+{
+	/* 在初始化阶段分配的各种资源,都在这里释放 */
+}
+
+PHP_MINIT_FUNCTION(Sample4)
+{
+	REGISTER_STRING_CONSTANT("SAMPLE4_VERSION",
+		PHP_SAMPLE4_EXTVER, CONST_CS | CONST_PERSISTENT);
+#ifdef ZTS
+	ts_allocate_id(&sampl4_global_id,
+		sizeof(zend_sample4_globals),
+		(ts_allocate_ctor)php_sampl4_globals_ctor,
+		(ts_allocate_dtor)php_sample4_globals_dtor);
+#else
+	php_sample4_globals_ctor(&sample4_globals TSRMLS_CC);
+#endif
+	return SUCCESS;
+}
+
+PHP_MSHOTDOWN_FUNCTION(sample4)
+{
+#ifndef ZTS
+	php_sample4_globals_dtor(&sample4_globals TSRMLS_CC);
+#endif
+	return SUCCESS;
+}
+-----------------------------------------------------------------
+	要注意,在没有开启ZTS时,ctor和dtor函数是手动调用的.不要忘记:
+非线程环境也需要初始化和终止.
+
+	你可能奇怪为什么在php_sample4_globals_ctor()和
+php_sample4_globals_dtor()中直接使用了TSRMLS_CC,如果你认为"这完全不
+需要",它在ZTS禁用时解析出来是空的内容,并且由#ifndef指令,我们知道ZTS
+是被禁用的,你的观点绝对正确.声明中的相关的TSRMLS_DC指令仅用于保证代
+码的一致性.从积极的一面考虑,如果ZEND API修改这些值使得在非ZTS构建中
+也有有效内容时,你的代码就不需要修改就做好了相应的调整.
+------------------------------------------------------------------
+访问扩展的全局空间
+	现在你的扩展有了一个全局变量集合,你可以在你的代码中访问它们了.
+在非ZTS模式中这很简单,只需要访问进程全局作用域的sample4_globals变量的
+相关成员即可,比如,小面的用户空间函数增加了你前面定义的计数器并返回它的
+当前值:
+
+PHP_FUNCTION(sample4_counter)
+{
+	RETURN_LONG(++sample4_globals.counter);
+}
+-------------------------------------------------------------------
+	很简单很容易.不幸的是,这种方式在线程环境的PHP构建中不能工作.这种
+情况下就需要做更多的工作.下面是使用ZTS语义的该函数返回语句:
+
+RETURN_LONG(++TSRMG(sample4_globals_id,	
+	zend_sample4_globals*, counter));
+-------------------------------------------------------------------
+	TSRMG()宏需要你已经传递的TSRMLS_CC参数,它会从当前线程池的资源结构
+中查找需要的数据.这里,它使用sample4_globals_id索引映射到内存池中你扩展
+的全局结构体的位置,最终,使用数据类型映射的元素名得到结构体中的偏移量.
+因为你并不知道运行时你的扩展是否使用ZTS模式,因此,你需要让你的代码适应
+两种情况.要做到这一点,就需要按照下面方式重写该函数:
+PHP_FUNCTION(sample4_counter)
+{
+#ifdef ZTS
+	RETURN_LONG(++TSRMG(sample4_globals_id, \
+		zend_sample4_globals *, counter));
+#else /* non-ZTS */
+
+#endif
+}
+}

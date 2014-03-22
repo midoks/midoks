@@ -1,0 +1,260 @@
+int compare_objects(zval *obj1, zval *obj2 TSRMLS_DC)
+	当比较操作符(比如:==, !=, <=, <,>,>=)用在两个对象上时,在操作数(参与比较的
+两个)上调用compare_objects()就是这个工作的第一部分.它的返回值通常是1, 0, -1,
+分别代表大于,等于,小于.默认情况下,对象是基于它们的标准属性表比较的,使用比较
+规则和第8章在数组和HashTable上工作中学习的数组比较规则一样.
+
+int cast_object(zval *src, zval *dst, int type, int should_free TSRMLS_DC)
+	当尝试将对象装换为其他数据类型时,会触发这个处理器.如果将should_free设置为
+非0值,zval_dtor()将在dst上调用,首先释放内部的资源.总之,处理器应当尝试将src中
+的对象表示为dst给出的zval*的类型中.这个处理器默认死未定义的,但当有它的时候,
+应该返回SUCCESS或FAILURE.
+
+int count_elements(zval *obj, long *count TSRMLS_DC)
+	实现了数组访问的对象应该定义这个处理器,它将设置当前的元素数量到count中并
+返回SUCCESS.如果当前实例没有实现数组访问,则它应该返回FAILURE,以使引擎回头去
+检查标准属性表.
+
+note:上面的句柄表和译者使用的php-5.4.9中已经不完全一致,读者在学习这一部分的
+时候,可以参看Zend/zend_object_handlers.c中最下面的标准处理器句柄表.
+---------------------------------------------------------------------------
+魔术方法第二部分
+	
+	使用前面看到的对象句柄表的自定义版本,可以让内部内提供与在用户空间基于对象
+或类的__xxx()魔术方法相比,相同或更多的能力.将这些自定义的句柄设置到对象实例上
+首先要求创建一个新的句柄表.因为你通常不会覆写所有的句柄,因此首先将标准句柄表
+拷贝到你的自定义句柄表中再去覆写你想要修改的句柄就很有意义了:
+
+static zend_object_handlers php_sample3_obj_handlers;
+
+int php_sample3_has_dimension(zval *obj, zval *idx,
+			int chk_type TSRMLS_DC)
+{
+	/* 仅在php版本>=1.0的使用 */
+	if(chk_type == 0){
+		/* 重新映射chk_type的值 */
+		chk_type = 2;
+	}
+
+	/* 当chk_type值1时保存不变.接着使用标准的hash_prooperty方法执行逻辑 */
+	return php_sample3_obj_handlers.has_property(obj, idx, chk_type TSRMLS_CC);
+}
+
+PHP_MINT_FUNCTION(sample3)
+{
+	zend_class_entry ce;
+	zend_object_handlers *h = &php_sample_obj_handlers;
+
+	/* 注册接口 */
+	INIT_CLASS_ENTRY(ce, "Sample3_Interface",
+				php_sample3_iface_methods);
+
+	php_sample3_iface_entry = 
+		zend_register_internal_class(&ce TSRMLS_CC);
+
+	php_sample3_iface_entry->ce_flag = ZEND_ACC_INTERFACE;
+
+	/* 注册SecondClass类 */
+
+	INIT_CLASS_ENTRY(ce, PHP_SAMPLE3_SC_NAME,
+				php_sample3_sc_functions);
+
+	php_sample3_sc_entry = 
+				zend_register_internal_class(&ce TSRMLS_CC);
+
+	php_sample3_register_constants(php_sample3_sc_entry);
+
+	/* 实现AbstractClass接口 */
+	zend_class_implemets(php_sample3_sc_entry_entry TSRMLS_CC，
+			1, php_sample3_iface_entry);
+
+	/* 创建自定义句柄表 */
+	php_sample3_obj_handlers = *zend_get_std_object_handlers();
+
+	/* 这个句柄表的目的是让$obj['foo']的行为定价于$obj->foo */
+	h->read_dimension = h->read_property;
+	h->write_dimension = h->write_property;
+	h->unset_dimension = h->unset_property;
+
+#if PHP_MAJOR_VERSION > 5 || \
+		(PHP_MAJOR_VERSION == 5 && PHP_MINOR_VERSION > 0)
+
+	/* php-5.1.0中，has_property和has_dimension的chk_type含义不同,
+为使它们行为一致,自己包装一个函数 */
+	h->has_dimension = php_sample3_has_dimension;
+
+#else
+	/* php 5.0.x的has_property和has_dimension行为一致 */
+
+#endif
+	return SUCCESS;
+}
+---------------------------------------------------------------------------
+	要将这个句柄表应用到对象上,你有两种选择.最简单也是最具代表性的就是实现
+一个构造器方法,并在其中重新赋值变量的句柄表.
+
+PHP_METHOD(Sample3_SecondClass, __construct)
+{
+	zval *objvar = getThis();
+
+	if(!objptr)
+	{
+		php_error_docref(NULL TSRMLS_CC, E_WARINING, 
+				"Constructor called statically!");
+		RETURN_FALSE;
+	}
+
+	
+	/* 执行正常的构造器任务... */
+	/* 覆写句柄表 */
+	Z_OBJ_HT_P(objptr) = &php_sample3_obj_handlers;
+}
+	当构造器返回时,对象就有了新的句柄表以及对应的自定义行为.还有一种更加受
+欢迎的方法是覆写类的对象创建函数.
+
+zend_object_value php_sample3_sc_create(zend_class_entry *ce TSRMLS_CC)
+{
+	zend_object *object;
+	zend_object_value retval;
+
+	/* 覆写create_object时,属性表必须手动初始化 */
+	ALLOC_HASHTABLE(object->properties);
+	zend_hash_init(object->properties, 0, NULL, ZVAL_PTR_DTOR, 0);
+
+	/* 覆写默认句柄表 */
+	retval.handlers = &php_sample3_obj_handlers;
+	
+	/* 这里可能会执行其他对象初始化工作 */
+	return retval;
+}
+
+	这样就可以在MINIT阶段注册类(zend_class_entry)之后直接将自定义句柄表附加上去.
+
+INIT_CLASS_ENTRY(ce, PHP_SAMPLE3_SC_NAME,
+		php_sample3_sc_functions);
+
+php_sample3_sc_entry = 
+		zend_register_intenal_class(&ce TSRMLS_CC);
+
+php_sample3_sc_entry->create_object = php_sample3_sc_create;
+
+php_sample3_register_constants(php_sample3_sc_entry);
+
+zend_class_implements(php_sample3_sc_entry TSRMLS_CC,
+		1, php_sample3_iface_entry);
+
+	这两种方法唯一可预见的不同是它们发生的时机不同.引擎在碰到new
+Sample3_SecondClass后会在处理构造器以及它的参数之前调用create_object.
+通常,你计划覆盖的各个点使用的方法(create_object VS __construct)应该
+一致.
+
+	译注:php-5.4.9中,xxx_property/xxx_dimension这一组句柄的原型是不一致的,
+因此,按照原著中的实例,直接将xxx_property/xxx_dimension进行映射已经不能工作
+,要完成上面的功能,需要对4个句柄均包装一个函数去映射.由于译者没有详细跟踪
+具体在哪一个版本发生了这些改变,应此这里不给出译者测试的实例(没有做兼容性处
+理检查),如果读者碰到这个问题,请检查自己所使用php版本中两组句柄原型的差异并
+进行相应修正.
+-------------------------------------------------------------------------
+
+启动,终止,以及其中的一些点
+
+	在本书中,你已经多次使用MINIT函数在php加载你的扩展的共享时执行初始化任务.
+在第1章"php的生命周期"中,你还学习了其他三个启动/终止函数,与MINIT对应的是
+MSHUTDOWN,另外还有一对RINT/RSHUTDOWN方法在每个页面请求其中和终止时被调用.
+----------------------------------------------------------------------------
+
+生命周期
+	除了这四个直接连接模块结构函数外,还有两个函数仅用与线程环境,用来处理每个
+线程的启动和终止,以及它们使用的私有存储空间.开始之前,首先将你的php扩展骨架程
+序拷贝到php源码树的ext/sample4下.代码如下
+
+config.m4
+----------------------------------------------------------------------------
+config.m4
+
+PHP_ARG_ENABLE(Sample4,
+	[Whether toenable the "Sample4" extension],
+	[ enable-sample4	Enable "Sample4" extension support])
+
+if test $PHP_SAMPLE4 != "no"; then
+	PHP_SUBST(SAMPLE4_SHARE_LIBADD)
+	PHP_NEW_EXTENSION(Sample4, sample4.c, $ext_shared)
+fi
+-------------------------------------------------------------
+
+其他部分不写(自动生成骨架php5.1.0)
+
+-------------------------------------------------------------
+	要注意,每个启动和终止函数在退出时都返回SUCCESS.如果这些函数中
+某个返回FAILURE,引擎就认为这个过程失败并中断php的执行.
+
+------------------------------------------------------------
+模块生命周期
+	在前面章节已经多次使用,因此MINIT对你来说应该已经很熟悉了.它在模块
+第一次加载到进程空间时触发,对于单请求sapi比如CLI和CGI,或者多线程sapi
+比如apache2-worker,它们都执行一次,因此不涉及到fork.
+	当模块被卸载时,MSHUTDOWN方法被调用,此时模块的所有资源(比如持久化
+内存)都将被释放,返回给操作系统.
+	
+	引擎的特性,比如类,资源ID,流包装和过滤器,用户空间全局变量,php.ini中
+的指令这些公共的资源都是在模块的INIT和SHUTDOWN阶段被分配和释放的.
+
+理论上来说,你可以不用子啊MSHUTDOWN阶段做资源释放工作,把它留给OS去做隐式
+的内存和文件释放.不过在apache1.3中使用你的扩展时,你会发现一个有趣的现象,
+apache将加载mod_php，在进程中运行MINIT,接着立即卸载mod_php,触发MSHUTDOWN
+方法,接着再次加载它,如果没有正确的MSHUTDOWN阶段,在MINIT阶段初始化分配的
+资源就将泄漏.
+-----------------------------------------------------------------------
+
+线程生命周期
+	在多线程sapi中,有时需要为每个线程分配它自己独立的资源,或跟踪它自己的单
+请求技术器.对于这些特殊情况,存在一组每个线程的钩子,允许在线程启动和终止时
+执行它们.典型的情况是当apache2-worker这样的sapi启动时,它将会产生一打或更多
+的线程去处理并发请求.
+	任何在多请求间共享,在同一进程中不同线程有不能访问的资源,都是在线程的构
+造器和析构器中分配和释放的.比如这可能包括EG(persistent_list)HashTable中持
+久化资源,因为他们通常包括网络或文件资源,需要考虑指令间它们的状态一致性.
+
+-------------------------------------------------------------------------
+
+请求声明周期
+	最后一个也是最短的生命周期是请求生命周期,在这个周期内,你的扩展可能会去
+初始化默认的用户空间变量,或初始化内部状态跟踪信息.因为这些方法在每个页面请
+求都被调用,因此要尽可能的保证这些处理和内存分配可以执行的足够快.
+
+--------------------------------------------------------------------------
+通过MINFO对外暴露模块信息
+	除非你计划只有很少人使用你的扩展,并且没有假话修改API,否则你就需要能够告
+诉用户空间一些关于扩展自身的信息.比如,是否所有的环境和版本特有特性都可用?
+它编译的外部库的版本是什么?是否有网站或邮件地址可以让你扩展的用户在需要时
+寻求帮助?
+
+	如果你曾经看过phpinfo()或php -i的输出,你就会注意到,所有的这些信息都被组
+织到一种良好格式,易于解析的输出中.你的扩展可以很简单的在这些内容中增加自己的信息,
+值需要在你的模块中增加一个MINFO()函数即可:
+
+PHP_MINFO_FUNCTION(sample4)
+{
+	php_info_print_table_start();
+	
+	php_info_print_table_row(2, "Sample4 Module", "enabled");
+	php_info_print_table_row(2, "version", PHP_SAMPLE4_EXTVER);
+
+	php_info_print_table_end();
+}
+
+	通过使用这些包装函数,你的模块信息将在从webserver sapi(比如cgi,
+iis,apache等)输出时自动的包装为HTML标签,而在使用cli时输出为普通文本.
+为了使得构建时你的扩展中可以使用这些函数原型,你需要#include "ext/standard/info.h"
+
+	下面是这个头文件中可用的php_info_*()族函数.
+
+char *php_info_html_esc(char *str TSRMLS_DC);
+	用户空间htmlentites()函数的底层实现php_escape_html_entities()的一个包装.返回
+的字符串是用emalloc()分配的,使用后必须显式的使用efree()释放.
+
+void php_info_print_table_start(void);
+void php_info_print_table_end();
+
+	输出html表格的开始/结束标签.html输出禁用时,比如在cli中,它将在start中输出换行
+符,end中不输出任何内容.
