@@ -1,0 +1,353 @@
+	看起来不舒服?使得,如果你所有的代码都基于这样的ifdef指令去处理线程安全的
+全局访问,它看起来可能比Perl还糟糕!这就是为什么在所有的PECL扩展中都使用了一
+个抽象的宏来封装全局访问的原因.在你的php_sample4.h文件中进行如下定义:
+	
+#ifdef ZTS
+#include "TSRM.h"
+
+#define SAMPLE4_G(v)	TSRMG(sample4_globals_id,
+							zend_sample4_global *, v)
+
+#else
+#define	SAMPLE4_G(v)	(sample4_global.v)
+#endif
+---------------------------------------------------------------
+	这样，就可以让你的访问扩展全局空间时变得简单易懂:
+
+PHP_FUNCTION(sample4_counter)
+{
+	RETURN_LONG(++SAMPLE4_G(counter));
+}
+
+	这个宏给你一种似曾相识的感觉吗?应该是这样的.它和你已经使用过的
+EG(symbol_table)以及EG(active_symbol_table)是仙童的概念和实践.在阅
+读php源码树中其他部分以及其他扩展时,你会经常碰到这种宏.下表列出了
+常用的全局访问宏:
+------------------------------------------------------------------
+访问宏						关联数据
+
+EG()						执行全局空间，这个结果体主要用于引擎内部
+							对当前请求的状态跟踪.这个全局空间中可以
+							找到符号表,函数表，类表,常量表,资源表等.
+---------------------------------------------------------------------
+CG()						核心全局空间。主要被Zend引擎在脚本编译和内核
+							底层执行过程中使用。在你的扩展中一般很少直接
+							测试这些值.
+---------------------------------------------------------------------
+PG()						PHP全局空间。多数"核心"php.ini指令映射到php
+							全局变量结构体中的一个或多个元素.比如:
+							PG(register_globals), PG(safe_mode)
+							以及PG(memory_limit)
+-------------------------------------------------------------------
+FG()						文件全局空间。对数文件I/O或流相关的全局变量
+							被装入到这个结构通过标准扩展暴露。
+--------------------------------------------------------------------
+
+用户空间超级全局变量
+	用户空间有它自己的完全无关的全局概念.在用户空间，有一种特殊的全局
+变量被称为超级全局变量。这种特殊的用户空间变量包括$_GET,$_POST,$_FILE
+等等.在全局作用域.函数或方法内部都可以等同本地作用域进行访问.
+	这是由于超级全局变量的解析方式造成了，它们必须在脚本编译之前定义.
+这就意味着在普通的脚本中不能定义其他超级全局变量。不过，在扩展中，可以
+在请求接受到之前去将变量名定义为超级全局变量.
+	扩展定义超级全局变量的一个基本示例是ext/session,它在session_start()
+和session_write_close()或脚本结束之前，使用$_SESSION超级全局变量储存会话
+信息。为了将$_SESSION定义为超级全局变量,session扩展在MINIT函数中执行了一
+次下面的语句:
+PHP_MINIT_FUNCTION(session)
+{
+	zend_register_auto_global("_SESSION",
+		sizeof("_SESSION")-1,
+		NULL TSRMLS_CC);
+
+	return SUCCESS;
+}
+
+	注意,第二个参数,变量名的长度，使用了sizeof()-1，因此不包含终止NULL，
+这和之前你看到的多数内部调用不同,因此,在定义自己的超级变量时要格外小心
+这一点.
+	zend_register_auto_global()函数在Zend引擎2中的原型的如下:
+
+int zend_register_auto_global(char *name, uint name_len,
+		zend_auto_global_callback auto_global_callback TSRMLS_CC);
+
+	在Zend引擎1中,auto_global_callback参数并不存在,为了让你的扩展兼容
+PHP4,就需要在MINIT函数中通过#ifdef块去选择性的执行不同的调用,定义
+$_SAMPLE4超级全局变量.
+	
+PHP_MINIT_FUNCTION(sample4)
+{
+	zend_register_auto_global("_SAMPLE4",
+			sizeof("_SAMPLE4")-1
+#ifdef ZEND_ENGINE_2
+				, NULL
+#endif
+			TSRMLS_CC);
+
+	return SUCCESS;
+}
+------------------------------------------------------------------
+自动全局回调
+	ZE2中zend_register_auto_global()的auto_global_callback参数是一
+个指向自定义函数的指针,该函数在编译阶段用户空间脚本碰到你的超级全局
+变量时被触发.实际上,它可以用在当前脚本没有访问超级全局变量时避免繁杂
+的初始化处理.考虑下面的代码:
+
+zend_bool php_sample4_autoglobal_callback(char *name,
+			uint name_len TSRMLS_DC)
+{
+	zval *sample4_val;
+	int i;
+
+	MAKE_STD_ZVAL(sample4_val);
+	array_init(sample4_val);
+
+	for(i=0; i<10000; i++){
+		add_next_index_long(sample4_val, i);
+	}
+	ZEND_SET_SYMBOL(&EG(symbol_table), "_SAMPLE4",
+			sample4_val);
+
+	return 0;
+}
+
+PHP_MINIT_FUNCTION(sample4)
+{
+	zend_register_auto_global("_SAMPLE4", sizeof("_SAMPLE4")-1,
+#ifdef ZEND_ENGINE_2
+						,php_sample4_autoglobal_callback
+#endif
+						TSRMLS_CC);
+	return SUCCESS;
+}
+-------------------------------------------------------------------------
+	php_sample4_autoglobal_callback()所做的工作代表的是对内存和CPU时间的耗
+费,如果$_SAMPLE4没有访问,则这些资源都将被浪费.在Zend引擎2中,只有当脚本被编
+译时发现某个地方访问$_SAMPLE4才会调用php_sample4_autoglobal_callback()函数
+.注意,一旦数组初始化完全并增加到请求的符号表后,函数就返回0值.这样就解除了
+请求中后续对该超级全局变量访问时你的回调,以确保对$_SAMPLE4的多次访问不会
+导致对该回调函数的多次调用.如果你的扩展需要在每次碰到该超级全局变量时都执行
+回调函数,只需要让回调函数返回真值(非0)使得超级全局变量回调函数不被解除即可.
+	不幸的是,现在的设计和php4/zend引擎1冲突,因为旧的引擎并不支持自动全局回
+调.这种情况下,你就需要在每次脚本启动时,无论是否使用了变量都去初始化.要这样
+做,直接在RINIT函数中调用你上面的编写的回调函数即可:
+
+PHP_RINIT_FUNCTION(sample4)
+{
+#ifndef ZEND_ENGINE_2
+	php_sample4_autoglobal_callback("_SAMPLE4",
+			sizeof("_SAMPLE4")-1,
+			TSRMLS_CC);
+
+#endif
+	return SUCCESS;
+}
+
+-----------------------------------------------------------------
+小结
+	通过本章的学习,你认识了一些新的但是已经熟悉的概念,包括内部的线
+程安全全局变量,怎样向用户空间暴露诸如常量,预初始化变量,超级全局变
+量等信息.下一章,你将学会怎样定义和解析php.ini中的指令,并将它们和你
+已经设置的内部线程安全的全局结构关联起来.
+-----------------------------------------------------------------
+INI设置
+	和上一章你看到的超级全局变量以及持久化常量一样,php.ini值必须扩展
+的MINIT代码块定义.然而,和其他特性不同的是,ini选项的定义仅仅由简单的
+启动/终止线组成.
+
+PHP_MINIT_FUNCTION(sample4)
+{
+	REGISTER_INI_ENTRIES();
+	return SUCCESS;
+}
+
+PHP_MSHUTDOWN_FUNCTION(sample4)
+{
+	UNREGISTER_INI_ENTRIES();
+	return SUCCESS;
+}
+--------------------------------------------------------------------------
+定义并访问INI设置
+	INI指令自身是在源码文件中MINIT函数上面,使用下面的宏完全独立的定义的,在这
+两个宏之间可以定义一个或多个INI指令:
+
+PHP_INI_BEGIN()
+PHP_INI_END()
+	这两个宏函数和ZEND_BEGIN_MODULE_GLOBALS()/ZEND_END_MODULE_GLOBALS()异曲
+同工.不过这里不是typedef一个结构体,而是对静态数据实例定义的框架组织:
+
+static zend_ini_entry int_entries[] = {
+	{0, 0, NULL, 0, NULL, NULL, NULL, NULL, NULL, 0, NULL, 0, 0, NULL};
+}
+	如你所见,它定义了一个zend_ini_entry值的向量,以一条空的记录结束.这和你在
+前面看到的静态向量function_entry的定义一致.
+--------------------------------------------------------------------------
+简单的INI设置
+	现在,你已经有一个INI结构体用户定义INI指令,以及引擎注册/卸载INI设置的机制,
+因此我们可以真正的去为你的扩展定义一些INI指令.假设你的扩展暴露了一个打招呼的
+函数,就像第五章"你的第一个扩展"中一样,不过,你想让打招呼的话可以自定义:
+
+PHP_FUNCTION(sample4_hello_world)
+{
+	php_printf("Hello World!\n");
+}
+---------------------------------------------------------------------
+	最简单最直接的方式就是定义一个INI指令,并给它一个默认值"Hello World":
+
+#include "php_ini.h"
+
+PHP_INI_BEGIN()
+	PHP_INI_ENTRY("sample4.greeting", 
+			"Hello World", PHP_INI_ALL, NULL);
+PHP_INI_END()
+------------------------------------------------------------------
+	你可能已经猜到了,这个宏的前两个参数表示INI指令的名字和它的默认
+值.第三个参数用来确定引擎是否允许这个INI指令被修改(这将涉及本章后
+面要介绍的访问级别问题).最后一个参数是一个回调函数,它将在每次INI指令
+的值发生变化时被调用.你将在修改事件一节看到这个参数的细节.
+	译注:如果你和译者一样遇到结果和原著结构与其不一致时,请在测试时,
+在你的MINIT()函数中增加一句"REGISTER_INI_ENTRIES();"调用,并确保该调用
+在你的MINIT中分配全局空间之后执行.
+	现在你的INI设置已经定义,只需要在你的打招呼函数中使用就可以了.
+
+PHP_FUNCTION(sample4_hello_world)
+{
+	const char *greetin = INI_STR("sample4_greeting");
+	php_printf("%s\n", greeting);
+}
+	一定要注意,char *的值是引擎所有的,一定不要修改.正因为这样,所以将
+你本地用来临时储存INI设置值的变量定义为const修饰.当然,并不是所有INI
+值都是字符串;还有其他的宏用来获取整型,浮点型以及布尔型的值:
+long lval = INI_INT("sample4.intval");
+double dval = INI_FLT("sample4.fltval");
+zend_bool bval = INI_BOOL("sample4.boolval");
+
+	通常你想要知道的是INI设置的当前值;不过,作为补充,存在几个宏可以用来
+读取未经修改的INI设置:
+
+const char *strval = INI_ORIG_STR("sample4_stringval");
+long lval = INI_ORIG_INI("sample4.intval");
+double dval = INI_ORIG_FLT("sample4.fltval");
+zend_bool bval = INI_ORIG_BOOL("sample4.boolval");
+
+	这个例子中,INI指令的名字"sample4.greeting"增加了扩展名作为前缀,
+这样来保证不会和其他扩展暴露的INI指令名字冲突.对于私有的扩展的来说,
+这个前缀不是不须的,但是对于商业化或开源发布的公开扩展还是鼓励这样做
+的.
+------------------------------------------------------------------
+访问级别
+	对于INI指令,开始总是有一个默认值.对数情况下,理想是保持默认值不变;
+然而,对于某些特殊的环境或者脚本特定的动作,这些值可能需要被修改.如下表
+所示,INI指令的值可能在下面3个点修改:
+---------------------------------------------------------------------
+访问级别							含义
+SYSTEM								位于php.ini中,或者apache的httpd.conf
+									配置文件中<Directory>和<VirtualHost>
+									指令外部,影响引擎的启动阶段,可以认为是INI
+									设置的"全局"值.
+
+PERDIR								位于Apache的httpd.conf配置文件中<Directory>
+									和<VirtualHost>指令中,或者请求脚本所在目录或
+									虚拟主机下.htaccess文件以及其他apache在处理请求
+									之前其他地方设置的INI指令.
+
+USER								一旦脚本开始执行,你只能通过调用用户空间函数
+									ini_set()去修改INI设置了.
+---------------------------------------------------------------------------------
+	某些设置如果可以在任何地方被修改就没有多大意义了,比如safe_mode,如果可以在任何
+地方去修改,那么恶意脚本的作者就可以很简单的去禁用safe_mode,接着去读或修改本不允许
+操作的文件.
+	类似的,某些非安全的相关的指令比如register_globals或magic_quotes_gpc,在脚本中
+PHP_INI_PERDIR | PHP_INI_USER.
+	对于register_globals和magic_quotes_gpc这样的指令,定义的访问级别为
+PHP_INI_SYSTEMP | PHP_INI_PERDIR.排除了PHP_INI_USER将导致以这个名字调用ini_set()
+时最终会失败.
+	现在,你肯能已经猜到,safe_mode和open_basedir这样的指令应该仅被定义为
+PHP_INI_SYSTEM.这样的设置就确保了只有系统管理员可以修改这些值,因为只有他们可以访问
+修改php.ini或httpd.conf文件中的配置.
+---------------------------------------------------------------------------------
+修改事件
+	当INI指令被修改时,无论是通过ini_set()函数还是某个perdir指令的处理,引擎都会为
+其测试OnModify回调.修改处理器可以使用ZEND_INI_MH()宏定义,并通过在OnModify参数
+上传递函数名附加到INI指令上:
+	
+ZEND_INI_MH(php_sample4_modify_greeting)
+{
+	if(new_value_length ==0)
+	{
+		return FAULURE;	
+	}
+	return SUCCESS;
+}
+
+PHP_INI_BEGIN()
+	PHP_INI_ENTRY("sample4.greeting", "Hello World",
+		PHP_INI_ALL, php_sample4_modify_greeting)
+PHP_INI_END()
+-------------------------------------------------------------------
+	通过在new_value_length为0时返回FAILURE,这个修改处理器禁止将
+greeting设置为空字符串.ZEND_INI_MH()宏产生的整个原型如下:
+
+int php_sample4_modify_greeting(zend_ini_entry *entry,
+	char *new_vlaue, unint new_value_length,
+	void *mh_arg1, void *mh_arg2,void *mh_args3,
+	ini stage TSRMLS_CC);
+
+-----------------------------------------------------------------------
+参数名									含义
+
+entry 									指向引擎真实存储的INI指令项.这个结构体
+										提供了当前值,原始值,所属模块,以及其他
+										一些下面代码(zend_ini_entry结构体结构)
+										列出的信息
+-------------------------------------------------------------------------------
+new_value								要被设置的值.如果处理器返回SUCCESS,这个值
+										被设置entry->value,同时如果entry->orig_value
+										当前没有设置,则将当前设置到entry->orig_value
+										中,并设置new_value_length传递.
+---------------------------------------------------------------------------------
+mh_arg1,2,3								这3个指针对应INI指令定义时给出的数据指针
+										zend_ini_entry结构体中的3个同名成员,实际上,
+										这几个值是引擎内部处理使用,你不需要关心他们
+-----------------------------------------------------------------------------------
+stage									ZEND_INI_STAGE_系列的5个值之一:STARTUP,
+										SHUTDOWN,ACTIVATE,DEACTIVATE,RUNTIME.这些
+										常量对应于MINIT,MSHUTDOWN,RINIT,RSHUTDOWN,
+										以及活动脚本执行.
+-----------------------------------------------------------------------------------
+核心结构体:	zend_ini_entry
+
+struct _zend_ini_entry{
+	int module_number;
+	int modifiable;
+	char *name;
+	uint name_length;
+	ZEND_INI_MH(*om_modify);
+	void *mh_arg1;
+	void *mh_arg2;
+	void *mh_arg3;
+
+	char *value;
+	uint value_length;
+	
+	char *orig_value;
+	uint orig_value_length;
+	int modified;
+
+	void ZEND_INI_DISP(*displayer);
+};
+------------------------------------------------------------------------------
+展示INI设置
+	在上一章,你看到了MINFO函数以及相关的指令用于展示扩展的信息.由于扩展暴露INI
+指令是很常见的,因此引擎提供了一个公共的宏可以放置到PHP_MINIFO_FUNCTION()中用于
+展示INI指令信息:
+PHP_MINFO_FUNCTION(sample4)
+{
+	DISPLAY_INI_ENTRIES();
+}
+	这个宏将迭代PHP_INI_BEGIN()和PHP_INI_END()宏之间定义的INI指令集和,在一个3列
+的表格中展示它们的INI指令名,原始值(全局的),以及当前值(经过PERDIR指令或ini_set
+调用修改后)
+	默认情况下,所有的指令都直接一气字符串形式输出.对于某些指令,比如布尔值以及
+用于语法高亮的颜色值,则在展示处理时应用了其他格式.这些格式是通过每个INI设置的
+显示处理器的,它和你看到OnModify一样是一个动态的回调函数指针.

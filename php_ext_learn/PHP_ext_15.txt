@@ -1,0 +1,252 @@
+	显示处理器可以使用PHP_INI_ENTRY()宏的扩展版指定,它接受一个额外的参数.如果通过设置为NULL,
+则使用展示字符串值的处理器作为默认处理器:
+
+PHP_INI_ENTRY_EX("sample4.greeting", "Hello World",
+	PHP_INI_ALL, php_sample4_modity_greeting, php_sampl4_display_greeting);
+	
+	显然,需要在INI设置定义之前声明这个函数.和OnModify回调函数一样,这可以通过
+一个包装宏以及少量编码完成:
+
+#include "SAPI.H" /* 需要sapi_module模块 */
+
+PHP_INI_DISP(php_sample4_display_greeting)
+{
+	const char *value = ini_entry->value;
+	/* 选择合适的当前值或原始值 */
+	if(type == ZEND_INI_DISPLAY_ORIG &&
+		ini_entry->modified)
+	{
+		value = ini_entry->orig_value;
+	}
+
+	/* 使得打招呼的字符串粗体显示(当以HTML方式输出时) */
+	if(sapi_module.phpinfo_as_text){
+		php_printf("%s", value);
+	}else{
+		php_printf("<b>%s</b>", value);
+	}
+}
+
+---------------------------------------------------------------------------
+绑定到扩展的全局空间
+	所有的INI指令都在ZEND引擎内有一块存储空间,可以用以跟踪脚本内的变更并进行
+请求外部的全局设置维护.在这块存储空间中,所有的INI指令都以字符串值存储.你已经
+知道了,这些值可以使用INI_INt(),INI_FTL(),INI_BOOL()等宏函数,很简单的翻译成其
+他的标量类型.
+	这个查找和转换过程由于两个原因非常低效:首先,每次一个INI的值在获取时,它必
+须通过脚本名字在一个HashTable中进行定位.这种查找方式对于仅在运行时编译的用户
+空间脚本而言是没有问题的,但是对于已编译的机器代码源,运行时做这个工作就毫无意
+义.
+	每次请求标量值的时候都需要将底层的字符串值转换到标量值是非常低效的,因此
+我们使用你已经学习过的线程安全全局作为存储媒介,每次INI指令变更时更新它即可.
+这样,所有访问INI指令的代码都只需要查找你的线程安全全局空间结构体中的某个指
+针即可,这样就获得了编译器优化的优点.
+	在你的php_sample4.h文件MODULE_GLOBALS结构体中增加const char *greeting;
+接着更新sample4.c中的下面两个方法:
+
+ZEND_INI_MH(php_sample4_modify_greeting)
+{
+	/* Disallow empty greetyings */
+	if(new_value_length==0){
+		return FAILURE;
+	}
+
+	SAMPLE4_G(greeting) = new_value;
+	return SUCCESS;
+}
+
+PHP_FUNCTION(sample4_hello_world)
+{
+	php_printf("%s\n", SAMPLE4_G(greeting));
+}
+-------------------------------------------------------------------------------
+	由于这是对INI访问的一种非常常见的优化方式,因此引擎暴露了一组专门处理INI指令
+到全局变量的绑定宏:
+
+STD_PHP_INI_ENTRY_EX("sample4.greeting", "Hello World",
+	PHP_INI_ALL, OnUpdateStringUnemtpy, greeting,
+	zend_sample4_globals, sample4_gobals,
+	php_sample4_display_greeting)
+-------------------------------------------------------------------------
+	这个宏执行和上面你自己的php_sample4_modify_greeting相同的工作,但它不需
+要OnModify回调.取而代之的是.如果要允许空的greeting指令值,你可以直接指定
+OnUpdateString替代OnUpdateStringUnempty.
+	类似的,INI指令也可以绑定long,double,zend_bool的标量值.在你的php_sample4.h
+中MODULE_GLOBALS结构体上增加了几个字段:
+
+long mylong;
+double mydouble;
+zend_bool mybool;
+
+	现在你的PHP_INI_BEGIN()/PHP_INI_END()代码块中使用STD_PHP_INI_ENTRY()宏创建
+新的INI指令,它和对应的_EX版本的宏的区别只是显示处理器以及绑定到的值不同.
+
+STD_PHP_INI_ENTRY("sample4.longval", "123",
+	PHP_INI_ALL, OnUpdateLong, mylong,
+	zend_sample4_globals, sample4_globals)
+
+STD_PHP_INI_ENTRY("sample4.doubleval", "123.456",
+	PHP_INI_ALL, OnUpdateDouble, mydouble,
+	zend_sample4_globals, sample4_globals)
+
+STD_PHP_INI_ENTRY("sample4.boolval", "1",
+	PHP_INI_ALL, OnUpdateBool, mybool,
+	zend_sample4_globals, sample4_globals)
+------------------------------------------------------------------
+	这里要注意,如果调用了DISPLAY_INI_ENTRIES(),布尔类型的INI指令
+"sample4.boolval"将和其他设置一样,被显示为它的字符串值;然而,首选的
+布尔值指令应该被显示为"on"或"off".要使用这些更加表意的显示,你可以
+使用STD_PHP_INI_ENTRY_EX()宏并创建显示处理器,或者使用另外一个宏:
+	STD_PHP_INI_BOOLEAN("sample4.boolval", "1",
+		PHP_INI_ALL, OnUpdateBool, mybool,
+		zend_sample4_global *, sample4_globals)
+	这个特定类型的宏是布尔类型特有的,它提供的是将布尔值转换为"on"
+/"off"值的显示处理器.
+--------------------------------------------------------------------
+访问流
+	PHP用户空间中所有的文件I/O处理都通过php4.3引入的php流包装层处理的.
+在内部,扩展代码可以选择使用stdio或posix文件处理和本地文件系统或伯克利
+域套接字进行通信,或者也可以调用和用户空间流I/O相同的API.
+----------------------------------------------------------------------
+流的概览
+	通常,直接的文件描述符相比调用流包装层消耗更少的CPU和内存;然而,这样
+会将实现某个特定协议的所有工作都堆积到作为扩展开发者的你身上.通过挂钩到
+流包装层,你的扩展代码可以透明的使用各种内建的流包装,比如HTTP,FTP,以及它
+们对应的SSL版本,另外还有gzip和bzip压缩包装.通过include特定PEAR或PECL模块,
+你的代码还可以访问其他协议,比如SSH2,WebDav,甚至是Gopher!
+	本章将介绍内部基于流工作的基础API.后面到第16章"有趣的流"中,我们将看
+到诸如应用过滤器,使用上下文选项和参数等高级概念.
+----------------------------------------------------------------------
+打开流
+	尽管是一个统一的API,但实际上依赖于所需要的流的类型,有4中不同的路径
+去打开一个流.从用户空间角度来看,这四种不同的类别如下(函数列表只代表实
+例,不是完整列表):
+<?php
+
+	/** fopen包装
+	 * 操作文件/URI方式指定远程文件类资源
+	 */
+	$fp = fopen($url, $mode);
+	$data = file_get_contents($url);
+	$lines = file($url);
+
+	/* 传输
+	 * 基于套接字的顺序I/O
+	 */
+	$fp = fsockopen($host, $port);
+	$fp = stream_socket_client($uri);
+	$fp = stream_socket_server($uri, $options);
+
+	/* 目录流 */
+	$dir = opendir($url);
+	$files = scandir($url);
+	$obj = dir($url);
+
+	/* "特殊"的流 */
+	$fp = tmpfile();
+	$fp = popen($cmd);
+	proc_open($cmd, $pipes);
+?>
+	无论你打开的是什么类型的流,它们都存储在一个公共的结构体php_stream中.
+------------------------------------------------------------------------
+fopen包装
+	我们首先从实现fopen()函数开始.现在你应该已经对创建扩展骨架很熟悉了,如果
+还不熟悉,请回到第五章"你的第一个扩展"复习一下,小面是我们实现fopen()函数:
+
+PHP_FUNCTION(samlple5_fopen)
+{
+	php_stream *stream;
+	char *path, *model
+	int path_len, mode_len;
+	int options = ENFORCE_SAFE_MODE | REPORT_ERRORS;
+
+	if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "ss",
+		&path, &path_len, &mode, &mode_len) == FAILURE)
+	{
+		return;
+	}
+
+	stream = php_stream_open_wrapper(path, mode, options, NULL);
+
+	if(!stream){
+		RETURN_FALSE;
+	}
+
+	php_stream_to_zval(stream, return_value);
+}
+	php_stream_open_wrapper()目的应该是完全绕过底层.path指定要读写文件
+名或URL,读写行为依赖于mode的值.
+	options是位域的标记值的集合,这里是设置为下面介绍的一组固定值:
+
+USE_PATH					将php.ini文件的include_path应该到相对路径上.
+							内建函数fopen()在指定第三个参数为TRUE时将会设置
+							这个选项.
+
+STREAM_USE_URL				设置这个选项后,将只能打开远端URL.对于php://,
+							file://,zlib://,bzip2://这些URL包装器并不认为
+							它们是远端URL.
+
+ENFORCE_SAFE_MODE			尽管这个常量这样命名,但实际上设置这个选项后仅仅
+							是启用了安全模式(php.ini文件中safe_mode指令)的
+							强制检查.如果没有设置这个选项将导致跳过safe_mode
+							的检查(不论INI设置中safe_mode如果设置)
+
+REPORT_ERRORS				在指定的资源打开过程中碰到错误时,如果设置了这个
+							选项则将产生错误报告.
+
+STREAM_MUST_SEEK			对于某些流,比如套接字,是不可以seek的(随机访问);
+							这类文件句柄,只有在特定情况下才可以seek.如果
+							调用作用域指定这个选项,并且包装器检测到它不能
+							保证可以seek,将会拒绝打开这个流.
+
+STREAM_WILL_CAST			如果调用作用域要求流可以装换到stdio或posix文件
+							描述符,则应该给open_wrapper函数传递这个选项,以
+							保证在I/O操作发生以前就失败
+
+STREAM_ONLY_GET_HEADERS		标识只需要从流中请求元数据.实际上这是用于Http
+							包装器,获取http_response_headers全局变量而不真
+							正的抓取远程文件内容.
+
+STREAM_DISABLE_OPEN_BASEDIR	类似safe_mode检查,不设置这个选项则会检查INI设置
+							open_basedir,如果指定这个选项则可以绕过这个默认
+							的检查.
+
+STREAM_OPEN_PERSISTENT		告知流包装器,所有内部分配的空间都采用持久化分配
+							并将关联的资源注册到持久化列表中.
+
+IGNORE_PATH					如果不指定,则搜索默认的包含路径.对数URL包装器都
+							忽略这个选项.
+
+IGNORE_URL					提供这个选项时,流包装层只打开本地文件,所有的is_url
+							包装器都将忽略.
+-----------------------------------------------------------------------------
+	最后的NULL参数是char **类型,它最初是用来设置匹配路径,如果path指向普通文件
+URL,则去掉file://部分,保留直接的文件路径用于传统的文件名操作.这个参数仅仅是以前
+引擎内部处理使用的.
+	此外,还有php_stream_open_wrapper()的一个扩展版本:
+
+php_stream *php_steam_open_wrapper_ex(char *path,
+	char *mode, int options, char **opened_path,
+	php_stream_context *context);
+
+	最后一个参数context允许附件的控制,并可以得到包装器内的通知.你将在16章看到这个
+参数的细节.
+--------------------------------------------------------------------------------
+传输层包装
+	尽管传输流和fopen包装流是相同的组件组从的,但它的注册策略和其他的流不同.从某种
+程度上来说,这是因为用户空间对它们的访问方式的不同造成的,它们需要实现基于套接字的
+其他因子.
+	从扩展开发者角度来看,打开传输流的过程是相同的.下面是对fsockopen()的实现:
+
+PHP_FUNCTION(sample5_fsockopen)
+{
+	php_stream *stream;
+	char *host, *transport, *errstr = null;
+}
+
+
+
+.....
+
+以后部分全部都流操作部分,由于内容太多了,我的PHP扩展开发学习就告一段落.
+我就自己慢慢看了,在开发中去实践了.
