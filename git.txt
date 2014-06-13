@@ -1,4 +1,4 @@
-//Git使用方法
+i//Git使用方法
 
 git config --global user.name midoks
 git config --global user.email midoks@163.com
@@ -19,6 +19,9 @@ git rm --cached <文件名> (系统中还是存在)
 git commit -m "修改的消息" --提交修改
 git push --tags --将修改推到服务器
 git branch 	--提交修改
+
+git branch gh-pages (切换到gh-pages域名可以绑定的分支)
+
 			-a 查看本地branch
 			-d 删除
 git checkout master 切换分支
