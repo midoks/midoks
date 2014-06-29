@@ -12,6 +12,8 @@
 	- DEDE微信机器人插件
 - midoks_weixin_robot
 	- DISCUZ微信机器人插件
+- ec_plugins_install
+	- ecshop插件机制实现
 
 ### 文件解释
 - PHPproxy.php
@@ -24,3 +26,5 @@
 	- 查看Memcache在线状态
 - DelBom.php
 	- 删除文件Bom信息
+- DeleteDotSvn.php
+	- 删除文件svn记录信息
