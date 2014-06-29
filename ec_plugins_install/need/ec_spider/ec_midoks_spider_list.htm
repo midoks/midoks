@@ -1,0 +1,42 @@
+{include file="pageheader.htm"}
+<div class="list-div" id="listDiv">
+    <table cellspacing='1' cellpadding='3'>
+        <tr>
+            <th>id</th>
+            <th>蜘蛛名</th>
+            <th>时间</th>
+            <th>ip</th>
+            <th>url</th>
+            <th>{$lang.handler}</th>
+        </tr>
+        
+        {if $error}
+        <tr><td valign="top" colspan="6" style="text-align:center;">{$error}</td></tr>
+        {else}
+        {foreach from=$list item=list}
+        <tr>
+            <td class="first-cell" valign="top" nowrap="true">{$list.id}</td>
+            <td valign="top" nowrap="true">{$list.name}</td>
+            <td valign="top">{$list.time}</td>
+            <td valign="top">{$list.ip}</a></td>
+            <td valign="top">{$list.url}</a></td>
+            <td valign="top">
+                <a href="javascript:confirm_redirect('你的真的确认删除!!!', location.href+'&method=del&id='+{$list.id})">删除</a>
+            </td>
+        </tr>
+        {/foreach}
+        {/if}
+        
+        <tr>
+            <th colspan="5">{$page}</th>
+            <th><a href="javascript:confirm_redirect('你真的确认清空!!!', location.href+'&method=clear')">清空</a></th>
+        </tr>
+        
+    </table>
+</div>
+
+
+<script type="text/javascript" language="javascript">
+//console.log(Ajax);
+</script>
+{include file="pagefooter.htm"}
