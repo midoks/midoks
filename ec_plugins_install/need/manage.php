@@ -14,13 +14,18 @@ if(is_admin()){//后台页面
 	$purview['plugins_manage'] = 'plugins_manage'; //插件管理
 
 
-	$modules['plugins_manage']['01_plugins_list']= 'plugins.php?m=list';
+	$modules['plugins_manage']['01_plugins_list']	= 'plugins.php?m=list';
 	$_LANG['01_plugins_list']	= '插件列表';
 	$purview['01_plugins_list'] = 'plugins_manage'; //插件管理
 
-	//$modules['pulgins']['02_plugins_list']		= 'plugins.php?m=list';
-	//$_LANG['02_plugins_list']	= '其他';
-	//$purview['02_plugins_list'] = 'plugins_manage'; //插件管理
+
+	$modules['plugins_manage']['02_plugins_list']	= 'plugins.php?m=readme';
+	$_LANG['02_plugins_list']	= '插件说明';
+	$purview['02_plugins_list'] = 'plugins_manage'; //插件管理
+
+	if(isset($_GET['m']) && 'readme' == $_GET['m']){
+		$smarty->display('plugins_readme.htm');
+	}
 	
 	if(isset($_GET['m']) && 'install' == $_GET['m']){
 		m_ec_insert_plugins($_GET);

@@ -95,6 +95,26 @@ if($ret){
 	$sign = false;
 }
 
+//移动插件实现文件
+$so = BAK_DIR.'need/plugins.htm';
+$to = ROOT_PATH.M_ADMIN_ADDR.'/templates/plugins.htm';
+$ret = copy($so, $to);
+if($ret){
+	echo $to.' 插件程序移动完成<br />';
+}else{
+	$sign = false;
+}
+
+//移动插件实现文件
+$so = BAK_DIR.'need/plugins_readme.htm';
+$to = ROOT_PATH.M_ADMIN_ADDR.'/templates/pluginstemplates/plugin.htm_readme.htm';
+$ret = copy($so, $to);
+if($ret){
+	echo $to.' 插件程序移动完成<br />';
+}else{
+	$sign = false;
+}
+
 
 //添加引入文件,实现插件效果
 add_inc_file($root_init, 'include("./'.M_ADMIN_ADDR.'/plugins.php");');

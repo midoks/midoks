@@ -23,6 +23,8 @@ delete_inc_file($root_admin, 'include("./plugins.php");');
 
 @unlink(ROOT_PATH.M_ADMIN_ADDR.'/plugins.php');
 @unlink(ROOT_PATH.M_ADMIN_ADDR.'/menu.php');
+@unlink(ROOT_PATH.M_ADMIN_ADDR.'/templates/plugins.htm');
+@unlink(ROOT_PATH.M_ADMIN_ADDR.'/templates/plugins_readme.htm');
 
 //删除引入文件
 function delete_inc_file($file, $value = ''){
