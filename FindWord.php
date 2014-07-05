@@ -117,6 +117,7 @@ function fwd($word,$file='bwlblog/ThinkPHP'){
 	return $str;
 }
 
+header( 'Content-Type: text/html; charset=utf-8' );
 //test
 fwd('要查找的字符串','文件名');
 ?>
