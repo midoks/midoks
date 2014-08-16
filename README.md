@@ -14,6 +14,16 @@
 	- DISCUZ微信机器人插件
 - ec_plugins_install
 	- ecshop插件机制实现
+- vpn
+	- 搭建vpn服务器
+- python
+	- 学习python片段
+- c
+	- 学习C片段
+- golang
+	- 学习golang片段
+- Nodejs
+	-学习nodejs判断
 
 ### 文件解释
 - PHPproxy.php
