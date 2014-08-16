@@ -1,0 +1,69 @@
+vpn 设置
+
+
+yum install -y gcc ppp iptables
+
+rpm -ivh http://acelnmp.googlecode.com/files/pptpd-1.3.4-1.rhel5.x86_x64.rpm (w)
+
+wget http://poptop.sourceforge.net/yum/stable/packages/pptpd-1.3.4-2.rhel5.i386.rpm(w)
+
+wget http://www.diahosting.com/dload/pptpd-1.3.4-1.rhel5.1.i386.rpm (r)
+
+
+yum install -y libwrap.so.0 [depend on]
+
+rpm -ivh pptpd-1.3.4-2.rhel5.i386.rpm
+
+
+
+vim /etc/pptpd.conf
+去掉localip和remoteip的注释
+
+
+vim /etc/ppp/options.pptpd
+
+在最下面添加两行
+ms-dns 8.8.8.8
+ms-dns 8.8.4.4
+
+设置用户密码
+vim /etc/ppp/chap-secrets
+
+vim /etc/sysctl.conf
+
+将net.ipv4_ipforward 改为1 保存退出
+通过下面命令使其生效
+sysctl -p
+
+iptables -t nat -A POSTROUTING -s 192.168.0.0/24 -o etho -j ACCEPT
+iptables -A INPUT -p tcp -m state --state NEW -m tcp --dport 1723 -j ACCEPT #注：这条命令尽量放在防火墙列表前面几条不然可能会阻止
+
+
+iptables -A INPUT -p gre -j ACCEPT
+iptables -A INPUT -p tcp -m tcp --dport 1723 -j ACCEPT
+iptables -A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+iptables -A FORWARD -s 192.168.1.0/24 -o eth0 -j ACCEPT
+iptables -A FORWARD -d 192.168.1.0/24 -i eth0 -j ACCEPT
+iptables -t nat -A POSTROUTING -s 192.168.1.0/24 -o eth0 -j MASQUERADE
+
+
+iptables -t nat -A POSTROUTING -s 192.168.1.0/24 -o venet0 -j MASQUERADE
+
+service iptables save
+service iptables restart
+
+service pptpd start
+
+#运行信息
+tail -f -n 10 /var/log/messages
+
+
+
+vim /etc/ppp/options.pptpd
+
+
+
+#查看iptables 规则
+iptables -nvL --line-number
+
+
