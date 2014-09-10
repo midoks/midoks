@@ -28,6 +28,8 @@ ms-dns 8.8.4.4
 
 设置用户密码
 vim /etc/ppp/chap-secrets
+client        server  secret                  IP addresses 
+shen pptpd 123456 * 
 
 vim /etc/sysctl.conf
 

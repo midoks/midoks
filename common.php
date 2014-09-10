@@ -96,4 +96,24 @@ function Write($fn, $text){
 	fwrite($fp, $text."\n");
 	fclose($fp);
 }
+
+
+
+// 读取备份文件中,所有目录
+function src_dir_file($name){
+
+	$name = rtrim($name,'/').'/';
+	$fp = opendir($name);
+	$arr = array();
+	while($n = readdir($fp))
+		if($n=='.'|| $n=='..'){
+		}else if(is_dir($name.$n)){
+			$arr[]= src_dir_file($name.$n);
+		}else if(is_file($name.$n)){
+			$arr[] = $name.$n;
+		}
+	closedir($fp);
+	return $arr;
+
+}
 ?>
