@@ -48,7 +48,6 @@ class TimeServer{
 
 		$this->serv->on('WorkerStart', function($serv, $worker_id){
 			echo "OnWorkerStart\n";
-			opcache_reset();
 
 			include('hot_reload.php');
 			$this->worker = null;
@@ -62,7 +61,15 @@ class TimeServer{
 
 		$this->serv->on('WorkerStop', function(){
 			echo("OnWorkerStop\n");
-			opcache_reset();
+			if(function_exists('opcache_reset')){
+				opcache_reset();
+			}
+			
+			if(function_exists('eaccelerator_clear')){
+				eaccelerator_clear();
+				eaccelerator_clean();
+				eaccelerator_purge();
+			}
 		});
 
 		$this->serv->on('Connect', array($this, 'onConnect'));
