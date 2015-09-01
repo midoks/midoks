@@ -1,0 +1,10 @@
+ACE php 代码目录说明
+===================================
+  webroot:     服务器可访问到的代码目录,  一般情况下, 对外访问的 php 文件和所有静态文件放置此目录下
+  app.yaml:    代码配置文件, 文档说明: http://ace.aliapp.com/php/app-config.md
+                    默认不可在本地写文件, 需要本地写文件请务必在布署前配置 app.yaml
+                                        当通过 URL 访问文件/目录不存在时, 默认转发请求到/index.php?[参数]
+
+
+  开发者社区: http://bbs.aliyun.com/thread/220.html
+  官方旺旺群: 1016033632
