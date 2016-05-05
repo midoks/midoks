@@ -43,5 +43,5 @@ make -j2 #支持多核特性
 ### 注意
 --with-pcre=../pcre \ #必须填写 pcre包解药路径
 
-开发模式,把次配置关闭
+开发模式,把此配置关闭
 lua_code_cache off;
