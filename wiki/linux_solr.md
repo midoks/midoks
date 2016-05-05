@@ -50,7 +50,7 @@ tar zxvf tomcat-*.tar.gz
 
 
 ### 其他
-
+```
 uname -a # 查看内核/操作系统/CPU信息 
 head -n 1 /etc/issue # 查看操作系统版本 
 cat /proc/cpuinfo # 查看CPU信息 
@@ -88,3 +88,4 @@ crontab -l # 查看当前用户的计划任务服务
 chkconfig –list # 列出所有系统服务 
 chkconfig –list | grep on # 列出所有启动的系统服务程序 
 rpm -qa # 查看所有安装的软件包
+```
