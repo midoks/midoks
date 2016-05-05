@@ -1,10 +1,10 @@
-### openresty Ê¹ÓÃ
+### openresty ä½¿ç”¨
 
-### ĞèÒªµÄ×ÊÔ´
+### éœ€è¦çš„èµ„æº
 - wget http://openresty.org/download/ngx_openresty-1.4.3.6.tar.gz
 - http://www.pcre.org/
 
-### °²×°
+### å®‰è£…
 ```
 yum install readline-devel pcre-devel openssl-devel gcc tcl
 
@@ -27,21 +27,21 @@ make
 make install
 
 
-make -j2 #Ö§³Ö¶àºËÌØĞÔ
+make -j2 #æ”¯æŒå¤šæ ¸ç‰¹æ€§
 
-##Æô¶¯
+##å¯åŠ¨
 /usr/local/openresty/nginx/sbin/nginx -c /usr/local/openresty/nginx/conf/nginx
-## Í£Ö¹|ÖØÆô
+## åœæ­¢|é‡å¯
 /usr/local/openresty/nginx/sbin/nginx -s relaod|stop
-##¼ì²é
+##æ£€æŸ¥
 /usr/local/openresty/nginx/sbin/nginx -t
 
 ```
 
 
 
-### ×¢Òâ
---with-pcre=../pcre \ #±ØĞëÌîĞ´ pcre°ü½âÒ©Â·¾¶
+### æ³¨æ„
+--with-pcre=../pcre \ #å¿…é¡»å¡«å†™ pcreåŒ…è§£è¯è·¯å¾„
 
-¿ª·¢Ä£Ê½,°Ñ´ÎÅäÖÃ¹Ø±Õ
+å¼€å‘æ¨¡å¼,æŠŠæ¬¡é…ç½®å…³é—­
 lua_code_cache off;
