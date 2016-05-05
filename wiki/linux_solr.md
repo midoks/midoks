@@ -1,11 +1,11 @@
-### solr´î½¨(linux)
+### solræ­å»º(linux)
 
-### ĞèÒªµÄ×ÊÔ´
+### éœ€è¦çš„èµ„æº
 - yum -y remove java-1.7.0-openjdk*
 - yum -y remove tzdata-java.noarch
 
 - yum install java
-- http://download.oracle.com/otn-pub/java/jdk/8u91-b14/jdk-8u91-linux-x64.tar.gz £¨ĞèÒªÊÖ¶¯ÏÂÔØ£©
+- http://download.oracle.com/otn-pub/java/jdk/8u91-b14/jdk-8u91-linux-x64.tar.gz ï¼ˆéœ€è¦æ‰‹åŠ¨ä¸‹è½½ï¼‰
 - wget http://mirror.bit.edu.cn/apache/lucene/solr/6.0.0/solr-6.0.0.tgz
 - wget http://apache.opencas.org/tomcat/tomcat-8/v8.0.33/bin/apache-tomcat-8.0.33.tar.gz
 
@@ -23,15 +23,15 @@ mv java* /usr/local/java
 
 
 
-ÅäÖÃjava JDK
+é…ç½®java JDK
 ```
 JAVA_HOME=/usr/local/java
 PATH=$JAVA_HOME/bin:$PATH
 export JAVA_HOME PATH
 ```
-Ğ´Èë:
+å†™å…¥:
 /etc/profile.d/jdk.sh
-Ö´ĞĞ,ÉúĞ§
+æ‰§è¡Œ,ç”Ÿæ•ˆ
 ./etc/profile.d/jdk.sh 
 
 tar zxvf tomcat-*.tar.gz 
@@ -49,42 +49,42 @@ tar zxvf tomcat-*.tar.gz
 
 
 
-### ÆäËû
+### å…¶ä»–
 
-# uname -a # ²é¿´ÄÚºË/²Ù×÷ÏµÍ³/CPUĞÅÏ¢ 
-# head -n 1 /etc/issue # ²é¿´²Ù×÷ÏµÍ³°æ±¾ 
-# cat /proc/cpuinfo # ²é¿´CPUĞÅÏ¢ 
-# hostname # ²é¿´¼ÆËã»úÃû 
-# lspci -tv # ÁĞ³öËùÓĞPCIÉè±¸ 
-# lsusb -tv # ÁĞ³öËùÓĞUSBÉè±¸ 
-# lsmod # ÁĞ³ö¼ÓÔØµÄÄÚºËÄ£¿é 
-# env # ²é¿´»·¾³±äÁ¿×ÊÔ´ 
-# free -m # ²é¿´ÄÚ´æÊ¹ÓÃÁ¿ºÍ½»»»ÇøÊ¹ÓÃÁ¿ 
-# df -h # ²é¿´¸÷·ÖÇøÊ¹ÓÃÇé¿ö 
-# du -sh <Ä¿Â¼Ãû> # ²é¿´Ö¸¶¨Ä¿Â¼µÄ´óĞ¡ 
-# grep MemTotal /proc/meminfo # ²é¿´ÄÚ´æ×ÜÁ¿ 
-# grep MemFree /proc/meminfo # ²é¿´¿ÕÏĞÄÚ´æÁ¿ 
-# uptime # ²é¿´ÏµÍ³ÔËĞĞÊ±¼ä¡¢ÓÃ»§Êı¡¢¸ºÔØ 
-# cat /proc/loadavg # ²é¿´ÏµÍ³¸ºÔØ´ÅÅÌºÍ·ÖÇø 
-# mount | column -t # ²é¿´¹Ò½ÓµÄ·ÖÇø×´Ì¬ 
-# fdisk -l # ²é¿´ËùÓĞ·ÖÇø 
-# swapon -s # ²é¿´ËùÓĞ½»»»·ÖÇø 
-# hdparm -i /dev/hda # ²é¿´´ÅÅÌ²ÎÊı(½öÊÊÓÃÓÚIDEÉè±¸) 
-# dmesg | grep IDE # ²é¿´Æô¶¯Ê±IDEÉè±¸¼ì²â×´¿öÍøÂç 
-# ifconfig # ²é¿´ËùÓĞÍøÂç½Ó¿ÚµÄÊôĞÔ 
-# iptables -L # ²é¿´·À»ğÇ½ÉèÖÃ 
-# route -n # ²é¿´Â·ÓÉ±í 
-# netstat -lntp # ²é¿´ËùÓĞ¼àÌı¶Ë¿Ú 
-# netstat -antp # ²é¿´ËùÓĞÒÑ¾­½¨Á¢µÄÁ¬½Ó 
-# netstat -s # ²é¿´ÍøÂçÍ³¼ÆĞÅÏ¢½ø³Ì 
-# ps -ef # ²é¿´ËùÓĞ½ø³Ì 
-# top # ÊµÊ±ÏÔÊ¾½ø³Ì×´Ì¬ÓÃ»§ 
-# w # ²é¿´»î¶¯ÓÃ»§ 
-# id <ÓÃ»§Ãû> # ²é¿´Ö¸¶¨ÓÃ»§ĞÅÏ¢ 
-# last # ²é¿´ÓÃ»§µÇÂ¼ÈÕÖ¾ 
-# cut -d: -f1 /etc/passwd # ²é¿´ÏµÍ³ËùÓĞÓÃ»§ 
-# cut -d: -f1 /etc/group # ²é¿´ÏµÍ³ËùÓĞ×é 
-# crontab -l # ²é¿´µ±Ç°ÓÃ»§µÄ¼Æ»®ÈÎÎñ·şÎñ 
-# chkconfig ¨Clist # ÁĞ³öËùÓĞÏµÍ³·şÎñ 
-# chkconfig ¨Clist | grep on # ÁĞ³öËùÓĞÆô¶¯µÄÏµÍ³·şÎñ³ÌĞò 
-# rpm -qa # ²é¿´ËùÓĞ°²×°µÄÈí¼ş°ü
+# uname -a # æŸ¥çœ‹å†…æ ¸/æ“ä½œç³»ç»Ÿ/CPUä¿¡æ¯ 
+# head -n 1 /etc/issue # æŸ¥çœ‹æ“ä½œç³»ç»Ÿç‰ˆæœ¬ 
+# cat /proc/cpuinfo # æŸ¥çœ‹CPUä¿¡æ¯ 
+# hostname # æŸ¥çœ‹è®¡ç®—æœºå 
+# lspci -tv # åˆ—å‡ºæ‰€æœ‰PCIè®¾å¤‡ 
+# lsusb -tv # åˆ—å‡ºæ‰€æœ‰USBè®¾å¤‡ 
+# lsmod # åˆ—å‡ºåŠ è½½çš„å†…æ ¸æ¨¡å— 
+# env # æŸ¥çœ‹ç¯å¢ƒå˜é‡èµ„æº 
+# free -m # æŸ¥çœ‹å†…å­˜ä½¿ç”¨é‡å’Œäº¤æ¢åŒºä½¿ç”¨é‡ 
+# df -h # æŸ¥çœ‹å„åˆ†åŒºä½¿ç”¨æƒ…å†µ 
+# du -sh <ç›®å½•å> # æŸ¥çœ‹æŒ‡å®šç›®å½•çš„å¤§å° 
+# grep MemTotal /proc/meminfo # æŸ¥çœ‹å†…å­˜æ€»é‡ 
+# grep MemFree /proc/meminfo # æŸ¥çœ‹ç©ºé—²å†…å­˜é‡ 
+# uptime # æŸ¥çœ‹ç³»ç»Ÿè¿è¡Œæ—¶é—´ã€ç”¨æˆ·æ•°ã€è´Ÿè½½ 
+# cat /proc/loadavg # æŸ¥çœ‹ç³»ç»Ÿè´Ÿè½½ç£ç›˜å’Œåˆ†åŒº 
+# mount | column -t # æŸ¥çœ‹æŒ‚æ¥çš„åˆ†åŒºçŠ¶æ€ 
+# fdisk -l # æŸ¥çœ‹æ‰€æœ‰åˆ†åŒº 
+# swapon -s # æŸ¥çœ‹æ‰€æœ‰äº¤æ¢åˆ†åŒº 
+# hdparm -i /dev/hda # æŸ¥çœ‹ç£ç›˜å‚æ•°(ä»…é€‚ç”¨äºIDEè®¾å¤‡) 
+# dmesg | grep IDE # æŸ¥çœ‹å¯åŠ¨æ—¶IDEè®¾å¤‡æ£€æµ‹çŠ¶å†µç½‘ç»œ 
+# ifconfig # æŸ¥çœ‹æ‰€æœ‰ç½‘ç»œæ¥å£çš„å±æ€§ 
+# iptables -L # æŸ¥çœ‹é˜²ç«å¢™è®¾ç½® 
+# route -n # æŸ¥çœ‹è·¯ç”±è¡¨ 
+# netstat -lntp # æŸ¥çœ‹æ‰€æœ‰ç›‘å¬ç«¯å£ 
+# netstat -antp # æŸ¥çœ‹æ‰€æœ‰å·²ç»å»ºç«‹çš„è¿æ¥ 
+# netstat -s # æŸ¥çœ‹ç½‘ç»œç»Ÿè®¡ä¿¡æ¯è¿›ç¨‹ 
+# ps -ef # æŸ¥çœ‹æ‰€æœ‰è¿›ç¨‹ 
+# top # å®æ—¶æ˜¾ç¤ºè¿›ç¨‹çŠ¶æ€ç”¨æˆ· 
+# w # æŸ¥çœ‹æ´»åŠ¨ç”¨æˆ· 
+# id <ç”¨æˆ·å> # æŸ¥çœ‹æŒ‡å®šç”¨æˆ·ä¿¡æ¯ 
+# last # æŸ¥çœ‹ç”¨æˆ·ç™»å½•æ—¥å¿— 
+# cut -d: -f1 /etc/passwd # æŸ¥çœ‹ç³»ç»Ÿæ‰€æœ‰ç”¨æˆ· 
+# cut -d: -f1 /etc/group # æŸ¥çœ‹ç³»ç»Ÿæ‰€æœ‰ç»„ 
+# crontab -l # æŸ¥çœ‹å½“å‰ç”¨æˆ·çš„è®¡åˆ’ä»»åŠ¡æœåŠ¡ 
+# chkconfig â€“list # åˆ—å‡ºæ‰€æœ‰ç³»ç»ŸæœåŠ¡ 
+# chkconfig â€“list | grep on # åˆ—å‡ºæ‰€æœ‰å¯åŠ¨çš„ç³»ç»ŸæœåŠ¡ç¨‹åº 
+# rpm -qa # æŸ¥çœ‹æ‰€æœ‰å®‰è£…çš„è½¯ä»¶åŒ…
