@@ -38,7 +38,8 @@ make -j2 #支持多核特性
 
 ```
 
-
+### 学习
+- https://github.com/moonbingbing/openresty-best-practices
 
 ### 注意
 --with-pcre=../pcre \ #必须填写 pcre包解药路径
