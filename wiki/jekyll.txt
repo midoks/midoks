@@ -1,5 +1,12 @@
+gem list jekyll #展示插件列表
 gem source -a http://gems.github.com -r  https://rubygems.org/
 # 添加源
+
+#安装必要的插件
+gem install jekyll-paginate
+gem install pygments.rb
+gem install wdm
+
 
 $ jekyll serve
 # => 一个开发服务器将会运行在 http://localhost:4000/
