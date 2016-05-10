@@ -3,6 +3,7 @@ gem source -a http://gems.github.com -r  https://rubygems.org/
 # 添加源
 
 #安装必要的插件
+gem install bundler
 gem install jekyll-paginate
 gem install pygments.rb
 gem install wdm
@@ -18,3 +19,6 @@ $ jekyll serve --detach
 
 $ jekyll serve --watch
 # => 和`jekyll serve`相同，但是会查看变更并且自动再生成。
+
+$增量更新
+jekyll serve --watch --incremental
