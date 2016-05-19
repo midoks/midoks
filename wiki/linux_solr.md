@@ -10,10 +10,14 @@
 - wget http://apache.opencas.org/tomcat/tomcat-8/v8.0.33/bin/apache-tomcat-8.0.33.tar.gz
 
 
-http://archive.apache.org/dist/lucene/solr/4.3.0/
+- linux需要下载solr-*.tgz ,(window)zip文件才有效
+http://archive.apache.org/dist/lucene/solr/6.0.0/solr-6.0.0.zip
 
+安装solr(官方说明)
+https://cwiki.apache.org/confluence/display/solr/Installing+Solr
 
-
+##java mysql 驱动
+https://dev.mysql.com/downloads/connector/j/
 
 ### 
 
@@ -42,6 +46,12 @@ tar zxvf tomcat-*.tar.gz
 
 
 
+$ bin/solr start
+$ bin/solr start -f
+$ bin/solr start -p 8984
+$ bin/solr stop -p 8983
+$ bin/solr status
+& bin/solr create -c <name>
 
 
 

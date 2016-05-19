@@ -5,7 +5,7 @@
 yum install samba
 
 #启动
-server smb start|stop|status
+service smb start|stop|status
 
 ##加入自启动
 chkconfig smb on
