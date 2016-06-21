@@ -1,0 +1,1 @@
+python mysqldb -- https://sourceforge.net/projects/mysql-python/
