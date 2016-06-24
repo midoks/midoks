@@ -1,5 +1,7 @@
 ### solr搭建(linux)
 
+http://blog.csdn.net/zoubf/article/details/51505940
+
 ### 需要的资源
 - yum -y remove java-1.7.0-openjdk*
 - yum -y remove tzdata-java.noarch
@@ -54,6 +56,14 @@ $ bin/solr status
 & bin/solr create -c <name>
 
 
+### 创建应用程序和数据目录
+mkdir -p  /data/solr /usr/local/solr
+### 创建运行Solr的用户并赋权
+​groupadd solr
+useradd -g solr solr
+chown -R solr.solr  /data/solr /usr/local/solr
+
+
 
 
 
@@ -99,3 +109,5 @@ chkconfig –list # 列出所有系统服务
 chkconfig –list | grep on # 列出所有启动的系统服务程序 
 rpm -qa # 查看所有安装的软件包
 ```
+
+学习地址:http://blog.csdn.net/zoubf/article/details/51505940
