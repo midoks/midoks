@@ -40,3 +40,6 @@ setfacl -m d:u:mysql:rwx -R /usr/local/mysql
 
 cd ../
 cd ../
+
+#mysql socket Á´½Ó·½Ê½
+#/usr/local/mysql/bin/mysql  -S /YOKA/DB/server0/mysql.sock -uroot -p -A
