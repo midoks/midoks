@@ -24,16 +24,16 @@ cd mysql-5.5.3-m3/
 --with-unix-socket-path=/tmp/mysql.sock
 make && make install
 
-#ÉèÖÃÈ¨ÏŞ
+#è®¾ç½®æƒé™
 setfacl -m u:mysql:rwx -R /usr/local/mysql
 setfacl -m d:u:mysql:rwx -R /usr/local/mysql
-#°²×°mysqlºÍtestÊı¾İ¿â
+#å®‰è£…mysqlå’Œtestæ•°æ®åº“
 /usr/local/mysql/bin/mysql_install_db --user=mysql
-#Æô¶¯mysql·şÎñ
+#å¯åŠ¨mysqlæœåŠ¡
 #/usr/local/mysql/bin/mysqld_safe --user=mysql &
-#ĞŞ¸ÄmysqlµÇÂ¼ÃÜÂëÎª123
+#ä¿®æ”¹mysqlç™»å½•å¯†ç ä¸º123
 #/usr/local/mysql/bin/mysqladmin -uroot password  123456789c
-#ÓÃmysqlµÇÂ¼
+#ç”¨mysqlç™»å½•
 #/usr/local/mysql/bin/mysql -uroot -p123456789c
 
 #ln -s /usr/lib64/mysql/ /usr/lib/mysql
@@ -41,5 +41,5 @@ setfacl -m d:u:mysql:rwx -R /usr/local/mysql
 cd ../
 cd ../
 
-#mysql socket Á´½Ó·½Ê½
+#mysql socket é“¾æ¥æ–¹å¼
 #/usr/local/mysql/bin/mysql  -S /YOKA/DB/server0/mysql.sock -uroot -p -A
