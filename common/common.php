@@ -1,21 +1,21 @@
 <?php
 /*-------------------------
-	@func $ Ê±¼ä¼ÇÂ¼µã $
+	@func $ æ—¶é—´è®°å½•ç‚¹ $
 ---------------------------*/
 function G($start, $end='', $dec=3) {
     static $_info = array();
-    if(!empty($end)) { // Í³¼ÆÊ±¼ä
+    if(!empty($end)) { // ç»Ÿè®¡æ—¶é—´
         if(!isset($_info[$end])) {
             $_info[$end] = microtime(TRUE);
         }
         return number_format(($_info[$end]-$_info[$start]),$dec);
-    }else{ // ¼ÇÂ¼Ê±¼ä
+    }else{ // è®°å½•æ—¶é—´
         $_info[$start] = microtime(TRUE);
     }
 }
 //static $baseUsage = memory_get_usage();
 /*-------------------------
-	@func $ ÄÚ´æ¼ÇÂ¼µã $
+	@func $ å†…å­˜è®°å½•ç‚¹ $
 ---------------------------*/
 function M( $start , $end = '' , $dec = 4){
 	static $_memory =  array();
@@ -30,12 +30,12 @@ function M( $start , $end = '' , $dec = 4){
 }
 
 /*----------------------------
-	@func 			$ Ê±¼äºÍÄÚ´æ¼ÇÂ¼µã $
-	@return array 	$ ·µ»ØÊý×é $
+	@func 			$ æ—¶é—´å’Œå†…å­˜è®°å½•ç‚¹ $
+	@return array 	$ è¿”å›žæ•°ç»„ $
 ------------------------------*/
 function R($start,$end='',$dec=3) {
     static $_info = array();
-    if(!empty($end)) { // Í³¼ÆÊ±¼äºÍÄÚ´æ
+    if(!empty($end)) { // ç»Ÿè®¡æ—¶é—´å’Œå†…å­˜
         if(!isset($_info['time'][$end]) && ! isset($_info['mem'][$end])) {
             $_info['time'][$end]   =  microtime(TRUE);
 			$_info['mem'][$end] = memory_get_usage();
@@ -44,7 +44,7 @@ function R($start,$end='',$dec=3) {
 			number_format(($_info['time'][$end]-$_info['time'][$start]),$dec),
 			number_format(($_info['mem'][$end]-$_info['mem'][$start]),$dec)
 		);
-    }else{ // ¼ÇÂ¼Ê±¼äÄÚ´æ
+    }else{ // è®°å½•æ—¶é—´å†…å­˜
         $_info['time'][$start]  =  microtime(TRUE);
 		$_info['mem'][$start] = memory_get_usage();
     }
@@ -52,8 +52,8 @@ function R($start,$end='',$dec=3) {
 
 
 /*----------------------------------------------------------------------------------
-	@return $ ·µ»ØÒ»¸öÈÕ±ê×¼µÄÈÕÆÚ exp[1990Äê8ÔÂ9ÈÕ 12:59:20] $	
-	@type $ ÊäÈëÒ»¸öÊ±¼äµÄÀàÐÍmysql[Êý¾Ý¼ÇÂ¼µÄÊ±¼ä] file[ÎÄ¼þµÄÊ±¼äÃû] time[Ê±¼ä] $
+	@return $ è¿”å›žä¸€ä¸ªæ—¥æ ‡å‡†çš„æ—¥æœŸ exp[1990å¹´8æœˆ9æ—¥ 12:59:20] $	
+	@type $ è¾“å…¥ä¸€ä¸ªæ—¶é—´çš„ç±»åž‹mysql[æ•°æ®è®°å½•çš„æ—¶é—´] file[æ–‡ä»¶çš„æ—¶é—´å] time[æ—¶é—´] $
 ------------------------------------------------------------------------------------*/	
 function DateTime( $type = '' ){
 	switch( $type ){
@@ -71,7 +71,7 @@ function DateTime( $type = '' ){
 
 
 /*---------------------
-	»ñÈ¡¿Í·þ¶ËIPµØÖ·
+	èŽ·å–å®¢æœç«¯IPåœ°å€
 -----------------------*/
 function get_client_ip(){
 	static $ip = null;
@@ -86,11 +86,11 @@ function get_client_ip(){
 	}elseif( isset($_SERVER['REMOTE_ADDR'] ) ){
 		$ip = $_SERVER['REMOTE_ADDR'];
 	}
-	//¼ì²éIPµØÖ·µÄºÏ·¨ÐÔ
+	//æ£€æŸ¥IPåœ°å€çš„åˆæ³•æ€§
 	$ip = (false!==ip2long($ip)) ? $ip : '0,0,0,0';
 }
 
-//Ð´ÈëÐÅÏ¢
+//å†™å…¥ä¿¡æ¯
 function Write($fn, $text){
 	$fp = fopen($fn, 'ab');
 	fwrite($fp, $text."\n");
@@ -99,7 +99,7 @@ function Write($fn, $text){
 
 
 
-// ¶ÁÈ¡±¸·ÝÎÄ¼þÖÐ,ËùÓÐÄ¿Â¼
+// è¯»å–å¤‡ä»½æ–‡ä»¶ä¸­,æ‰€æœ‰ç›®å½•
 function src_dir_file($name){
 
 	$name = rtrim($name,'/').'/';
@@ -115,5 +115,28 @@ function src_dir_file($name){
 	closedir($fp);
 	return $arr;
 
+}
+
+/**
+ * æœ¬åœ°æ–‡ä»¶ä¸Šä¼ 
+ * @param $url_filename æœ¬åœ°æ–‡ä»¶åœ°å€
+ */
+function file_upload($url_filename){
+
+	if (class_exists('\CURLFile')) {
+        $files_data = array('uid'=>$uid,'Filedata'=>new \CURLFile(realpath($url_filename)));
+    } else {
+        $files_data = array('uid'=>$uid,'Filedata'=>"@".$url_filename);
+    }
+
+    $api_url = 'http://url';
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+    curl_setopt($ch, CURLOPT_POST, TRUE);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $files_data);
+    curl_setopt($ch, CURLOPT_URL, $api_url);
+    $ret = curl_exec($ch);
+    curl_close($ch);
+    return $ret;
 }
 ?>
