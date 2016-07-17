@@ -17,3 +17,7 @@ sudo brew install openssl
 sudo brew install python --with-brewed-openssl
 sudo pip install redis
 sudo pip install MySQL
+
+sudo pip install Django
+
+django-admin.py startproject mysite
