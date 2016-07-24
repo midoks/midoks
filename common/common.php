@@ -139,4 +139,20 @@ function file_upload($url_filename){
     curl_close($ch);
     return $ret;
 }
+
+/**
+ *	多位字段排序
+ *	@param &$array 数组
+ *	@param $field 字段
+ *	@param $desc 排序
+ */
+function sortArrByField(&$array, $field, $desc = false){
+  	$fieldArr = array();
+  	foreach ($array as $k => $v) {
+  	  $fieldArr[$k] = $v[$field];
+  	}
+  	$sort = $desc == false ? SORT_ASC : SORT_DESC;
+  	array_multisort($fieldArr, $sort, $array);
+}
+
 ?>
