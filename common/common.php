@@ -155,4 +155,21 @@ function sortArrByField(&$array, $field, $desc = false){
   	array_multisort($fieldArr, $sort, $array);
 }
 
+
+/**
+ * 保证文件存在
+ * @parma 目录路径
+ */
+function mkdir_p($absdir){
+	$absdir = str_replace('\\', '/', $absdir);
+	$absdir = rtrim($absdir, '/');
+	if(file_exists($absdir)){
+		return true;
+	}
+	$pre_dir = dirname($absdir);
+	if(!file_exists($pre_dir)){
+		mkdir_p($pre_dir);
+	}
+	return mkdir($absdir);
+}
 ?>
