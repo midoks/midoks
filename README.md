@@ -18,3 +18,11 @@
 	- 算法相关
 - lnmp
 	- lnmp环境搭建shell
+
+### c10k && c10m
+```
+http://openresty.org/en/
+
+http://dpdk.org/download
+
+```
