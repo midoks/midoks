@@ -2,6 +2,9 @@
 ```
 https://www.elastic.co/
 https://www.elastic.co/downloads/marvel
+
+#日志收集
+http://kibana.logstash.es/content/logstash/scale/kafka.html
 ```
 
 
