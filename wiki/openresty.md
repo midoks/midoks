@@ -46,3 +46,11 @@ make -j2 #支持多核特性
 
 开发模式,把此配置关闭
 lua_code_cache off;
+
+//指定路径，;;指定默认路径 
+lua_package_path "/opt/vendor/lua/?.lua;;";
+
+//初始化加载
+init_by_lua_file /usr/local/nginx/html/init.lua; 
+
+
