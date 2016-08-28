@@ -54,7 +54,7 @@ end
 -- 判断是否是邮件地址
 function _M.isMail(self, mail)
 
-    local regex = [[^[\w][\w\._-]*@[\w\._-]*.[\w\._-]*$]]
+    local regex = [[^[\w][\w\._-]*@[\w][\w\._-]*.[\w\._-]*$]]
     local m = ngx.re.match(mail, regex, "o")
     if m then 
         -- ngx.say('json:', ":", cjson.encode(m), table.getn(m));
