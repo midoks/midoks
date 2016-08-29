@@ -56,15 +56,24 @@ function _M.isMail(self, mail)
 
     local regex = [[^[\w][\w\._-]*@[\w][\w\._-]*.[\w\._-]*$]]
     local m = ngx.re.match(mail, regex, "o")
+    -- ngx.say('json:', ":", cjson.encode(m), table.getn(m));
     if m then 
-        -- ngx.say('json:', ":", cjson.encode(m), table.getn(m));
         return true
     end
     return false
 end
 
+-- 判断是否是有效的http网络地址
+function _M.isHttpUrl(self, url)
 
-
+    local regex = [[\b(([\w-]+:\/\/?|www[.])[^\s()<>]+(?:\([\w\d]+\)|([^[:punct:]\s]|\/)))]]
+    local m = ngx.re.match(url, regex, "o")
+    -- ngx.say('json:', ":", cjson.encode(m), table.getn(m));
+    if m then 
+        return true
+    end
+    return false
+end
 
 
 return _M
