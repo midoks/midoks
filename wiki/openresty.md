@@ -30,7 +30,7 @@ make install
 make -j2 #支持多核特性
 
 ##启动
-/usr/local/openresty/nginx/sbin/nginx -c /usr/local/openresty/nginx/conf/nginx
+/usr/local/openresty/nginx/sbin/nginx -c /usr/local/openresty/nginx/conf/nginx.conf
 ## 停止|重启
 /usr/local/openresty/nginx/sbin/nginx -s relaod|stop
 ##检查
@@ -42,6 +42,9 @@ make -j2 #支持多核特性
 - https://github.com/moonbingbing/openresty-best-practices
 
 ### 注意
+
+access_log off; 关闭日志
+
 --with-pcre=../pcre \ #必须填写 pcre包解药路径
 
 开发模式,把此配置关闭
