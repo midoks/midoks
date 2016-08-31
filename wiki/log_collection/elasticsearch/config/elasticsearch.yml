@@ -92,4 +92,6 @@
 # Require explicit names when deleting indices:
 #
 # action.destructive_requires_name: true
-network.host: 0.0.0.0
+
+#network.host: 0.0.0.0
+network.host: 10.46.214.130
