@@ -18,12 +18,12 @@ http://www.learnes.net/
 ```
 
 #后台入口
-plugin install mobz/elasticsearch-head
+bin/plugin install mobz/elasticsearch-head
 
 
-plugin install elasticsearch/marvel/latest
+bin/plugin install elasticsearch/marvel/latest
 
-plugin install license
+bin/plugin install license
 
 kibana plugin --install elasticsearch/marvel/latest
 ```

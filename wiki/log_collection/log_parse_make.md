@@ -66,6 +66,9 @@ tar zxvf logstash-2.3.4.tar.gz
 bin/logstash-plugin install logstash-input-kafka
 bin/logstash-plugin install logstash-output-kafka
 
+bin/logstash-plugin install logstash-input-elasticsearch
+bin/logstash-plugin install logstash-output-elasticsearch
+
 配置文件
 
 常用命令
@@ -73,3 +76,20 @@ bin/logstash-plugin install logstash-output-kafka
 
 
 ```
+
+
+- elasticsearch
+https://www.elastic.co/
+https://www.elastic.co/downloads/marvel
+http://www.learnes.net/
+
+#集群配置
+http://blog.csdn.net/he90227/article/details/49782145
+```
+bin/plugin install mobz/elasticsearch-head
+bin/plugin install elasticsearch/marvel/latest
+bin/plugin install license
+```
+http://139.129.217.129:9200/_plugin/head/
+
+
