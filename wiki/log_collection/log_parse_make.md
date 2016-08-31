@@ -48,6 +48,7 @@ rpm -ivh jdk-8u101-linux-x64.rpm
 
 - kafka
 http://kafka.apache.org/
+
 ```
 tar zvxf kafka_2.10-0.10.0.1.tgz
 
@@ -59,6 +60,7 @@ listeners=PLAINTEXT://127.0.0.1:9092
 
 - logstash
 https://www.elastic.co/products/logstash
+http://kibana.logstash.es/content/logstash/scale/redis.html
 ```
 tar zxvf logstash-2.3.4.tar.gz
 
