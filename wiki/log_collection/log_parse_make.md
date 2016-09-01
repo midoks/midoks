@@ -75,6 +75,9 @@ bin/logstash-plugin install logstash-output-kafka
 bin/logstash-plugin install logstash-input-elasticsearch
 bin/logstash-plugin install logstash-output-elasticsearch
 
+bin/logstash-plugin install logstash-input-redis
+bin/logstash-plugin install logstash-output-redis
+
 配置文件
 
 常用命令
