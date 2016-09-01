@@ -49,8 +49,12 @@ rpm -ivh jdk-8u101-linux-x64.rpm
 - kafka
 http://kafka.apache.org/
 
+
 ```
 tar zvxf kafka_2.10-0.10.0.1.tgz
+
+#cmd
+./kafka-topics.sh --create --zookeeper 127.0.0.1:2181 --topic test --replication-factor 1 --partition 1
 
 #开启配置
 listeners=PLAINTEXT://127.0.0.1:9092
