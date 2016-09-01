@@ -7,12 +7,6 @@ function filter_req()
 end
 
 
-function retjpg2()
-	local ylib = require "resty.yokalib.pixels"
-	ylib:new()
-	ylib:one()
-end
-
 function send_kakfa_data2(message, topic)
 
 	local cjson = require "cjson"
@@ -91,7 +85,3 @@ for i,v in pairs(args) do
 end 
 -- ngx.say(cjson.encode(j))
 send_kakfa_data2(j, 'test')
-
-
--- 返回一像素图片
-retjpg2()
