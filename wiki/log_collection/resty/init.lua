@@ -1,5 +1,16 @@
 
 
+local  function format_table(t)
+
+	local str = ''
+
+	for k, v in pairs(t) do 
+		str = str .. k .. ' - ' .. type(v) .. '\r\n'
+	end
+
+	return str
+end
+
 
 -- function init_send_data()
 -- 	ngx.say("init:","mm")
