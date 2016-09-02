@@ -4,7 +4,9 @@ set_error_handler('catchErr');
 set_exception_handler('catchErr');
 
 function catchErr(){
-	var_dump(func_get_args());
+    $list = func_get_args();
+    array_pop($list);
+    var_dump($list);
 }
 
 $d=1/0;
