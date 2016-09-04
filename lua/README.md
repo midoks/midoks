@@ -20,3 +20,16 @@ local url = "https://midoks.github.com/"
 local b = rlib:isHttpUrl(url)
 ngx.say(url,":",b)
 ```
+
+### redis
+```
+local mdredis = require "resty.mdlib.mdredis"
+local red = mdredis:new({ip = "127.0.0.1", port = 6379})
+
+local ok, err = red:cmd('set', 'k', 'v', 10)
+if nil ~= err then
+	ngx.say("set fail")
+end
+local v = red:cmd('get', 'k')
+ngx.say("v:",v)
+```
