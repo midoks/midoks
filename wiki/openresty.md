@@ -43,7 +43,9 @@ make -j2 #支持多核特性
 
 ### 注意
 
-access_log off; 关闭日志
+access_log off; -- 关闭日志
+
+charset utf-8; -- 编码设置
 
 --with-pcre=../pcre \ #必须填写 pcre包解药路径
 
