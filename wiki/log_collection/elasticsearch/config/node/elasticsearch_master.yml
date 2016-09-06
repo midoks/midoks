@@ -1,0 +1,13 @@
+cluster.name: yoka_master
+
+node.master: true
+node.data: true 
+index.number_of_shards: 5
+index.number_of_replicas: 1
+network.host: 10.46.214.130
+
+http.port: 9200
+transport.tcp.compress: true
+transport.tcp.port: 9300
+
+discovery.zen.ping.unicast.hosts: ["10.46.214.164:9200"]

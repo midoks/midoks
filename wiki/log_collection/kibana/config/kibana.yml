@@ -2,7 +2,7 @@
 server.port: 5601
 
 # The host to bind the server to.
-server.host: "139.129.217.129"
+server.host: "10.46.214.130"
 
 # If you are running kibana behind a proxy, and want to mount it at a path,
 # specify that path here. The basePath can't end in a slash.
@@ -20,17 +20,17 @@ elasticsearch.url: "http://10.46.214.130:9200"
 
 # Kibana uses an index in Elasticsearch to store saved searches, visualizations
 # and dashboards. It will create a new index if it doesn't already exist.
-# kibana.index: ".kibana"
+kibana.index: ".kibana"
 
 # The default application to load.
-# kibana.defaultAppId: "discover"
+kibana.defaultAppId: "discover"
 
 # If your Elasticsearch is protected with basic auth, these are the user credentials
 # used by the Kibana server to perform maintenance on the kibana_index at startup. Your Kibana
 # users will still need to authenticate with Elasticsearch (which is proxied through
 # the Kibana server)
-# elasticsearch.username: "user"
-# elasticsearch.password: "pass"
+elasticsearch.username: "root"
+elasticsearch.password: "elastic_pwd"
 
 # SSL for outgoing requests from the Kibana Server to the browser (PEM formatted)
 # server.ssl.cert: /path/to/your/server.crt
