@@ -33,3 +33,15 @@ end
 local v = red:cmd('get', 'k')
 ngx.say("v:",v)
 ```
+
+### tc (测试)
+```
+local lib = require "resty.mdlib.mdtc"
+
+
+-- method 1
+lib:tc(function(param)
+	ngx.say("message "..param)
+	ngx.say("message "..nil)
+end, "test trycall")
+```
