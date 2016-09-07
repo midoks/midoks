@@ -102,3 +102,7 @@ bin/plugin install license
 http://139.129.217.129:9200/_plugin/head/
 
 
+-kibana
+```
+nohup bin/kibana > kibana.log &
+```
