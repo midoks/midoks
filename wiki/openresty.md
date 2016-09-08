@@ -58,4 +58,7 @@ lua_package_path "/opt/vendor/lua/?.lua;;";
 //初始化加载
 init_by_lua_file /usr/local/nginx/html/init.lua; 
 
+# 反爬虫方案
+http://www.07net01.com/2015/04/822090.html
+
 
