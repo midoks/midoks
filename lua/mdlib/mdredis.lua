@@ -52,7 +52,7 @@ function _M.cmd(self, command, ...)
     local select    = select
     local table     = table
 
-    red, err  = _connect(self)
+    local red, err  = _connect(self)
     if err then 
         return nil, err
     end
