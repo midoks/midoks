@@ -9,6 +9,9 @@ sudo sed '/^ *#/d' **.conf > *.bak.conf
 #查看服务器最近操作
 more /var/log/secure 
 who /var/log/wtmp
+
+#查看端口
+netstat -tlntp|grep -E "9200|9300"
 ```
 
 ##linux内核优化
