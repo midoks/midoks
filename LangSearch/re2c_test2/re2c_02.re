@@ -3,8 +3,7 @@
 
 /*!max:re2c*/
 
-struct input_t
-{
+struct input_t {
 	size_t len;
 	char  *str;
 
@@ -13,37 +12,34 @@ struct input_t
 		, str(new char[len + YYMAXFILL])
 	{
 		memcpy(str, s, len);
-		memset(str+len, 'a', YYMAXFILL);
+		memset(str + len, 'a', YYMAXFILL);
 	}
-
 	~input_t()
 	{
-		delete []str;
+		delete[]str;
 	}
 };
 
-
-static bool lex(const input_t &input)
+static bool lex(const input_t & input)
 {
 	const char *YYCURSOR = input.str;
 	const char *const YYLIMIT = input.str + input.len + YYMAXFILL;
-	//const char *const YYMARKER = 0;
 	/*!re2c
 		re2c:define:YYCTYPE = char;
 		re2c:define:YYFILL = "return false;";
 		re2c:define:YYFILL:naked = 1;
 
-		sstr = "'" ["']* "'";
+		sstr = "'"  [^']* "'";
 		dstr = "\"" [^"]* "\"";
 
 		'*'				{ return false; }
-		(sstr | dstr) { return YYLIMIT-YYCURSOR == (size_t)YYLIMIT; }
+		(sstr|dstr) 	{ return YYLIMIT - YYCURSOR == YYMAXFILL; }
 	*/
 }
 
 int main(int argc, char **argv)
 {
-	for(int i=1; i<argc; ++i){
+	for(int i = 1;  i < argc; ++i){
 		input_t arg(argv[i]);
 		printf("%s:%s\n", lex(arg) ? "str" : "err", argv[i]);
 	}
