@@ -1,0 +1,3 @@
+ALTER TABLE  `bw_blog` ADD UNIQUE (
+`domain`
+)

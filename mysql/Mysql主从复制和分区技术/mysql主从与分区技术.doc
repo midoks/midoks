@@ -1,0 +1,53 @@
+大数据存储
+　　　当mysql中一个表的总记录数超过1000万,会出现性能的大幅度下降吗？答案是肯定的.当性能下降的的比率由系统的构架、应用程序、数据库索引、服务器硬件等多种因素而定.数据库多达上亿的数据量，分表之后的单个表也已经突破千万,那么单个表的更新等均影响着系统的运行效率.甚至是一条简单的sql都有可能压垮整个数据库,如整个表对某个字段的排序操作等.
+　　　
+　　　目前,针对海量数据的优化主要有2种方法;大表拆小表的方式,SQL语句的优化。可以通过增加索引等来调整,但是数据量的增大将会导致索引的维护代价增加。
+　　　垂直分表
+　　　水平分表
+　　　
+　　　水平分区技术将一个表拆分多个表,比较常用的方式是将表中的记录按照某种hash算法进行拆分,简单的拆分方法如取模方式，同样，这种分区方法也必须对前端的应用程序中的SQL进行修改方可使用,而且对用sql，它可能会修改两个表，那么你必须写成2个sql语句从而可以完成一个逻辑的事物，使得程序的判断逻辑越来越复杂，这样也会导致程序的维护代价高，也就失去了采用数据可的优势，因此，分区技术可以用力地避免如上的弊端，成为解决海量数据存储的有力方法.
+　　　
+ 	Mysql的分区技术不同与之前的分区技术，它的水平分表有点类似，但是它是在逻辑层进行的水平表，对于应用程序而言它还是一张表，mysql5.1有种分区类型：
+　　　Range分区：基于属于一个给定连续区间的列表，把多行分配给分区
+　　　List分区：类似于按Range分区，区别在于LIST分区是基于列值一个离散值集合中的某个值来进行选择。
+　　　Hash分区：基于用户定义的表达式的返回值来进行选择的分区，该表达式使用将要插入到表中的这些行的列值进行计算，这个函数可以包含mysql中有效的、产生非负数整数值的任何表达式
+　　　Key分区：类似于按hash分区，区别在于key分区只支持计算一列或多列，且mysql服务器提供其自身的哈希函数.
+　　　
+　　　
+　　　例1:
+　　　假定你创建了一个入校的表，该表保存有20家音像店的职员记录，这20家音像的编号从1到20.如果你想将其分成4个小分区，那么你可以采用Range分区,创建的数据库如下:
+　　　Mysql>CREATE TABLE employees(
+　　　->id INT NOT NULL,
+　　　->fn ame VARCHAR(30),
+　　　->in ame VARCHAR(30),
+　　　->hired DATE NOT NULL DEFAULT '1970-01-01',
+　　　->separated DATE NOT NULL DEFAULT '9999-12-31',
+　　　->job_code INT NOT NULL,
+　　　->store_id INT NOT NULL
+　　　->)
+　　　->PARTITION BY RANGE(store_id)(
+　　　->	PARTITION p0 VALUES LESS THAN(6),
+　　　->	PARTITION p0 VALUES LESS THAN(11),
+　　　->	PARTITION p0 VALUES LESS THAN(16),
+　　　->	PARTITION p0 VALUES LESS THAN(21),
+　　　->);
+　　　
+　　　LIST分区语句创建数据表:
+　　　
+　　　Mysql>CREATE TABLE employees(
+　　　->id INT NOT NULL,
+　　　->fn ame VARCHAR(30),
+　　　->in ame VARCHAR(30),
+　　　->hired DATE NOT NULL DEFAULT '1970-01-01',
+　　　->separated DATE NOT NULL DEFAULT '9999-12-31',
+　　　->job_code INT NOT NULL,
+　　　->store_id INT NOT NULL
+　　　->)
+　　　->PARTITION BY LIST(store_id)(
+　　　->	PARTITION pNorth VALUES IN (3,5,6,9,17),
+　　　->	PARTITION pNorth VALUES IN (1,2,10,11,19),
+　　　->	PARTITION pNorth VALUES IN (4,12,13,14,18),
+　　　->	PARTITION pNorth VALUES IN (7,8,15,16),
+　　　->);
+　　　
+　　　

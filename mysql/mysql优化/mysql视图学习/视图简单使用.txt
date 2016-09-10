@@ -1,0 +1,7 @@
+mysql> select * from ecs_vote;//先查询是否有数据
+
+mysql> create view v as select * from ecs_vote;//创建视图
+
+mysql> drop view v;//删除数据
+
+mysql> select * from v;//使用视图

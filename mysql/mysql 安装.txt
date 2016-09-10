@@ -1,0 +1,33 @@
+1. 安装mysql
+1)	useradd -M -s /sbin/nologin mysql创建运行mysql数据库的系统用户、组
+2)	tar zxvf mysql-5.0.56.tar.gz -C /usr/src解压并释放源码包
+3)	cd /usr/src/mysql-5.0.56/进入到解压目录
+4)	./configure --prefix=/usr/local/mysql使用./configure命令配置编译选项
+5)	make && make install编译并安装
+6)	cp support-files/my-medium.cnf /etc/my.cnf建立配置文件
+7)	/usr/local/mysql/bin/mysql_install_db --user=mysql利用mysql的身份去安装mysql数据库并初始化数据库
+8)	chown -R root.mysql /usr/local/mysql/改变/usr/local/mysql/目录的属主和属组
+9)	chown -R mysql /usr/local/mysql/var改变/usr/local/mysql/var目录的属主
+10)	echo "/usr/local/mysql/lib/mysql" >> /etc/ld.so.conf添加库文件搜索路径可以通过修改/etc/ld.so.conf文件实现
+11)	ldconfig刷新库文件搜索路径，是修改生效
+2.	mysql启动控制
+1)	/usr/local/mysql/bin/mysqld_safe --user=mysql &在/usr/local/mysql/bin目录中，存放着管理mysql服务器的脚本和程序。其中脚本文件mysqld_safe可用来安全启用mysql服务器
+2)	netstat -tunpl | grep 3306查看3306的端口是否被监听
+3)	cp support-files/mysql.server /etc/init.d/mysqld将mysqld服务的启动脚本复制到/etc/init.d目录下
+4)	chmod +x /etc/init.d/mysqld为目录添加执行权限
+5)	chkconfig --add mysqld使用—add选项的chkconfig命令将其设为系统自启动服务
+6)	chkconfig mysqld on启动mysqld的服务
+7)	export PATH=$PATH:/usr/local/mysql/bin/临时设置mysql等命令和脚本的路径
+8)	echo "PATH=$PATH:/usr/local/mysql/bin/" >> /etc/profile永久的添加搜索路径 
+
+
+
+/usr/local/mysql/bin/mysql_install_db --user=mysql&    &:表示后台启动  
+
+netstat -tunpl | grep 3306查看3306的端口是否被监听{  检查mysql 是否启动 }  
+
+关闭mysql的用法
+
+./mysqladmin -uroot -p shutdown然后输入你的密码就可以了。
+
+ps:当然，如果你的root没有密码，就不需要-p选项喽。
