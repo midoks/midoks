@@ -197,4 +197,28 @@ function is_time($time){
     $pattern = '/[\d]{4}-[\d]{1,2}-[\d]{1,2}\s[\d]{1,2}:[\d]{1,2}:[\d]{1,2}/';
     return preg_match($pattern, $time);
 }
+
+/**
+ * url编码
+ */
+function base64url_encode($data, $pad = null){
+	$data = str_replace(array('+','/'), array('-','_'), base64_encode($data));
+	if(!$pad){
+		$data = rtrim($data, '=');
+	}
+	return $data;
+}
+
+//url解码
+function base64url_decode($data){
+	return base64_decode(str_replace(array('-','_'), array('+','/'), $data));
+}
+
+
+
+
+
+
+
+
 ?>
