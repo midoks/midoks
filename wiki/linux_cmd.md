@@ -14,6 +14,9 @@ who /var/log/wtmp
 netstat -tlntp|grep -E "9200|9300"
 ```
 
+#建立简单服务器
+python -m SimpleHTTPServer 8080
+
 ##linux内核优化
 ```
 #表示开启SYN Cookies.当出现SYN等待队列溢出时,启用cookies来处理,
