@@ -1,7 +1,6 @@
 # P
-*._Store
-mws
-bin/*
+.DS_Store
+*.log
 
 # Object files
 *.o
