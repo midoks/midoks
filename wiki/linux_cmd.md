@@ -17,6 +17,14 @@ netstat -tlntp|grep -E "9200|9300"
 #建立简单服务器
 python -m SimpleHTTPServer 8080
 
+#查看物理cpu个数
+grep 'physical id' /proc/cpuinfo | sort -u
+
+##查看核心数量
+grep 'core id' /proc/cpuinfo | sort -u | wc -l
+##查看线程数
+grep 'processor' /proc/cpuinfo | sort -u | wc -l
+
 ##linux内核优化
 ```
 #表示开启SYN Cookies.当出现SYN等待队列溢出时,启用cookies来处理,
