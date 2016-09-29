@@ -1,4 +1,9 @@
 
+if ngx.var.uri == "/favicon.ico" then
+    ngx.exit(0)
+end 
+
+
 local retjpg = function()
     local list = {
         0x47,0x49,0x46,0x38,0x39,0x61,
@@ -25,7 +30,9 @@ red:set_timeout(60000) -- 1min
 
 local ok, err = red:connect("127.0.0.1", 6379)
 if not ok then
-	ngx.say(ERR,"failed to connect:", err)
+	ngx.header.content_type = "text/plain"
+	ngx.say(ERR,":failed to connect", err)
+	ngx.exit(0)
 end
 
 local args = ngx.req.get_uri_args()
@@ -44,13 +51,13 @@ local message = cjson.encode(j)
 red:rpush(key, message)
 red:set_keepalive(100000, 1000)
 
-ngx.header.content_type = "text/plain"
-local u = ngx.req.get_uri_args()["u"]
+
+
+-- local u = ngx.req.get_uri_args()["u"]
 if(u) then
 	ngx.redirect(u)
 else
 	-- 返回一像素图片
 	retjpg()
 end
-
-
+ngx.header.content_type = "text/plain"
