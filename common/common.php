@@ -214,7 +214,18 @@ function base64url_decode($data){
 	return base64_decode(str_replace(array('-','_'), array('+','/'), $data));
 }
 
-
+//匹配图片
+function get_image_list($content) {
+    $imageList = array();
+    if (stripos($content, '<img') !== false) {
+        preg_match_all('/<img[^<>]*src=[\'|\"]*([^\'\"\s>]+)[\'|\"](.*)[^<]+>/i',$content, $oriImageList);
+        $imgList = $oriImageList[1];
+        foreach ($imgList as $img) {
+            $imageList[] = $img;
+        }
+    }
+    return $imageList;
+}
 
 
 
