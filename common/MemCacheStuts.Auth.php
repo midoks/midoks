@@ -38,7 +38,10 @@ class MemCacheStuts{
 	}
 
 	public function start(){
-		echo json_encode($this->linkID->getStats());exit;
+		//防止nginx登陆,直接跳入
+		if(!isset($_POST['user'])){
+			echo json_encode($this->linkID->getStats());exit;
+		}
 	}
 
 	public function __destruct(){
@@ -145,11 +148,6 @@ $login_page = <<<EOF
 
 	<div  style="width:200px;margin: 70px auto auto auto;">
 		<table>
-		<?php
-			if(!empty($this->login_err)){
-				echo('<tr><td colspan="2" style="color:red;text-align:center;">'.$this->login_err.'</td></tr>');
-			}
-		?>
 		<tr>
 		<td style="text-align:right;">用户名:</td>
 		<td><input type="text" name="user" value="" /> </td>
