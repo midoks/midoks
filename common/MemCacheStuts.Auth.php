@@ -5,7 +5,7 @@
  */
 
 define('MEM_USER', 'midoks');
-define('MEM_USER_PWD', md5('123123'));
+define('MEM_USER_PWD', md5('cjscjs123'));
 
 
 $mem_acl = new MemAcl();
@@ -335,8 +335,8 @@ function memcache_attr(data){
 	var get_btime = gett(data['uptime']);
 	var p = $(div_tpl).append('<div class="uptime" style="width:600px;font-size:12px;height:20px;float:left;line-height:20px;border-bottom:1px solid #DFDFDF;">运行时间:'+Math.floor(data['uptime']/60)+'分钟'+data['uptime']%60+'秒'+'</div>');
 	
-	p = $(p).append('<div class="byte" style="width:600px;font-size:12px;height:20px;float:left;line-height:20px;border-bottom:1px solid #DFDFDF;">使用内存:'+Math.floor(data['bytes']/1024)+'KB'+'</div>');
-	p = $(p).append('<div class="byte" style="width:600px;font-size:12px;height:20px;float:left;line-height:20px;border-bottom:1px solid #DFDFDF;">总内存:'+Math.floor((data['limit_maxbytes']/1024)/1023)+'MB'+'</div>');
+	p = $(p).append('<div class="byte" style="width:600px;font-size:12px;height:20px;float:left;line-height:20px;border-bottom:1px solid #DFDFDF;">使用内存:'+Math.floor((data['limit_maxbytes']/1024)/1024)+'MB'+'</div>');
+	p = $(p).append('<div class="byte" style="width:600px;font-size:12px;height:20px;float:left;line-height:20px;border-bottom:1px solid #DFDFDF;">总内存:'+Math.floor((data['limit_maxbytes']/1024)/1024)+'MB'+'</div>');
 	p = $(p).append('<div class="byte" style="width:600px;font-size:12px;height:20px;float:left;line-height:20px;border-bottom:1px solid #DFDFDF;">读取KB:'+Math.floor((data['bytes_read']/1024))+'KB'+'</div>');
 	p = $(p).append('<div class="byte" style="width:600px;font-size:12px;height:20px;float:left;line-height:20px;border-bottom:1px solid #DFDFDF;">写入KB:'+Math.floor((data['bytes_written']/1024))+'KB'+'</div>');
 	p = $(p).append('<div class="byte" style="width:600px;font-size:12px;height:20px;float:left;line-height:20px;border-bottom:1px solid #DFDFDF;">连接次数:'+data['total_connections']+'次'+'</div>');
