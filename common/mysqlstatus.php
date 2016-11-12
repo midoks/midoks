@@ -76,7 +76,7 @@ if(isset($_POST['type']) && $_POST['type'] == 'status'){
 <head>
 	<meta http-equiv="content-type" content="text/html;charset=utf-8" />
 	<title>MySQL服务器状态查询</title>
-	<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+	<script type="text/javascript" src="http://libs.baidu.com/jquery/1.7.2/jquery.min.js"></script>
 	<style>
 		*{
 			font-size:14px;
@@ -598,11 +598,11 @@ position:fixed;top:0px;right:0px;height:20px;width:220px;overflow:hidden;"></div
 	<div id="container">
 		<!-- 顶部 -->
 		<div id="top">
-			<form action=""method="POST" name="">
-				<span>服务器地址:<input class="inputtype" type="text" name="local" value="localhost" /></span>
+			<form action="" method="POST" name="">
+				<span>服务器地址:<input class="inputtype" type="text" name="local" value="127.0.0.1" /></span>
 				<span>端口:<input class="inputtype" type="text" name="port" value="3306" /></span>
 				<span>用户名:<input class="inputtype" type="text" name="user" value="root" /></span>
-				<span>密码:<input class="inputtype" type="password" name="pwd" value="" /></span>
+				<span>密码:<input class="inputtype" type="password" name="pwd" value="root" /></span>
 				<span>间隔刷新时间:<input class="inputtype" type="text" name="time" value="3" />秒</span>
 				<span><input type="button" name="run" value="执行" style="height:20px;width:50px;" /></span>
 			</form>
