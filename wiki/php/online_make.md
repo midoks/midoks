@@ -23,9 +23,8 @@ wget http://mirrors.aliyun.com/centos/5/os/x86_64/CentOS/yum-fastestmirror-1.1.1
 
 
 
-
+#php 稳定版
 wget http://cn2.php.net/distributions/php-5.6.28.tar.gz
-
 
 ./configure --prefix=/usr/local/php5.6 \
 --exec-prefix=/usr/local/php5.6 \
