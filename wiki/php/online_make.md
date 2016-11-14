@@ -20,9 +20,6 @@ wget http://mirrors.aliyun.com/centos/5/os/x86_64/CentOS/yum-fastestmirror-1.1.1
 
 
 
-
-
-
 #php 稳定版
 wget http://cn2.php.net/distributions/php-5.6.28.tar.gz
 
@@ -50,7 +47,20 @@ wget http://cn2.php.net/distributions/php-5.6.28.tar.gz
 --enable-fpm \
 
 
-wget http://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.14.tar.gz 
+wget http://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.14.tar.gz
 tar zxvf libiconv-1.14.tar.gz 
 ./configure --prefix=/usr/local/libiconv 
 make && make install
+
+#openresty
+./configure --prefix=/usr/local/openresty \
+--with-luajit \
+--without-http_redis2_module \
+--with-http_iconv_module \
+--with-http_postgres_module \
+--with-http_iconv_module \
+--without-http_memcached_module \ 
+--user=www \
+--group=www \ 
+--with-http_stub_status_module \
+with-http_ssl_module
