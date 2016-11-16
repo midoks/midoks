@@ -8,6 +8,9 @@ http://www.collab.net/products/integrations/certified
 ```
 tar.gz:CollabNetSubversionEdge-5.1.0_linux-x86_64.tar.gz
 
+#查看svn URL地址
+svn info | grep URL
+
 groupadd svn 
 useradd -g svn svnuser
 passwd svnuser
