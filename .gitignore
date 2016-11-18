@@ -1,5 +1,5 @@
 # P
-.DS_Store
+*.DS_Store
 *.log
 
 # Object files
