@@ -2,14 +2,13 @@
 - 网上整理(备忘)
 
 - PHP关于VC14, VC11 , VC9, VC6
+- http://wiki.php.net/internals/windows/stepbystepbuild
 ```
 
-VC6版本是使用Visual Studio 6编译器编译的，如果你的PHP是用Apache来架设的，那你就选择VC6版本。（现在PHP已经没有VC6了).
-VC9意思就是该版本PHP是用VisualStudio2008编译的，而VC11则是用VisualStudio2012编译的。这意味着:
-如果你下载的是VC9版本的，就需要先安VisualC++RedistributableforVisualStudio2008SP1，
-如果你下载的是VC11版本的，就需要先安VisualC++RedistributableforVisualStudio2012.
+Visual C++ 9.0 (Visual Studio 2008 or Visual C++ 2008) for PHP 5.4.
+Visual C++ 11.0 (Visual Studio 2012) for PHP 5.5 or 5.6.
+Visual C++ 14.0 (Visual Studio 2015) for PHP 7.0+.
 
-搭建php首先看操作系统的版本，如果是Windows的在这里下：http://windows.php.net/download/
 ```
 
 - Thread Safe和Non Thread Safe版本选择的问题
