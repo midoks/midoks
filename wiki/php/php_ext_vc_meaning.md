@@ -1,7 +1,7 @@
 ### PHP关于VC14, VC11 , VC9, VC6以及Thread Safe和Non Thread Safe版本选择的问题
--- 网上整理(备忘)
+- 网上整理(备忘)
 
--- PHP关于VC14, VC11 , VC9, VC6
+- PHP关于VC14, VC11 , VC9, VC6
 ```
 
 VC6版本是使用Visual Studio 6编译器编译的，如果你的PHP是用Apache来架设的，那你就选择VC6版本。（现在PHP已经没有VC6了).
@@ -12,7 +12,7 @@ VC9意思就是该版本PHP是用VisualStudio2008编译的，而VC11则是用Vis
 搭建php首先看操作系统的版本，如果是Windows的在这里下：http://windows.php.net/download/
 ```
 
--- Thread Safe和Non Thread Safe版本选择的问题
+- Thread Safe和Non Thread Safe版本选择的问题
 ```
 
 	Windows版的PHP从版本5.2.1开始有ThreadSafe(线程安全)和None Thread Safe(NTS，非线程安全)之分，这两者不同在于何处？
@@ -31,7 +31,7 @@ PHP就必须用ThreadSafe(线程安全)的版本；而用FastCGI模式运行PHP�
 
 ```
 
--- PHP的两种执行方式：ISAPI和FastCGI。
+- PHP的两种执行方式：ISAPI和FastCGI。
 ```
 ISAPI执行方式是以DLL动态库的形式使用，可以在被用户请求后执行，在处理完一个用户请求后不会马上消失，所以需要进行线程安全检查，这
 样来提高程序的执行效率，所以如果是以ISAPI来执行PHP，建议选择Thread Safe版本。而FastCGI执行方式是以单一线程来执行操作，所以
@@ -39,4 +39,4 @@ ISAPI执行方式是以DLL动态库的形式使用，可以在被用户请求后
 Non Thread Safe版本。
 ```
 
--- 如有错误及不足,欢迎指正
+- 如有错误及不足,欢迎指正
