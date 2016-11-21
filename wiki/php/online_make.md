@@ -15,10 +15,20 @@ http://mirrors.aliyun.com/centos/
 wget http://mirrors.aliyun.com/centos/5/os/x86_64/CentOS/python-iniparse-0.2.3-6.el5.noarch.rpm
 wget http://mirrors.aliyun.com/centos/5/os/x86_64/CentOS/yum-metadata-parser-1.1.2-4.el5.x86_64.rpm
 wget http://mirrors.aliyun.com/centos/5/os/x86_64/CentOS/yum-3.2.22-40.el5.centos.noarch.rpm  
-wget http://mirrors.aliyun.com/centos/5/os/x86_64/CentOS/yum-plugin-fastestmirror-1.1.30-37.el6.noarch.rpm
 wget http://mirrors.aliyun.com/centos/5/os/x86_64/CentOS/yum-fastestmirror-1.1.16-21.el5.centos.noarch.rpm
+wget http://mirrors.aliyun.com/centos/5/os/x86_64/CentOS/python-elementtree-1.2.6-5.x86_64.rpm
 
 
+wget http://mirrors.aliyun.com/centos/6/os/x86_64/Packages/yum-3.2.29-73.el6.centos.noarch.rpm
+wget http://mirrors.aliyun.com/centos/6/os/x86_64/Packages/yum-metadata-parser-1.1.2-16.el6.x86_64.rpm
+wget http://mirrors.aliyun.com/centos/6/os/x86_64/Packages/python-urlgrabber-3.9.1-11.el6.noarch.rpm
+wget http://mirrors.aliyun.com/centos/6/os/x86_64/Packages/yum-plugin-fastestmirror-1.1.30-37.el6.noarch.rpm
+
+
+yum clean all
+yum makecache
+
+yum groupinstall -y "Development Tools"
 
 #php 稳定版
 wget http://cn2.php.net/distributions/php-5.6.28.tar.gz
