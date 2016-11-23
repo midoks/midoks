@@ -3,6 +3,7 @@
 
 - PHP关于VC14, VC11 , VC9, VC6
 - http://wiki.php.net/internals/windows/stepbystepbuild
+- https://wiki.php.net/internals/windows/libs
 ```
 
 Visual C++ 9.0 (Visual Studio 2008 or Visual C++ 2008) for PHP 5.4.
