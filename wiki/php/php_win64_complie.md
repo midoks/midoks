@@ -4,6 +4,7 @@
 - http://windows.php.net/downloads/php-sdk/
 - https://github.com/php-memcached-dev/php-memcached
 - http://www.cygwin.com/
+- http://svn.coderepos.org/share/lang/c/libmemcached-win32/
 
 ```
 
@@ -22,7 +23,7 @@ nmake snap
 - 遇到的问题
 
 - 1.命令缺少(mc)
-从vs2012命令行进入,不会遇到此问题
+从vs2012命令行进入,不会遇到此问题( VS2012->工具->Visual Studio命令提示(C) )
 ```
 Recreating build dirs
         "" -h win32\ -r x64\Release_TS\ -x x64\Release_TS\ win32\build\wsyslog.m
