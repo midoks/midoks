@@ -3,6 +3,7 @@
 - https://wiki.php.net/internals/windows/stepbystepbuild
 - http://windows.php.net/downloads/php-sdk/
 - https://github.com/php-memcached-dev/php-memcached
+- http://www.cygwin.com/
 
 ```
 
