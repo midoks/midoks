@@ -30,8 +30,12 @@ static inline uint64 cycle_timer() {
 
 
 int main(){
-	uint64 t = cycle_timer();
+	uint64 s = cycle_timer();
 
-	printf("time:%llu\n",t);
+	cycle_timer();
+
+	uint64 e = cycle_timer();
+
+	printf("time:%llu\n", e - s);
 	return 0;
 }
