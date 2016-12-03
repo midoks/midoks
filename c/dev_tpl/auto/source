@@ -1,0 +1,9 @@
+# Copyright (C) midoks
+
+CORE_INCS="src/app"
+
+
+CORE_DEPS="src/app/cqtasks.h"
+
+
+CORE_SRCS="src/app/cqtasks.c"

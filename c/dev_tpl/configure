@@ -1,0 +1,28 @@
+#!/bin/bash
+
+CQ_CONFIGURE=`echo $@ | sed 's/"/\\\\"/g'`
+
+
+# linux shell color support.
+RED="\\033[31m"
+GREEN="\\033[32m"
+YELLOW="\\033[33m"
+BLACK="\\033[0m"
+
+function ec(){
+if (( $# >= 2 )) ; then
+echo -e "$2$1$2$BLACK$BLACK"
+else
+echo -e $1
+fi
+}
+
+
+. auto/options
+. auto/init
+. auto/source
+
+
+
+. auto/make
+. auto/install

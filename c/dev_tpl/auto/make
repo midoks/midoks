@@ -1,0 +1,101 @@
+# Copyright (C) midoks
+
+#ready
+test -d $CQ_OBJS || mkdir -p $CQ_OBJS
+cp -rf ./src $CQ_OBJS
+
+echo "creating $CQ_MAKEFILE"
+
+LINK="\$(CC)"
+
+cat << END                                                     > $CQ_MAKEFILE
+
+CC =	$CC
+CFLAGS = $CFLAGS
+CPP =	$CPP
+LINK =	$LINK
+
+END
+
+#const
+cq_regex_cont=' \\\
+	'
+cq_cont=' \
+	'
+cq_include_opt="-I "
+cq_regex_dirsep='\/'
+cq_binext=''
+cq_dirsep="/"
+cq_spacer=' '
+cq_objext='o'
+
+
+
+#inc
+cq_incs=`echo $CORE_INCS\
+	| sed -e "s/  *\([^ ][^ ]*\)/$cq_regex_cont$cq_include_opt\1/g" \
+	-e "s/\//$cq_regex_dirsep/g"`
+
+cat << END                                                    >> $CQ_MAKEFILE
+
+ALL_INCS = $cq_include_opt$cq_incs
+
+END
+
+
+cq_deps=`echo $CORE_DEPS\
+    | sed -e "s/  *\([^ ][^ ]*\)/$cq_regex_cont\1/g" \
+          -e "s/\//$cq_regex_dirsep/g"`
+
+cq_incs=`echo $CORE_INCS\
+    | sed -e "s/  *\([^ ][^ ]*\)/$cq_regex_cont$cq_include_opt\1/g" \
+          -e "s/\//$cq_regex_dirsep/g"`
+
+cat << END                                                    >> $CQ_MAKEFILE
+
+CORE_DEPS = $cq_deps
+
+CORE_INCS = $cq_include_opt$cq_incs
+
+END
+
+
+cq_deps=`echo $CORE_SRCS \
+    | sed -e "s#\([^ ]*\.\)cpp#$CQ_OBJS\/\1$cq_objext#g" \
+          -e "s#\([^ ]*\.\)cc#$CQ_OBJS\/\1$cq_objext#g" \
+          -e "s#\([^ ]*\.\)c#$CQ_OBJS\/\1$cq_objext#g" \
+          -e "s#\([^ ]*\.\)S#$CQ_OBJS\/\1$cq_objext#g" \
+          -e "s#\([^ ]*\.\)h#$CQ_OBJS\/\1$cq_objext#g"`
+
+
+ngx_deps=`echo $cq_deps \
+    | sed -e "s/  *\([^ ][^ ]*\)/$cq_regex_cont\1/g" \
+          -e "s/\//$cq_regex_dirsep/g"`
+
+#DEPS
+cat << END                                                    >> $CQ_MAKEFILE
+
+$CQ_OBJS${cq_dirsep}cqtask${cq_binext}: $cq_deps$cq_spacer
+	\$(LINK) -o $CQ_OBJS${cq_dirsep}cqtask${cq_binext}${cq_binext} $cq_deps
+
+END
+
+
+# the core sources
+for cq_src in $CORE_SRCS
+do
+    cq_src=`echo $cq_src | sed -e "s/\//$cq_regex_dirsep/g"`
+    cq_obj=`echo $cq_src \
+        | sed -e "s#^\(.*\.\)cpp\\$#$CQ_OBJS\/\1$cq_objext#g" \
+              -e "s#^\(.*\.\)cc\\$#$CQ_OBJS\/\1$cq_objext#g" \
+              -e "s#^\(.*\.\)c\\$#$CQ_OBJS\/\1$cq_objext#g" \
+              -e "s#^\(.*\.\)S\\$#$CQ_OBJS\/\1$cq_objext#g"`
+
+	cat << END                                                >> $CQ_MAKEFILE
+
+$cq_obj:	\$(CORE_DEPS)$cq_cont$CQ_OBJS/$cq_src
+	\$(CC) -c \$(CFLAGS) \$(CORE_INCS)${cq_cont}-o $cq_obj$cq_cont$CQ_OBJS/$cq_src
+
+END
+
+done

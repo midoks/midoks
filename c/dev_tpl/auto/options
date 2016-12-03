@@ -1,0 +1,55 @@
+#!/bin/sh
+
+help=no
+
+CQ_PREFIX=/usr/local/cqtasks
+CQ_OBJS=objs
+CC=${CC:-gcc}
+
+
+function show_help(){
+	cat << END
+
+Options:
+    -h,--help 			print help message
+    --prefix=PATH		set the installation prefix
+END
+}
+
+
+function parse_user_option_to_value_and_option() {
+    case "$option" in
+        -*=*) 
+            value=`echo "$option" | sed -e 's|[-_a-zA-Z0-9/]*=||'` 
+            option=`echo "$option" | sed -e 's|=[-_a-zA-Z0-9/.]*||'`
+        ;;
+           *) value="" ;;
+    esac
+}
+
+function parse_user_option(){
+
+ 	case "$option" in
+        -h)                             help=yes                    ;;
+        --help)                         help=yes                    ;;
+        
+        --prefix)                    	CQ_PREFIX=$value                 ;;
+        *)
+            echo "$0: error: invalid option {$option}"
+            exit 1
+        ;;
+    esac
+}
+
+#parse option
+for option
+do
+	opt="$opt `echo $option | sed -e \"s/\(--[^=]*=\)\(.* .*\)/\1'\2'/\"`"
+	parse_user_option_to_value_and_option
+	parse_user_option
+done
+
+if [ $help = yes ]; then
+	show_help
+	exit 0
+fi 

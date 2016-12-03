@@ -1,0 +1,8 @@
+# Copyright (C) midoks
+
+
+cat << END                                                    >> $CQ_MAKEFILE
+
+install: $CQ_OBJS${cq_dirsep}cqtask${cq_binext}
+
+END

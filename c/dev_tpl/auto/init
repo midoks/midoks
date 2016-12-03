@@ -1,0 +1,19 @@
+
+# Copyright (C) midoks
+
+CQ_MAKEFILE=$CQ_OBJS/Makefile
+CQ_ERR=$CQ_OBJS/autoconf.err
+
+
+cat << END > Makefile
+
+build:
+	rm -rf $CQ_OBJS/cqtask
+	\$(MAKE) -f $CQ_MAKEFILE
+
+install:
+	\$(MAKE) -f $CQ_MAKEFILE install
+
+clean:
+	rm -rf Makefile $CQ_OBJS
+END
