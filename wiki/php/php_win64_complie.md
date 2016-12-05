@@ -4,8 +4,7 @@
 - http://windows.php.net/downloads/php-sdk/
 - https://github.com/php-memcached-dev/php-memcached
 - http://www.cygwin.com/
-- http://svn.coderepos.org/share/lang/c/libmemcached-win32/
-
+- http://gnuwin32.sourceforge.net/packages/make.htm
 ```
 
 phpsdk_setvars.bat
