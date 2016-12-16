@@ -3,15 +3,20 @@
 
 
 #删除yum
+```
 rpm -aq | grep yum|xargs rpm -e --nodeps
+```
 
 ## 更换yum源
+```
 wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-5.repo
 
 http://mirror.centos.org/centos/
 http://mirrors.aliyun.com/centos/
+```
 
 #安装yum
+```
 wget http://mirrors.aliyun.com/centos/5/os/x86_64/CentOS/python-iniparse-0.2.3-6.el5.noarch.rpm
 wget http://mirrors.aliyun.com/centos/5/os/x86_64/CentOS/yum-metadata-parser-1.1.2-4.el5.x86_64.rpm
 wget http://mirrors.aliyun.com/centos/5/os/x86_64/CentOS/yum-3.2.22-40.el5.centos.noarch.rpm  
@@ -72,8 +77,11 @@ rpm --rebuilddb
 
 rpm -ql rpm
 rpm -ql rpm-libs
+```
 
 #php 稳定版
+
+```
 wget http://cn2.php.net/distributions/php-5.6.28.tar.gz
 
 ./configure --prefix=/usr/local/php5.6 \
@@ -96,6 +104,7 @@ wget http://cn2.php.net/distributions/php-5.6.28.tar.gz
 --enable-soap \
 --enable-fpm \
 
+```
 
 
 --with-mcrypt \
@@ -121,7 +130,9 @@ tar zxvf libiconv-1.14.tar.gz
 ./configure --prefix=/usr/local/libiconv 
 make && make install
 
-#openresty
+# openresty
+
+```
 ./configure \
 --prefix=/usr/local/openresty \
 --with-luajit \
@@ -133,3 +144,4 @@ make && make install
 --group=www \
 --with-http_stub_status_module \
 --with-http_ssl_module \
+```
