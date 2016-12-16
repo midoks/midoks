@@ -82,6 +82,12 @@ rpm -ql rpm-libs
 #php 稳定版
 
 ```
+
+wget http://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.14.tar.gz
+tar zxvf libiconv-1.14.tar.gz 
+./configure --prefix=/usr/local/libiconv 
+make && make install
+
 wget http://cn2.php.net/distributions/php-5.6.28.tar.gz
 
 ./configure --prefix=/usr/local/php5.6 \
@@ -104,12 +110,16 @@ wget http://cn2.php.net/distributions/php-5.6.28.tar.gz
 --enable-soap \
 --enable-fpm \
 
-```
-
-
 --with-mcrypt \
 --with-ldap \
 --with-ldap-sasl \
+
+```
+
+
+# openresty
+
+```
 
 wget http://openresty.org/download/openresty-1.11.2.2.tar.gz
 
@@ -124,15 +134,6 @@ wget http://openresty.org/download/openresty-1.11.2.2.tar.gz
 --with-http_ssl_module \
 --disable-shared \
 
-
-wget http://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.14.tar.gz
-tar zxvf libiconv-1.14.tar.gz 
-./configure --prefix=/usr/local/libiconv 
-make && make install
-
-# openresty
-
-```
 ./configure \
 --prefix=/usr/local/openresty \
 --with-luajit \
