@@ -89,6 +89,7 @@ tar zxvf libiconv-1.14.tar.gz
 make && make install
 
 wget http://cn2.php.net/distributions/php-5.6.28.tar.gz
+wget http://cn2.php.net/distributions/php-7.0.14.tar.gz
 
 ./configure --prefix=/usr/local/php5.6 \
 --exec-prefix=/usr/local/php5.6 \
@@ -108,8 +109,19 @@ wget http://cn2.php.net/distributions/php-5.6.28.tar.gz
 --with-xmlrpc \
 --enable-zip \
 --enable-soap \
---enable-fpm \
+--enable-fpm
 
+
+./configure --prefix=/usr/local/php70 \
+--exec-prefix=/usr/local/php70 \
+--with-config-file-path=/usr/local/php70/etc \
+--enable-opcache \
+--enable-fpm \
+--without-iconv \
+--disable-fileinfo \
+--enable-debug
+
+--enable-dtrace \
 --with-mcrypt \
 --with-ldap \
 --with-ldap-sasl \
