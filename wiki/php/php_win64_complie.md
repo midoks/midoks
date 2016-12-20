@@ -16,6 +16,8 @@ nmake
 
 nmake snap
 
+configure --disable-all --enable-cli --enable-xhprof=shared 
+
 ```
 
 
