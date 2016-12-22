@@ -18,6 +18,9 @@ nmake snap
 
 configure --disable-all --enable-cli --enable-xhprof=shared 
 
+
+configure --disable-all --enable-cli --enable-apache2-4handler --without-mssql --without-pdo-mssql --disable-isapi --enable-com-dotnet=shared --with-mcrypt=static --disable-static-analyze --with-pgo
+
 ```
 
 

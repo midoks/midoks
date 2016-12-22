@@ -33,6 +33,7 @@
 #include "php.h"
 #include "php_ini.h"
 #include "ext/standard/info.h"
+#include "ext/standard/php_var.h"
 #include "php_xhprof.h"
 #include "zend_extensions.h"
 #include <malloc.h>
@@ -258,21 +259,13 @@ typedef struct hp_global_t {
 /* XHProf global state */
 static hp_global_t       hp_globals;
 
-#if PHP_VERSION_ID < 50500
-/* Pointer to the original execute function */
-static ZEND_DLEXPORT void (*_zend_execute) (zend_op_array *ops TSRMLS_DC);
 
-/* Pointer to the origianl execute_internal function */
-static ZEND_DLEXPORT void (*_zend_execute_internal) (zend_execute_data *data,
-                           int ret TSRMLS_DC);
-#else
 /* Pointer to the original execute function */
 static void (*_zend_execute_ex) (zend_execute_data *execute_data TSRMLS_DC);
 
 /* Pointer to the origianl execute_internal function */
 static void (*_zend_execute_internal) (zend_execute_data *data,
                       struct _zend_fcall_info *fci, int ret TSRMLS_DC);
-#endif
 
 /* Pointer to the original compile function */
 static zend_op_array * (*_zend_compile_file) (zend_file_handle *file_handle,
@@ -284,7 +277,6 @@ static zend_op_array * (*_zend_compile_string) (zval *source_string, char *filen
 /* Bloom filter for function names to be ignored */
 #define INDEX_2_BYTE(index)  (index >> 3)
 #define INDEX_2_BIT(index)   (1 << (index & 0x7));
-
 
 /**
  * ****************************
@@ -716,7 +708,7 @@ void hp_init_profiler_state(int level TSRMLS_DC) {
    * calculate them lazily. */
   if (hp_globals.cpu_frequencies == NULL) {
     get_all_cpu_frequencies();
-    //restore_cpu_affinity(&hp_globals.prev_mask);
+    restore_cpu_affinity(&hp_globals.prev_mask);
   }
 
   /* bind to a random cpu so that we can use rdtsc instruction. */
@@ -779,7 +771,6 @@ void hp_clean_profiler_state(TSRMLS_D) {
       /* Update entries linked list */                                  \
       (*(entries)) = (cur_entry);                                       \
     }                                                                   \
-	   php_printf("BEGIN_PROFILING:%s\n",symbol);							            \
   } while (0)
 
 
@@ -811,7 +802,6 @@ void hp_clean_profiler_state(TSRMLS_D) {
       (*(entries)) = (*(entries))->prev_hprof;                          \
       hp_fast_free_hprof_entry(cur_entry);                              \
     }                                                                   \
-    php_printf("END_PROFILING\n");                                      \
   } while (0)
 
 
@@ -1009,6 +999,7 @@ static char *hp_get_function_name(zend_op_array *ops TSRMLS_DC) {
       } else {
         ret = estrdup(func);
       }
+
     } else {
       long     curr_op;
       int      add_filename = 0;
@@ -1151,8 +1142,6 @@ zval * hp_hash_lookup(char *symbol  TSRMLS_DC) {
   HashTable   *ht;
   void        *data;
   zval        *counts = (zval *) 0;
-
-  return counts;
 
   /* Bail if something is goofy */
   if (!hp_globals.stats_count || !(ht = HASH_OF(hp_globals.stats_count))) {
@@ -1403,18 +1392,18 @@ static void get_all_cpu_frequencies() {
   int id;
   double frequency;
 
-  //hp_globals.cpu_frequencies = malloc(sizeof(double) * hp_globals.cpu_num);
-  //if (hp_globals.cpu_frequencies == NULL) {
-  //  return;
-  //}
+  hp_globals.cpu_frequencies = malloc(sizeof(double) * hp_globals.cpu_num);
+  if (hp_globals.cpu_frequencies == NULL) {
+   return;
+  }
 
   /* Iterate over all cpus found on the machine. */
-  //for (id = 0; id < hp_globals.cpu_num; ++id) {
-  //  /* Only get the previous cpu affinity mask for the first call. */
-  //  if (bind_to_cpu(id)) {
-  //    clear_frequencies();
-  //    return;
-  //  }
+  for (id = 0; id < hp_globals.cpu_num; ++id) {
+   /* Only get the previous cpu affinity mask for the first call. */
+   if (bind_to_cpu(id)) {
+     clear_frequencies();
+     return;
+   }
 
     /* Make sure the current process gets scheduled to the target cpu. This
      * might not be necessary though. */
@@ -1426,7 +1415,7 @@ static void get_all_cpu_frequencies() {
       return;
     }
     hp_globals.cpu_frequencies[id] = frequency;
-  //}
+  }
 }
 
 /**
@@ -1586,7 +1575,6 @@ void hp_mode_hier_beginfn_cb(hp_entry_t **entries,
                              hp_entry_t  *current  TSRMLS_DC) {
   /* Get start tsc counter */
   current->tsc_start = cycle_timer();
-  return ;
 
   /* Get CPU usage */
   if (hp_globals.xhprof_flags & XHPROF_FLAGS_CPU) {
@@ -1660,18 +1648,17 @@ void hp_mode_hier_endfn_cb(hp_entry_t **entries  TSRMLS_DC) {
 
   /* Get the stat array */
   hp_get_function_stack(top, 2, symbol, sizeof(symbol));
-  php_printf("hp_mode_hier_endfn_cb:%s", symbol);
-  return;
+
   if (!(counts = hp_mode_shared_endfn_cb(top, symbol  TSRMLS_CC))) {
     return;
   }
 
   if (hp_globals.xhprof_flags & XHPROF_FLAGS_CPU) {
-   /* Get CPU usage */
-   getrusage(RUSAGE_SELF, &ru_end);
+    /* Get CPU usage */
+    getrusage(RUSAGE_SELF, &ru_end);
 
-   /* Bump CPU stats in the counts hashtable */
-   hp_inc_count(counts, "cpu", (get_us_interval(&(top->ru_start_hprof.ru_utime),
+    /* Bump CPU stats in the counts hashtable */
+    hp_inc_count(counts, "cpu", (get_us_interval(&(top->ru_start_hprof.ru_utime),
                                              &(ru_end.ru_utime)) +
                              get_us_interval(&(top->ru_start_hprof.ru_stime),
                                              &(ru_end.ru_stime)))
@@ -1713,31 +1700,23 @@ void hp_mode_sampled_endfn_cb(hp_entry_t **entries  TSRMLS_DC) {
  *
  * @author hzhao, kannan
  */
-#if PHP_VERSION_ID < 50500
-ZEND_DLEXPORT void hp_execute (zend_op_array *ops TSRMLS_DC) {
-#else
+
 ZEND_DLEXPORT void hp_execute_ex (zend_execute_data *execute_data TSRMLS_DC) {
   zend_op_array *ops = execute_data->op_array;
-#endif
   char          *func = NULL;
   int hp_profile_flag = 1;
 
   func = hp_get_function_name(ops TSRMLS_CC);
+
   if (!func) {
-#if PHP_VERSION_ID < 50500
-    _zend_execute(ops TSRMLS_CC);
-#else
     _zend_execute_ex(execute_data TSRMLS_CC);
-#endif
     return;
   }
 
   BEGIN_PROFILING(&hp_globals.entries, func, hp_profile_flag);
-#if PHP_VERSION_ID < 50500
-  _zend_execute(ops TSRMLS_CC);
-#else
+
   _zend_execute_ex(execute_data TSRMLS_CC);
-#endif
+
   if (hp_globals.entries) {
     END_PROFILING(&hp_globals.entries, hp_profile_flag);
   }
@@ -1754,17 +1733,9 @@ ZEND_DLEXPORT void hp_execute_ex (zend_execute_data *execute_data TSRMLS_DC) {
  * @author hzhao, kannan
  */
 
-#if PHP_VERSION_ID < 50500
-#define EX_T(offset) (*(temp_variable *)((char *) EX(Ts) + offset))
-
-ZEND_DLEXPORT void hp_execute_internal(zend_execute_data *execute_data,
-                                       int ret TSRMLS_DC) {
-#else
 #define EX_T(offset) (*EX_TMP_VAR(execute_data, offset))
-
 ZEND_DLEXPORT void hp_execute_internal(zend_execute_data *execute_data,
                                        struct _zend_fcall_info *fci, int ret TSRMLS_DC) {
-#endif
   zend_execute_data *current_data;
   char             *func = NULL;
   int    hp_profile_flag = 1;
@@ -1777,31 +1748,9 @@ ZEND_DLEXPORT void hp_execute_internal(zend_execute_data *execute_data,
   }
 
   if (!_zend_execute_internal) {
-    /* no old override to begin with. so invoke the builtin's implementation  */
-    zend_op *opline = EX(opline);
-#if ZEND_EXTENSION_API_NO >= 220100525
-    temp_variable *retvar = &EX_T(opline->result.var);
-    ((zend_internal_function *) EX(function_state).function)->handler(
-                       opline->extended_value,
-                       retvar->var.ptr,
-                       (EX(function_state).function->common.fn_flags & ZEND_ACC_RETURN_REFERENCE) ?
-                       &retvar->var.ptr:NULL,
-                       EX(object), ret TSRMLS_CC);
-#else
-    ((zend_internal_function *) EX(function_state).function)->handler(
-                       opline->extended_value,
-                       EX_T(opline->result.u.var).var.ptr,
-                       EX(function_state).function->common.return_reference ?
-                       &EX_T(opline->result.u.var).var.ptr:NULL,
-                       EX(object), ret TSRMLS_CC);
-#endif
+    execute_internal(execute_data, fci, ret TSRMLS_CC);
   } else {
-    /* call the old override */
-#if PHP_VERSION_ID < 50500
-    _zend_execute_internal(execute_data, ret TSRMLS_CC);
-#else
     _zend_execute_internal(execute_data, fci, ret TSRMLS_CC);
-#endif
   }
 
   if (func) {
@@ -1893,13 +1842,8 @@ static void hp_begin(long level, long xhprof_flags TSRMLS_DC) {
     zend_compile_string = hp_compile_string;
 
     /* Replace zend_execute with our proxy */
-#if PHP_VERSION_ID < 50500
-    _zend_execute = zend_execute;
-    zend_execute  = hp_execute;
-#else
     _zend_execute_ex = zend_execute_ex;
     zend_execute_ex  = hp_execute_ex;
-#endif
 
     /* Replace zend_execute_internal with our proxy */
     _zend_execute_internal = zend_execute_internal;
@@ -1970,17 +1914,14 @@ static void hp_stop(TSRMLS_D) {
   }
 
   /* Remove proxies, restore the originals */
-#if PHP_VERSION_ID < 50500
-  zend_execute          = _zend_execute;
-#else
+
   zend_execute_ex       = _zend_execute_ex;
-#endif
   zend_execute_internal = _zend_execute_internal;
   zend_compile_file     = _zend_compile_file;
   zend_compile_string   = _zend_compile_string;
 
   /* Resore cpu affinity. */
-  //restore_cpu_affinity(&hp_globals.prev_mask);
+  restore_cpu_affinity(&hp_globals.prev_mask);
 
   /* Stop profiling */
   hp_globals.enabled = 0;
