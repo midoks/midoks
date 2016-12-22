@@ -46,39 +46,49 @@
 #include <stdlib.h>
 
 #define GET_AFFINITY(pid, size, mask) 1
-// #ifdef __FreeBSD__
-// # if __FreeBSD_version >= 700110
-// #   include <sys/resource.h>
-// #   include <sys/cpuset.h>
-// #   define cpu_set_t cpuset_t
-// #   define SET_AFFINITY(pid, size, mask) \
-//            cpuset_setaffinity(CPU_LEVEL_WHICH, CPU_WHICH_TID, -1, size, mask)
-// #   define GET_AFFINITY(pid, size, mask) \
-//            cpuset_getaffinity(CPU_LEVEL_WHICH, CPU_WHICH_TID, -1, size, mask)
-// # else
-// #   error "This version of FreeBSD does not support cpusets"
-// # endif /* __FreeBSD_version */
-// #elif __APPLE__
-// /*
-//  * Patch for compiling in Mac OS X Leopard
-//  * @author Svilen Spasov <s.spasov@gmail.com>
-//  */
-// #    include <mach/mach_init.h>
-// #    include <mach/thread_policy.h>
-// #    define cpu_set_t thread_affinity_policy_data_t
-// #    define CPU_SET(cpu_id, new_mask) \
-//         (*(new_mask)).affinity_tag = (cpu_id + 1)
-// #    define CPU_ZERO(new_mask)                 \
-//         (*(new_mask)).affinity_tag = THREAD_AFFINITY_TAG_NULL
-// #   define SET_AFFINITY(pid, size, mask)       \
-//         thread_policy_set(mach_thread_self(), THREAD_AFFINITY_POLICY, mask, \
-//                           THREAD_AFFINITY_POLICY_COUNT)
-// #else
-// /* For sched_getaffinity, sched_setaffinity */
+#ifdef __FreeBSD__
+# if __FreeBSD_version >= 700110
+#   include <sys/resource.h>
+#   include <sys/cpuset.h>
+#   define cpu_set_t cpuset_t
+#   define SET_AFFINITY(pid, size, mask) \
+           cpuset_setaffinity(CPU_LEVEL_WHICH, CPU_WHICH_TID, -1, size, mask)
+#   define GET_AFFINITY(pid, size, mask) \
+           cpuset_getaffinity(CPU_LEVEL_WHICH, CPU_WHICH_TID, -1, size, mask)
+# else
+#   error "This version of FreeBSD does not support cpusets"
+# endif /* __FreeBSD_version */
+#elif __APPLE__
+/*
+ * Patch for compiling in Mac OS X Leopard
+ * @author Svilen Spasov <s.spasov@gmail.com>
+ */
+#    include <mach/mach_init.h>
+#    include <mach/thread_policy.h>
+#    define cpu_set_t thread_affinity_policy_data_t
+#    define CPU_SET(cpu_id, new_mask) \
+        (*(new_mask)).affinity_tag = (cpu_id + 1)
+#    define CPU_ZERO(new_mask)                 \
+        (*(new_mask)).affinity_tag = THREAD_AFFINITY_TAG_NULL
+#   define SET_AFFINITY(pid, size, mask)       \
+        thread_policy_set(mach_thread_self(), THREAD_AFFINITY_POLICY, mask, \
+                          THREAD_AFFINITY_POLICY_COUNT)
+
+#elif PHP_WIN32
+/*
+* Patch for compiling in Windows (i've used MS VC++ 6)
+* @author Benjamin Carl
+*/
+#define CPU_SET(cpu_id, new_mask) (*(new_mask))=(cpu_id + 1)
+#define CPU_ZERO(new_mask) (*(new_mask))=0
+#define SET_AFFINITY(pid, size, mask) SetProcessAffinityMask(pid, (*(mask)))
+#define GET_AFFINITY(pid, size, mask) GetProcessAffinityMask(GetCurrentProcess(), mask, mask)
+#else
+/* For sched_getaffinity, sched_setaffinity */
 // # include <sched.h>
 // # define SET_AFFINITY(pid, size, mask) sched_setaffinity(0, size, mask)
 // # define GET_AFFINITY(pid, size, mask) sched_getaffinity(0, size, mask)
-// #endif /* __FreeBSD__ */
+#endif /* __FreeBSD__ */
 
 
 
@@ -151,7 +161,7 @@ typedef struct hp_entry_t {
   uint64                  tsc_start;         /* start value for TSC counter  */
   long int                mu_start_hprof;                    /* memory usage */
   long int                pmu_start_hprof;              /* peak memory usage */
-  //struct rusage           ru_start_hprof;             /* user/sys time start */
+  struct rusage           ru_start_hprof;             /* user/sys time start */
   struct hp_entry_t      *prev_hprof;    /* ptr to prev entry being profiled */
   uint8                   hash_code;     /* hash_code for the function name  */
 } hp_entry_t;
@@ -220,7 +230,7 @@ typedef struct hp_global_t {
   uint32 cpu_num;
 
   /* The saved cpu affinity. */
-  //cpu_set_t prev_mask;
+  cpu_set_t prev_mask;
 
   /* The cpu id current process is bound to. (default 0) */
   uint32 cur_cpu_id;
@@ -397,7 +407,7 @@ ZEND_END_ARG_INFO()
  * FUNCTION PROTOTYPES
  * *********************
  */
-//int restore_cpu_affinity(cpu_set_t * prev_mask);
+int restore_cpu_affinity(cpu_set_t * prev_mask);
 int bind_to_cpu(uint32 cpu_id);
 
 /**
@@ -1480,17 +1490,17 @@ static void get_all_cpu_frequencies() {
  * @author cjiang
  */
 
-// int restore_cpu_affinity(cpu_set_t * prev_mask) {
+int restore_cpu_affinity(cpu_set_t * prev_mask) {
  
-//  if (SET_AFFINITY(0, sizeof(cpu_set_t), prev_mask) < 0) {
-//    perror("restore setaffinity");
-//    return -1;
-//  }
+ if (SET_AFFINITY(0, sizeof(cpu_set_t), prev_mask) < 0) {
+   perror("restore setaffinity");
+   return -1;
+ }
 
-//  /* default value ofor cur_cpu_id is 0. */
-//  hp_globals.cur_cpu_id = 0;
-//  return 0;
-// }
+ /* default value ofor cur_cpu_id is 0. */
+ hp_globals.cur_cpu_id = 0;
+ return 0;
+}
 
 /**
  * Reclaim the memory allocated for cpu_frequencies.
@@ -1630,9 +1640,9 @@ void hp_mode_hier_beginfn_cb(hp_entry_t **entries,
   return ;
 
   /* Get CPU usage */
- /* if (hp_globals.xhprof_flags & XHPROF_FLAGS_CPU) {
+  if (hp_globals.xhprof_flags & XHPROF_FLAGS_CPU) {
     getrusage(RUSAGE_SELF, &(current->ru_start_hprof));
-  }*/
+  }
 
   /* Get memory usage */
   if (hp_globals.xhprof_flags & XHPROF_FLAGS_MEMORY) {
@@ -1694,7 +1704,7 @@ zval * hp_mode_shared_endfn_cb(hp_entry_t *top,
 void hp_mode_hier_endfn_cb(hp_entry_t **entries  TSRMLS_DC) {
   hp_entry_t   *top = (*entries);
   zval            *counts;
-//struct rusage    ru_end;
+  struct rusage    ru_end;
   char             symbol[SCRATCH_BUF_LEN];
   long int         mu_end;
   long int         pmu_end;
@@ -1707,17 +1717,17 @@ void hp_mode_hier_endfn_cb(hp_entry_t **entries  TSRMLS_DC) {
     return;
   }
 
-  //if (hp_globals.xhprof_flags & XHPROF_FLAGS_CPU) {
-  //  /* Get CPU usage */
-  //  getrusage(RUSAGE_SELF, &ru_end);
+  if (hp_globals.xhprof_flags & XHPROF_FLAGS_CPU) {
+   /* Get CPU usage */
+   getrusage(RUSAGE_SELF, &ru_end);
 
-  //  /* Bump CPU stats in the counts hashtable */
-  //  hp_inc_count(counts, "cpu", (get_us_interval(&(top->ru_start_hprof.ru_utime),
-  //                                            &(ru_end.ru_utime)) +
-  //                            get_us_interval(&(top->ru_start_hprof.ru_stime),
-  //                                            &(ru_end.ru_stime)))
-  //            TSRMLS_CC);
-  //}
+   /* Bump CPU stats in the counts hashtable */
+   hp_inc_count(counts, "cpu", (get_us_interval(&(top->ru_start_hprof.ru_utime),
+                                             &(ru_end.ru_utime)) +
+                             get_us_interval(&(top->ru_start_hprof.ru_stime),
+                                             &(ru_end.ru_stime)))
+             TSRMLS_CC);
+  }
 
   if (hp_globals.xhprof_flags & XHPROF_FLAGS_MEMORY) {
     /* Get Memory usage */
