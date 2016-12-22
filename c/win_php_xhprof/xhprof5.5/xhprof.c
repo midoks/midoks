@@ -318,72 +318,21 @@ static inline zval  *hp_zval_at_key(char  *key,
 static inline char **hp_strings_in_zval(zval  *values);
 static inline void   hp_array_del(char **name_array);
 
-int gettimeofday(struct timeval *tv);
-static void get_base_time(LARGE_INTEGER *base_time);
-
-
-#define SECS_TO_FT_MULT 10000000
-static LARGE_INTEGER base_time;
-
-
-
-// Find 1st Jan 1970 as a FILETIME   
-static void get_base_time(LARGE_INTEGER *base_time)
-{  
-    SYSTEMTIME st;  
-    FILETIME ft;  
-  
-    memset(&st,0,sizeof(st));  
-    st.wYear=1970;  
-    st.wMonth=1;  
-    st.wDay=1;  
-    SystemTimeToFileTime(&st, &ft);  
-      
-    base_time->LowPart = ft.dwLowDateTime;  
-    base_time->HighPart = ft.dwHighDateTime;  
-    base_time->QuadPart /= SECS_TO_FT_MULT;  
-}
-
-int gettimeofday(struct timeval *tv) {
-	SYSTEMTIME st;
-	FILETIME ft;
-	LARGE_INTEGER li;
-	static char get_base_time_flag=0;  
-  
-    if (get_base_time_flag == 0)  
-    {  
-        get_base_time(&base_time);  
-    }  
-  
-    /* Standard Win32 GetLocalTime */  
-    GetLocalTime(&st);  
-    SystemTimeToFileTime(&st, &ft);
-  
-    li.LowPart = ft.dwLowDateTime;  
-    li.HighPart = ft.dwHighDateTime;  
-    li.QuadPart /= SECS_TO_FT_MULT;  
-    li.QuadPart -= base_time.QuadPart;  
-  
-    tv->tv_sec = li.LowPart;  
-    tv->tv_usec = st.wMilliseconds;  
-    return 0;  
-}
-
 void usleep(double i)
 {
-	LARGE_INTEGER litmp;
-	LONGLONG QPart1, QPart2;
-	double dfMinus, dfFreq, dfTim;
-	QueryPerformanceFrequency(&litmp);
-	dfFreq = (double)litmp.QuadPart;// 获得计数器的时钟频率
-	QueryPerformanceCounter(&litmp);
-	QPart1 = litmp.QuadPart;// 获得初始值
-	do {
-		QueryPerformanceCounter(&litmp);
-		QPart2 = litmp.QuadPart;//获得中止值
-		dfMinus = (double)(QPart2-QPart1);
-		dfTim = dfMinus / dfFreq;// 获得对应的时间值，单位为秒
-	}while(dfTim<i);
+	// LARGE_INTEGER litmp;
+	// LONGLONG QPart1, QPart2;
+	// double dfMinus, dfFreq, dfTim;
+	// QueryPerformanceFrequency(&litmp);
+	// dfFreq = (double)litmp.QuadPart;
+	// QueryPerformanceCounter(&litmp);
+	// QPart1 = litmp.QuadPart;
+	// do {
+	// 	QueryPerformanceCounter(&litmp);
+	// 	QPart2 = litmp.QuadPart;
+	// 	dfMinus = (double)(QPart2-QPart1);
+	// 	dfTim = dfMinus / dfFreq;
+	// }while(dfTim<i);
 }
 
 /* {{{ arginfo */
@@ -816,21 +765,21 @@ void hp_clean_profiler_state(TSRMLS_D) {
 #define BEGIN_PROFILING(entries, symbol, profile_curr)                  \
   do {                                                                  \
     /* Use a hash code to filter most of the string comparisons. */     \
-    /*uint8 hash_code  = hp_inline_hash(symbol);*/                          \
-    /*profile_curr = !hp_ignore_entry(hash_code, symbol);*/                 \
+    uint8 hash_code  = hp_inline_hash(symbol);                          \
+    profile_curr = !hp_ignore_entry(hash_code, symbol);                 \
     if (profile_curr) {                                                 \
-      /*hp_entry_t *cur_entry = hp_fast_alloc_hprof_entry();*/              \
-      /*(cur_entry)->hash_code = hash_code;         */                      \
-      /*(cur_entry)->name_hprof = symbol;   */                              \
-      /*(cur_entry)->prev_hprof = (*(entries));  */                         \
+      hp_entry_t *cur_entry = hp_fast_alloc_hprof_entry();              \
+      (cur_entry)->hash_code = hash_code;                               \
+      (cur_entry)->name_hprof = symbol;                                 \
+      (cur_entry)->prev_hprof = (*(entries));                           \
       /* Call the universal callback */                                 \
-      /*hp_mode_common_beginfn((entries), (cur_entry) TSRMLS_CC); */        \
+      hp_mode_common_beginfn((entries), (cur_entry) TSRMLS_CC);         \
       /* Call the mode's beginfn callback */                            \
-      /*hp_globals.mode_cb.begin_fn_cb((entries), (cur_entry) TSRMLS_CC);*/ \
+      hp_globals.mode_cb.begin_fn_cb((entries), (cur_entry) TSRMLS_CC); \
       /* Update entries linked list */                                  \
-      /*(*(entries)) = (cur_entry);                  */                     \
+      (*(entries)) = (cur_entry);                                       \
     }                                                                   \
-	   php_printf("BEGIN_PROFILING:%s\n",symbol);							\
+	   php_printf("BEGIN_PROFILING:%s\n",symbol);							            \
   } while (0)
 
 
@@ -849,20 +798,20 @@ void hp_clean_profiler_state(TSRMLS_D) {
 #define END_PROFILING(entries, profile_curr)                            \
   do {                                                                  \
     if (profile_curr) {                                                 \
-      /*hp_entry_t *cur_entry;*/                                            \
+      hp_entry_t *cur_entry;                                            \
       /* Call the mode's endfn callback. */                             \
       /* NOTE(cjiang): we want to call this 'end_fn_cb' before */       \
       /* 'hp_mode_common_endfn' to avoid including the time in */       \
       /* 'hp_mode_common_endfn' in the profiling results.      */       \
-      /*hp_globals.mode_cb.end_fn_cb((entries) TSRMLS_CC);*/                \
-      /* cur_entry = (*(entries)); */                                        \
+      hp_globals.mode_cb.end_fn_cb((entries) TSRMLS_CC);                \
+      cur_entry = (*(entries));                                         \
       /* Call the universal callback */                                 \
-      /*hp_mode_common_endfn((entries), (cur_entry) TSRMLS_CC);*/           \
+      hp_mode_common_endfn((entries), (cur_entry) TSRMLS_CC);           \
       /* Free top entry and update entries linked list */               \
-      /*(*(entries)) = (*(entries))->prev_hprof;*/                          \
-      /*hp_fast_free_hprof_entry(cur_entry);*/                              \
+      (*(entries)) = (*(entries))->prev_hprof;                          \
+      hp_fast_free_hprof_entry(cur_entry);                              \
     }                                                                   \
-    php_printf("END_PROFILING\n");              \
+    php_printf("END_PROFILING\n");                                      \
   } while (0)
 
 

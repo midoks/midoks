@@ -77,12 +77,17 @@ SYSTEM_INFO sysinfo;
 #define RUSAGE_SELF     0
 #define RUSAGE_CHILDREN (-1)
 
+#define SECS_TO_FT_MULT 10000000
+static LARGE_INTEGER base_time;
+
 struct rusage {
     struct timeval ru_utime;    /* user time used */
     struct timeval ru_stime;    /* system time used */
 };
 
 extern int getrusage(int who, struct rusage * rusage);
+extern void get_base_time(LARGE_INTEGER *base_time);
+extern int gettimeofday(struct timeval *tv);
 
 
 #endif  /* PHP_ZOPFLI_WIN32_H */

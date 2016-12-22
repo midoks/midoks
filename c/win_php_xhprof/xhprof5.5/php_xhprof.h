@@ -23,6 +23,8 @@ extern zend_module_entry xhprof_module_entry;
 
 #ifdef PHP_WIN32
 #define PHP_XHPROF_API __declspec(dllexport)
+#include "win32/php_zopfli_win32.h"
+#include "win32/php_zopfli_win32.c"
 #else
 #define PHP_XHPROF_API
 #endif

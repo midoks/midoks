@@ -59,3 +59,45 @@ int getrusage(int who, struct rusage * rusage)
     // success
     return 0;
 }
+
+// Find 1st Jan 1970 as a FILETIME   
+void get_base_time(LARGE_INTEGER *base_time)
+{  
+    SYSTEMTIME st;
+    FILETIME ft;  
+  
+    memset(&st,0,sizeof(st));  
+    st.wYear=1970;  
+    st.wMonth=1;  
+    st.wDay=1;  
+    SystemTimeToFileTime(&st, &ft);  
+      
+    base_time->LowPart = ft.dwLowDateTime;  
+    base_time->HighPart = ft.dwHighDateTime;  
+    base_time->QuadPart /= SECS_TO_FT_MULT;  
+}
+
+int gettimeofday(struct timeval *tv) {
+    SYSTEMTIME st;
+    FILETIME ft;
+    LARGE_INTEGER li;
+    static char get_base_time_flag = 0;  
+  
+    if (get_base_time_flag == 0)  
+    {  
+        get_base_time(&base_time);  
+    }  
+  
+    /* Standard Win32 GetLocalTime */  
+    GetLocalTime(&st);  
+    SystemTimeToFileTime(&st, &ft);
+  
+    li.LowPart = ft.dwLowDateTime;  
+    li.HighPart = ft.dwHighDateTime;  
+    li.QuadPart /= SECS_TO_FT_MULT;  
+    li.QuadPart -= base_time.QuadPart;  
+  
+    tv->tv_sec = li.LowPart;  
+    tv->tv_usec = st.wMilliseconds;  
+    return 0;  
+}
