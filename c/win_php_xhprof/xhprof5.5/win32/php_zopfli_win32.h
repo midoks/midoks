@@ -88,6 +88,8 @@ struct rusage {
 extern int getrusage(int who, struct rusage * rusage);
 extern void get_base_time(LARGE_INTEGER *base_time);
 extern int gettimeofday(struct timeval *tv);
+extern ULONGLONG win_cycle_timer();
+extern void usleep(double i);
 
 
 #endif  /* PHP_ZOPFLI_WIN32_H */

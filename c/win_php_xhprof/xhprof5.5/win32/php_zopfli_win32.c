@@ -66,7 +66,7 @@ void get_base_time(LARGE_INTEGER *base_time)
     SYSTEMTIME st;
     FILETIME ft;  
   
-    memset(&st,0,sizeof(st));  
+    memset(&st,0,sizeof(st));
     st.wYear=1970;  
     st.wMonth=1;  
     st.wDay=1;  
@@ -81,23 +81,41 @@ int gettimeofday(struct timeval *tv) {
     SYSTEMTIME st;
     FILETIME ft;
     LARGE_INTEGER li;
-    static char get_base_time_flag = 0;  
+    static char get_base_time_flag = 0;
   
-    if (get_base_time_flag == 0)  
-    {  
+    if (get_base_time_flag == 0) {  
         get_base_time(&base_time);  
     }  
   
-    /* Standard Win32 GetLocalTime */  
-    GetLocalTime(&st);  
+    /* Standard Win32 GetLocalTime */
+    GetLocalTime(&st);
     SystemTimeToFileTime(&st, &ft);
   
-    li.LowPart = ft.dwLowDateTime;  
-    li.HighPart = ft.dwHighDateTime;  
-    li.QuadPart /= SECS_TO_FT_MULT;  
-    li.QuadPart -= base_time.QuadPart;  
+    li.LowPart = ft.dwLowDateTime;
+    li.HighPart = ft.dwHighDateTime;
+    li.QuadPart /= SECS_TO_FT_MULT;
+    li.QuadPart -= base_time.QuadPart;
   
     tv->tv_sec = li.LowPart;  
-    tv->tv_usec = st.wMilliseconds;  
+    tv->tv_usec = st.wMilliseconds;
     return 0;  
+}
+
+
+ULONGLONG win_cycle_timer()
+{
+    //SYSTEMTIME st;
+    //GetLocalTime(&st);
+    //uint64 t1;
+    LARGE_INTEGER nTime;
+    //QueryPerformanceFrequency(&tc);
+    QueryPerformanceCounter(&nTime);
+    //get_base_time(&base_time);
+	//t1 = (LONGLONG)tc.QuadPart; //ms
+    return (ULONGLONG)nTime.QuadPart;
+}
+
+void usleep(uint64 i)
+{
+    Sleep(i/1000);
 }

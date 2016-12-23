@@ -46,7 +46,7 @@
 #endif
 #include <stdlib.h>
 
-#define GET_AFFINITY(pid, size, mask) 1
+//#define GET_AFFINITY(pid, size, mask) 1
 #ifdef __FreeBSD__
 # if __FreeBSD_version >= 700110
 #   include <sys/resource.h>
@@ -310,22 +310,6 @@ static inline zval  *hp_zval_at_key(char  *key,
 static inline char **hp_strings_in_zval(zval  *values);
 static inline void   hp_array_del(char **name_array);
 
-void usleep(double i)
-{
-	// LARGE_INTEGER litmp;
-	// LONGLONG QPart1, QPart2;
-	// double dfMinus, dfFreq, dfTim;
-	// QueryPerformanceFrequency(&litmp);
-	// dfFreq = (double)litmp.QuadPart;
-	// QueryPerformanceCounter(&litmp);
-	// QPart1 = litmp.QuadPart;
-	// do {
-	// 	QueryPerformanceCounter(&litmp);
-	// 	QPart2 = litmp.QuadPart;
-	// 	dfMinus = (double)(QPart2-QPart1);
-	// 	dfTim = dfMinus / dfFreq;
-	// }while(dfTim<i);
-}
 
 /* {{{ arginfo */
 ZEND_BEGIN_ARG_INFO_EX(arginfo_xhprof_enable, 0, 0, 0)
@@ -1265,17 +1249,10 @@ void hp_sample_check(hp_entry_t **entries  TSRMLS_DC) {
  * @author cjiang
  */
 
-// __int64 __declspec(naked) read_time_stamp_counter()
-// {
-//     __asm cpuid;  
-//     __asm rdtsc;
-//     __asm ret;
-// }
+static inline uint64 cycle_timer() {
 
-inline uint64 cycle_timer() {
-	//uint64 val = read_time_stamp_counter();
-
-	clock_t t = clock();
+	uint64 t = win_cycle_timer();
+	//php_printf("clock:%u\n", t);
 	//uint64 val = 0;
 	return t;
 }
@@ -1291,7 +1268,7 @@ inline uint64 cycle_timer() {
  * @author cjiang
  */
 int bind_to_cpu(uint32 cpu_id) {
- /* cpu_set_t new_mask;
+  cpu_set_t new_mask;
 
   CPU_ZERO(&new_mask);
   CPU_SET(cpu_id, &new_mask);
@@ -1299,7 +1276,7 @@ int bind_to_cpu(uint32 cpu_id) {
   if (SET_AFFINITY(0, sizeof(cpu_set_t), &new_mask) < 0) {
     perror("setaffinity");
     return -1;
-  }*/
+  }
 
   /* record the cpu_id the process is bound to. */
   hp_globals.cur_cpu_id = cpu_id;
@@ -1334,8 +1311,11 @@ static void incr_us_interval(struct timeval *start, uint64 incr) {
  *
  * @author cjiang
  */
-inline double get_us_from_tsc(uint64 count, double cpu_frequency) {
-  return count / cpu_frequency;
+inline double get_us_from_tsc(uint64 count, uint64 cpu_frequency) {
+  //php_printf("count:%u\n", count);
+  //php_printf("cpu_frequency:%u\n", cpu_frequency);
+  //php_printf("tsc:%f\n", count / cpu_frequency);
+  return (count / cpu_frequency)*1000;//win
 }
 
 /**
@@ -1359,6 +1339,10 @@ inline uint64 get_tsc_from_us(uint64 usecs, double cpu_frequency) {
  * @author cjiang
  */
 static double get_cpu_frequency() {
+  // LARGE_INTEGER tc;
+  // QueryPerformanceFrequency(&tc);
+  // return (ULONGLONG)tc.QuadPart/1000;
+
   struct timeval start;
   struct timeval end;
 
@@ -1370,9 +1354,8 @@ static double get_cpu_frequency() {
   }
 
   tsc_start = cycle_timer();
-  /* Sleep for 5 miliseconds. Comparaing with gettimeofday's  few microseconds
-   * execution time, this should be enough. */
-  usleep(5000);
+
+  Sleep(5);
 
   if (gettimeofday(&end)) {
     perror("gettimeofday");
@@ -1407,7 +1390,7 @@ static void get_all_cpu_frequencies() {
 
     /* Make sure the current process gets scheduled to the target cpu. This
      * might not be necessary though. */
-    usleep(0);
+    Sleep(1);
 
     frequency = get_cpu_frequency();
     if (frequency == 0.0) {
