@@ -5,9 +5,12 @@
 - https://github.com/php-memcached-dev/php-memcached
 - http://www.cygwin.com/
 - http://gnuwin32.sourceforge.net/packages/make.htm
+- http://svn.coderepos.org/share/lang/c/libmemcached-win32/
 ```
 
 phpsdk_setvars.bat
+
+buildconf --force
 
 buildconf
 configure --help
@@ -16,7 +19,13 @@ nmake
 
 nmake snap
 
-configure --disable-all --enable-cli --enable-xhprof=shared 
+configure --disable-all --enable-cli --enable-xhprof=shared
+configure --disable-all --enable-cli --enable-md_xhprof=shared
+
+
+configure --disable-all --enable-cli --enable-memcached=shared --with-memcached=D:/MD/php_sdk/libmemcached-win32/libmemcached-latest/libmemcached/
+
+configure --disable-all --enable-cli --with-memcached=D:/MD/php_sdk/libmemcached-win32/libmemcached-latest/libmemcached/memcached.dll
 
 
 configure --disable-all --enable-cli --enable-apache2-4handler --without-mssql --without-pdo-mssql --disable-isapi --enable-com-dotnet=shared --with-mcrypt=static --disable-static-analyze --with-pgo
