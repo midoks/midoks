@@ -8,7 +8,7 @@ CQ_ERR=$CQ_OBJS/autoconf.err
 cat << END > Makefile
 
 build:
-	rm -rf $CQ_OBJS/cqtask
+	rm -rf $CQ_OBJS/$BIN_FILE
 	\$(MAKE) -f $CQ_MAKEFILE
 
 install:

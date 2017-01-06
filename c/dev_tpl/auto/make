@@ -68,15 +68,15 @@ cq_deps=`echo $CORE_SRCS \
           -e "s#\([^ ]*\.\)h#$CQ_OBJS\/\1$cq_objext#g"`
 
 
-ngx_deps=`echo $cq_deps \
+cq_deps=`echo $cq_deps \
     | sed -e "s/  *\([^ ][^ ]*\)/$cq_regex_cont\1/g" \
           -e "s/\//$cq_regex_dirsep/g"`
 
 #DEPS
 cat << END                                                    >> $CQ_MAKEFILE
 
-$CQ_OBJS${cq_dirsep}cqtask${cq_binext}: $cq_deps$cq_spacer
-	\$(LINK) -o $CQ_OBJS${cq_dirsep}cqtask${cq_binext}${cq_binext} $cq_deps
+$CQ_OBJS${cq_dirsep}${BIN_FILE}${cq_binext}: $cq_deps$cq_spacer
+	\$(LINK) -o $CQ_OBJS${cq_dirsep}${BIN_FILE}${cq_binext}${cq_binext} $cq_deps
 
 END
 

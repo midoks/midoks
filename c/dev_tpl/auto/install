@@ -3,6 +3,6 @@
 
 cat << END                                                    >> $CQ_MAKEFILE
 
-install: $CQ_OBJS${cq_dirsep}cqtask${cq_binext}
+install: $CQ_OBJS${cq_dirsep}$BIN_FILE${cq_binext}
 
 END

@@ -1,8 +1,8 @@
 #!/bin/sh
 
 help=no
-
-CQ_PREFIX=/usr/local/cqtasks
+BIN_FILE=cqtasks
+CQ_PREFIX=/usr/local/$BIN_FILE
 CQ_OBJS=objs
 CC=${CC:-gcc}
 
