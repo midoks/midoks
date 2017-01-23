@@ -1,13 +1,14 @@
 # P
+.DS_Store
 *.DS_Store
-*.log
+.log
 
 # Object files
-*.o
-*.ko
+.o
+.ko
 
 # Libraries
-*.lib
+.lib
 *.a
 
 # Shared objects (inc. Windows DLLs)
