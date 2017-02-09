@@ -287,5 +287,25 @@ function zh_en_change($str,$type) {
 
 }
 
+ /**
+ * @func 数据对齐(midoks) 2017-1-12
+ * @param $data 数据
+ * @param $width 对齐宽度 默认 3
+ */
+function dataAlignment($data, $width = 3){
+    if(is_array($data)){
+        $t_num = count($data);
+        $n = floor($t_num/$width);
+        $t_data = array();
+        if ( $n > 0 ){
+            $t_data = array_slice($data, 0, $n*$width);
+        }
+        return $t_data;
+    } else {
+        return $data;
+    }
+}
+
+
 
 ?>
