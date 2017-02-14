@@ -8,6 +8,9 @@
 - http://svn.coderepos.org/share/lang/c/libmemcached-win32/
 ```
 
+
+php ext_skel_win32.php --extname=kkk
+
 phpsdk_setvars.bat
 
 buildconf --force
