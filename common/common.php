@@ -307,5 +307,58 @@ function dataAlignment($data, $width = 3){
 }
 
 
+/**
+ * 数据库分页折半算法
+ * @param $total_num int 总共多少数据
+ * @param $page_now int 当前第几页
+ * @param $page_size int 每页多少数据(默认10)
+ * @param $sort_id  string 排序的字段
+ * @param $now_is_desc boolean 当前排序规则 true->desc|false->asc(默认true)
+ */
+function table_page_sort_algorithm($total_sum, $page_now, $page_size = 10, $sort_id = 'id', $now_is_desc = true) {
+
+	$page_sum = ceil($total_sum / $page_size);
+	
+	if ($page_now > $page_sum){
+		$page_now = $page_sum;
+	}
+
+	$last_page_size = $total_sum % $page_size;
+	$psize = ($page_sum == $page_now) && $last_page_size ? $last_page_size : $page_size;
+
+	$realpage = $page_sum - $page_now;
+	$resort = false;
+	$start_limit = ($page_now-1) * $page_size;
+	if ( $page_now > ($page_sum/2) && $page_now > 2 ) {
+		if ($last_page_size) {
+	        $start_limit = max(0, ($realpage - 1) * $page_size + $last_page_size);
+	    } else {
+	        $start_limit = max(0, $realpage * $page_size + $last_page_size);
+	    }
+
+	    if ($now_is_desc){
+	    	$sql = " order by {$sort_id} asc ";
+		} else {
+			$sql = " order by {$sort_id} desc ";
+		}
+
+	    $sql .= " limit $start_limit, $psize";
+	    $resort = true;
+	} else {
+
+		if ($now_is_desc){
+			$sql = " order by {$sort_id} desc ";
+		} else {
+			$sql = " order by {$sort_id} asc ";
+		}
+
+		$sql .= " limit $start_limit, $page_size";
+	}
+
+	$ret =  array('sql' => $sql,'resort' => $resort);
+	return $ret;
+}
+
+
 
 ?>
