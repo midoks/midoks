@@ -1,5 +1,6 @@
 ### 基本配置
-https://github.com/midoks/midoks.github.io/blob/master/_posts/%E8%BF%90%E7%BB%B4/2014-5-28-svn.md
+- https://github.com/midoks/midoks.github.io/blob/master/_posts/%E8%BF%90%E7%BB%B4/2014-5-28-svn.md
+- svn info
 
 
 ### csvn
