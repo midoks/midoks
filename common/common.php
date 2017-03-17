@@ -360,5 +360,43 @@ function table_page_sort_algorithm($total_sum, $page_now, $page_size = 10, $sort
 }
 
 
+function is_spider(){
+	$spider_list = array (
+		'googlebot' 	=> '谷歌',
+		'mediapartners-google' => 'Google Adsense',
+		'baiduspider' 	=> '百度',
+		'bingbot' 		=> '必应',
+		'slurp' 		=> '雅虎',
+		'Sogou' 		=> '搜狗',
+		'sosospider' 	=> '腾讯SOSO',
+		'ia_archiver' 	=> 'Alexa',
+		'iaarchiver' 	=> 'Alexa',
+		'yodaobot' 		=> 'Yodao',
+		'sohu-search' 	=> '搜狐',
+		'msnbot' 		=> 'MSN',
+		'360Spider'		=> '360',
+		'DNSPod'		=> 'DNSPod',
+		'JianKongBao'	=> '监控宝',
+		'YYSpider' 		=> '云云搜索',
+	);
+
+	$user_agent = $_SERVER['HTTP_USER_AGENT'];
+
+	$info = array(
+		'is_spider' 	=> false,
+		'spider_name' 	=> ''
+	);
+
+	foreach($spider_list as $k=>$v){
+		if((preg_match('/'.$k.'/i', $user_agent))){
+			$info['spider_name'] = $k;
+			$info['is_spider'] = true;
+			break;
+		}
+	}
+	return $info;
+}
+
+
 
 ?>
