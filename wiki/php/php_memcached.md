@@ -23,4 +23,19 @@ wget https://launchpadlibrarian.net/51546357/libmemcached-0.42.tar.gz
 tar zxvf libmemcached-0.42.tar.gz
 ./configure --prefix=/usr/local/libmemcached  --with-memcached && make && make install
 
-```     
+```
+
+
+### PHP memcache分布式问题
+
+- memcache
+
+
+
+
+
+
+
+
+
+
