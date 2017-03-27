@@ -72,6 +72,7 @@ yum makecache
 
 yum install ca-certificates
 yum groupinstall -y "Development Tools"
+package-cleanup --cleandupes --setopt=protected_multilib=false --setopt=protected_multilib=false
 
 rpm -Uvh yum* --nodeps
 rpm --rebuilddb
