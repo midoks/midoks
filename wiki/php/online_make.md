@@ -70,6 +70,7 @@ dbus-python-0.83.0-6.1.el6.x86_64
 yum clean all
 yum makecache
 
+yum install ca-certificates
 yum groupinstall -y "Development Tools"
 
 rpm -Uvh yum* --nodeps
