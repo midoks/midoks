@@ -20,13 +20,12 @@ cmake \
 -DEXTRA_CHARSETS=all \
 -DDEFAULT_CHARSET=utf8 \
 -DDEFAULT_COLLATION=utf8_general_ci
-     
-```
+
 
 cmake \
 -DCMAKE_INSTALL_PREFIX=/usr/local/mysql57 \
 -DMYSQL_DATADIR=/usr/local/mysql57/data \
--DSYSCONFDIR=/etc \
+-DSYSCONFDIR=/usr/local/mysql57 \
 -DWITH_MYISAM_STORAGE_ENGINE=1 \
 -DWITH_INNOBASE_STORAGE_ENGINE=1 \
 -DWITH_MEMORY_STORAGE_ENGINE=1 \
@@ -40,3 +39,12 @@ cmake \
 -DDEFAULT_COLLATION=utf8_general_ci \
 -DDOWNLOAD_BOOST=1 \
 -DWITH_BOOST=/usr/local/boost
+
+
+groupadd mysql
+useradd -g mysql mysql
+设置权限并初始化MySQL系统授权表
+修改/usr/local/mysql权限
+chown -R mysql:mysql /usr/local/mysql
+     
+```
