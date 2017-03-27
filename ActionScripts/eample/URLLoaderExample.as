@@ -1,4 +1,4 @@
-﻿package {
+package {
     import flash.display.Sprite;
     import flash.events.*;
     import flash.net.*;

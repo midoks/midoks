@@ -1,4 +1,4 @@
-﻿package {
+package {
 	//解决跨域问题,获取网页数据
 	//Author:midoks
 	

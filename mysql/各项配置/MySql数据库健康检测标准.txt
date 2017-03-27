@@ -1,4 +1,4 @@
-﻿线程缓存命中率:
+线程缓存命中率:
 		[(connections-threads_created)/connection]
 		(连接次数数-线程创建)/连接次数
 
