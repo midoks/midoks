@@ -46,5 +46,25 @@ useradd -g mysql mysql
 设置权限并初始化MySQL系统授权表
 修改/usr/local/mysql权限
 chown -R mysql:mysql /usr/local/mysql
+
+#初始化数据
+./bin/mysqld --initialize
+
+#启动(与关闭)
+./bin/mysqld_safe --user=mysql &
+./bin/mysqladmin -uroot shutdown
+
+#修改密码
+SET PASSWORD = PASSWORD('123456');
+flush privileges;
+
+update user set host = '%' where user = 'root';
+
+#授权登录
+grant all privileges on *.* to 'yourname'@'%' identified by 'youpasswd';
+
      
 ```
+
+
+
