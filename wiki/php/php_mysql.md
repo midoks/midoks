@@ -62,8 +62,36 @@ update user set host = '%' where user = 'root';
 
 #授权登录
 grant all privileges on *.* to 'yourname'@'%' identified by 'youpasswd';
+启动MySQL
+添加服务，拷贝服务脚本到init.d目录，并设置开机启动
 
-     
+#拷贝启动文件到/etc/init.d/下并重命令为mysql
+cp support-files/mysql.server /etc/init.d/mysql
+#增加执行权限
+chmod 755 /etc/init.d/mysql
+
+chkconfig --list mysql
+chkconfig --add mysql 
+
+#设置MySQL在345等级自动启动
+
+chkconfig --level 345 mysql on
+#或用这个命令设置开机启动
+
+#启动MySQL服务
+service mysql start
+#或者
+/etc/init.d/mysql start
+--------------------------
+#mysql服务的启动/重启/停止
+#启动mysql服务
+service mysqld start
+#重启mysql服务
+
+service mysqld restart
+#停止mysql服务
+
+service mysqld stop
 ```
 
 
