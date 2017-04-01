@@ -93,6 +93,9 @@ make && make install
 wget http://cn2.php.net/distributions/php-5.6.28.tar.gz
 wget http://cn2.php.net/distributions/php-7.0.14.tar.gz
 
+
+yum -y openssl-devel libxml2
+
 ./configure --prefix=/usr/local/php5.6 \
 --exec-prefix=/usr/local/php5.6 \
 --with-config-file-path=/usr/local/php5.6 \
