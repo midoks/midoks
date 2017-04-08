@@ -14,6 +14,7 @@ return array(
 				'port' 		=> '3306',
 				'user' 		=> 'root',
 				'password'	=> 'root',
+				'database'	=> 'wiki',
 				'charset'	=> 'utf8',
 				'prefix'	=> 't_',
 			),
@@ -24,10 +25,12 @@ return array(
 				'port' 		=> '3306',
 				'user' 		=> 'root',
 				'password'	=> 'root',
+				'database'	=> 'wiki',
 				'charset'	=> 'utf8',
 				'prefix'	=> 't_',
 			),
 		),
+		
 	)
 );
 
