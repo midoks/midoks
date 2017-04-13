@@ -3,6 +3,7 @@
 https://www.elastic.co/
 https://www.elastic.co/downloads/marvel
 
+
 #日志收集
 http://kibana.logstash.es/content/logstash/scale/kafka.html
 
@@ -40,3 +41,5 @@ http://kafka.apache.org/documentation.html#consumerconfigs
 bin/logstash-plugin install logstash-input-kafka
 bin/logstash-plugin install logstash-output-kafka
 ```
+
+- http://www.cnblogs.com/zeze/p/5902124.html
