@@ -9,7 +9,7 @@ Solr是一个独立的企业级搜索应用服务器，它对外提供类似于W
 - https://github.com/mbonaci/solr-data-import-scheduler[scheduler组件]
 
 #安装solr准备工作
-* JAVA环境安装
+* JAVA环境安装()
 * windows -> solr-6.3.0.zip
 * Unix,Linux,MacOSX -> solr-6.3.0.tgz
 
