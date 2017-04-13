@@ -5,6 +5,8 @@
 #删除yum
 ```
 rpm -aq | grep yum|xargs rpm -e --nodeps
+
+yum install lrzsz
 ```
 
 ## 更换yum源
