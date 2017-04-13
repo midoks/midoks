@@ -19,6 +19,9 @@ Solr是一个独立的企业级搜索应用服务器，它对外提供类似于W
 * bin/solr restart
 
 # 配置
+```
+./bin/solr create -c core
+```
 
 - MySQL数据为例
 ```
