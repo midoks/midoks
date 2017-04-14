@@ -95,7 +95,7 @@ SOLR_TIMEZONE="UTC+8"
 ```
 
 - solr集群搭建([查看文档](wiki_solr_cloud.md))
-- Solr分词([查看文档](wiki_solr_participle.md))
+- solr分词([查看文档](wiki_solr_participle.md))
 
 
 
