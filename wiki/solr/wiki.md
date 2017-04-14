@@ -38,6 +38,12 @@ CREATE TABLE `test1` (
 ) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4;
 ```
 
+- 添加库
+```
+<lib dir="${solr.install.dir:../../../..}/dist/" regex="mysql-connector-java-5.1.40-bin.jar" />
+<lib dir="${solr.install.dir:../../../..}/dist/" regex="solr-dataimporthandler-.*\.jar" />
+```
+
 - 复制solrconfig.xml文件(server/solr/configsets/basic_configs/conf)
 
 ```
