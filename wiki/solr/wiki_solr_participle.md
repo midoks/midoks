@@ -1,4 +1,6 @@
 # Solr分词
+
+
 ```
 managed-schema.xml
 
@@ -29,4 +31,10 @@ curl 'http://127.0.0.1:8983/solr/article/dataimport?_=1490424730223&indent=on&wt
 --data 'command=delta-import&verbose=false&clean=false&commit=true&optimize=false&debug=true&core=article&entity=article&name=dataimport'
 
 mmseg 中文分词
+```
+
+
+# 配置添加类
+```
+<lib dir="${solr.install.dir:../../../..}/contrib/mmseg4j" regex="*\.jar" />
 ```
