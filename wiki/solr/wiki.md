@@ -5,6 +5,9 @@ Solr是一个独立的企业级搜索应用服务器，它对外提供类似于W
 - http://www.apache.org/dyn/closer.lua/lucene/solr/6.3.0
 - https://lucene.apache.org/solr/resources.html#tutorials
 - http://dev.mysql.com/downloads/connector/j/
+```
+mysql-connector-java-5.1.41-bin.jar 
+```
 - https://wiki.apache.org/solr/DataImportHandler
 - https://github.com/mbonaci/solr-data-import-scheduler[scheduler组件]
 
@@ -92,9 +95,7 @@ SOLR_TIMEZONE="UTC+8"
 ```
 
 - solr集群搭建([查看文档](wiki_solr_cloud.md))
-
-
-
+- Solr分词([查看文档](wiki_solr_participle.md))
 
 
 

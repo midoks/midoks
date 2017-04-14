@@ -38,7 +38,8 @@
 
 - 添加Core
 ```
-在solr_home目录下创建core_1（可自定义），在core_1目录下创建data目录，并将solr_home/configsets/basic_configs/目录下的conf目录复制到core_1下,通过控制台添加core，并重新启动Tomcat,就会看到新建的core_1了.
+在solr_home目录下创建core_1（可自定义），
+在core_1目录下创建data目录，并将solr_home/configsets/basic_configs/目录下的conf目录复制到core_1下,通过控制台添加core，并重新启动Tomcat,就会看到新建的core_1了.
 ```
 
 - http://localhost:8080/solr/index.html
