@@ -47,7 +47,7 @@ grep 'core id' /proc/cpuinfo | sort -u | wc -l
 grep 'processor' /proc/cpuinfo | sort -u | wc -l
 ```
 
-##linux内核优化
+# linux内核优化
 ```
 #表示开启SYN Cookies.当出现SYN等待队列溢出时,启用cookies来处理,
 #可防范少量SYN攻击，默认为0，表示关闭;
