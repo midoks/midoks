@@ -1,29 +1,51 @@
 ## 常用命令
+- 查看监听端口的软件
 ```
-#查看监听端口的软件
 netstat -ntlp  
+```
 
-#去掉注释信息
+- 去掉注释信息
+```
 sudo sed '/^ *#/d' **.conf > *.bak.conf
+```
 
-#查看服务器最近操作
+- 查看服务器最近操作
+```
 more /var/log/secure 
 who /var/log/wtmp
+```
 
-#查看端口
+- 查看端口
+```
 netstat -tlntp|grep -E "9200|9300"
 ```
 
-#建立简单服务器
+- 时间
+```
+date "+%Y-%m-%d %H:%M:%S"
+
+date -j -f "%Y-%m-%d %H:%M:%S" "2012-12-01 00:00:00" "+%s"
+```
+
+- 建立简单服务器
+```
 python -m SimpleHTTPServer 8080
+```
 
-#查看物理cpu个数
+- 查看物理cpu个数
+```
 grep 'physical id' /proc/cpuinfo | sort -u
+```
 
-##查看核心数量
+- 查看核心数量
+```
 grep 'core id' /proc/cpuinfo | sort -u | wc -l
-##查看线程数
+```
+
+- 查看线程数
+```
 grep 'processor' /proc/cpuinfo | sort -u | wc -l
+```
 
 ##linux内核优化
 ```
