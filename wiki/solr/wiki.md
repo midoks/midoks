@@ -138,6 +138,7 @@ compression:external or internal 使用SOLR自己的压缩算法或应用容器�
 ```
 
 # 用户权限配置
+- http://wiki.eclipse.org/Jetty/Tutorial/Realms
 
 - 生成密码
 ```
