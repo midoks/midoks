@@ -135,3 +135,49 @@ httpBasicAuthUser:验证用户名，需要和主服务器一致
 httpBasicAuthPassword:验证密码，需和主服务器一致 
 compression:external or internal 使用SOLR自己的压缩算法或应用容器的
 ```
+
+# 用户权限配置
+
+- 生成密码
+```
+在/solr/server/etc/目录下vim realm.properties
+
+java -cp server/lib/jetty-util-9.3.14.v20161028.jar org.eclipse.jetty.util.security.Password admin admin
+admin
+OBF:1u2a1toa1w8v1tok1u30
+MD5:21232f297a57a5a743894a0e4a801fc3
+CRYPT:adpexzg3FUZAk
+```
+
+- 在/solr5/server/etc/jetty.xml中添加内容
+
+```
+<Call name="addBean">
+   <Arg>
+     <New class="org.eclipse.jetty.security.HashLoginService">
+      <Set name="name">Solr Admin</Set>
+      <Set name="config"><Property name="jetty.home" default="."/>/etc/realm.properties</Set>
+      <Set name="refreshInterval">0</Set>
+    </New>
+   </Arg>
+</Call>
+
+```
+
+- 在server/solr-webapp/webapp/WEB-INF/web.xml中添加如下内容
+```
+<security-constraint>
+    <web-resource-collection>
+      <web-resource-name>solr</web-resource-name>
+      <url-pattern>/</url-pattern>
+    </web-resource-collection>
+    <auth-constraint> 
+        <role-name>solr_home</role-name>  
+        <role-name>admin</role-name>  
+    </auth-constraint>
+  </security-constraint>
+  <login-config>  
+      <auth-method>BASIC</auth-method>  
+      <realm-name>Solr</realm-name>  
+  </login-config>  
+```
