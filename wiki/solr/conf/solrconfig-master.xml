@@ -1,0 +1,7 @@
+<requestHandler name="/replication" class="solr.ReplicationHandler" > 
+<lst name="master">
+<str name="replicateAfter">commit</str>
+<str name="replicateAfter">startup</str>
+<str name="confFiles">schema.xml,stopwords.txt</str> 
+</lst>
+</requestHandler>

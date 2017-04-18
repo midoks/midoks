@@ -1,0 +1,9 @@
+<requestHandler name="/replication" class="solr.ReplicationHandler" > 
+<lst name="slave"> 
+<str name="masterUrl">http://127.0.0.1:8983/solr/comment</str> 
+<str name="pollInterval">00:00:60</str> 
+<str name="compression">internal</str> 
+<str name="httpConnTimeout">50000</str> 
+<str name="httpReadTimeout">500000</str> 
+</lst> 
+</requestHandler>
