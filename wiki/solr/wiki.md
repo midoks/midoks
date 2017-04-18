@@ -20,6 +20,7 @@ mysql-connector-java-5.1.41-bin.jar
 * bin/solr start
 * bin/solr stop
 * bin/solr restart
+* /usr/local/src/solr-6.5.0/bin/solr restart
 
 # 配置
 ```
