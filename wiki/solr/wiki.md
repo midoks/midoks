@@ -106,3 +106,32 @@ SOLR_TIMEZONE="UTC+8"
 
 
 
+# 主solr配置，修改配置文件
+```
+<requestHandler name="/replication" class="solr.ReplicationHandler" >
+  <lst name="master">
+   <str name="replicateAfter">commit</str>
+   <str name="replicateAfter">startup</str>
+   <str name="confFiles">schema.xml,stopwords.txt</str>
+  </lst>
+</requestHandler>
+```
+ 
+
+# 从solr配置 ，修改配置文件
+```
+<requestHandler name="/replication" class="solr.ReplicationHandler" >
+ <lst name="slave">
+   <str name="masterUrl">http://127.0.0.1/core0/replication</str><!--主搜索引擎服务地址-->
+   <str name="pollInterval">00:00:60</str><!--同步频率，1分钟一次-->
+ </lst>
+</requestHandler>
+
+masterUrl : 主服务器同步URL地址 
+pollInterval:从服务器同步间隔，即每隔多长时间同步一次主服务器 
+httpConnTimeout:设置连接超时（单位：毫秒） 
+httpReadTimeout:如果设置同步索引文件过大，则应适当提高此值。（单位：毫秒） 
+httpBasicAuthUser:验证用户名，需要和主服务器一致 
+httpBasicAuthPassword:验证密码，需和主服务器一致 
+compression:external or internal 使用SOLR自己的压缩算法或应用容器的
+```
