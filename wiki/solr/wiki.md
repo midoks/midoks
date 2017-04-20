@@ -183,3 +183,16 @@ CRYPT:adpexzg3FUZAk
       <realm-name>Solr</realm-name>  
   </login-config>  
 ```
+
+
+# 常用操作
+
+- 清空数据
+```
+在solr客户端，访问你的索引库（我认为最方便的方法）
+documents type 选择 XML 
+documents 输入下面语句
+
+<delete><query>*:*</query></delete>
+<commit/>
+```
