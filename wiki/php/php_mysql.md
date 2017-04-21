@@ -62,6 +62,10 @@ update user set host = '%' where user = 'root';
 
 #授权登录
 grant all privileges on *.* to 'yourname'@'%' identified by 'youpasswd';
+
+#查看授权
+SELECT DISTINCT CONCAT('User: ''',user,'''@''',host,''';') AS query FROM mysql.user;
+
 启动MySQL
 添加服务，拷贝服务脚本到init.d目录，并设置开机启动
 
