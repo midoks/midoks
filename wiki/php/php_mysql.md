@@ -63,6 +63,8 @@ update user set host = '%' where user = 'root';
 #授权登录
 grant all privileges on *.* to 'yourname'@'%' identified by 'youpasswd';
 
+grant all privileges on *.* to 'cjs'@'%' identified by 'cjscjs123';
+
 #查看授权
 SELECT DISTINCT CONCAT('User: ''',user,'''@''',host,''';') AS query FROM mysql.user;
 
