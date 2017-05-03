@@ -142,7 +142,7 @@ compression:external or internal 使用SOLR自己的压缩算法或应用容器�
 
 - 生成密码
 ```
-在/solr/server/etc/目录下vim realm.properties
+在/solr/server/etc/目录下(vim realm.properties)| [示例文件](conf/realm.properties)
 
 java -cp server/lib/jetty-util-9.3.14.v20161028.jar org.eclipse.jetty.util.security.Password admin admin
 admin
@@ -151,18 +151,17 @@ MD5:21232f297a57a5a743894a0e4a801fc3
 CRYPT:adpexzg3FUZAk
 ```
 
-- 在/server/contexts/solr-jetty-context.xml中添加内容([示例文件](/conf/solr-jetty-context.xml))
+- 在/server/contexts/solr-jetty-context.xml中添加内容([示例文件](conf/solr-jetty-context.xml))
 
 ```
 <Get name="securityHandler">  
-     <Set name="loginService">  
-             <New class="org.eclipse.jetty.security.HashLoginService">  
-                     <Set name="name">Test Reaml</Set>  
-                    <Set name="config"><SystemProperty name="jetty.home" default="."/>/etc/realm.properties</Set>  
-             </New>  
-     </Set>  
-</Get> 
-
+ <Set name="loginService">  
+   <New class="org.eclipse.jetty.security.HashLoginService">  
+    <Set name="name">Test Reaml</Set>  
+    <Set name="config"><SystemProperty name="jetty.home" default="."/>/etc/realm.properties</Set>  
+   </New>  
+ </Set>  
+</Get>
 ```
 
 - 在server/solr-webapp/webapp/WEB-INF/web.xml中添加如下内容
