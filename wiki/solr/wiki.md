@@ -142,7 +142,7 @@ compression:external or internal 使用SOLR自己的压缩算法或应用容器�
 
 - 生成密码
 ```
-在/solr/server/etc/目录下vim realm.properties([示例文件](conf/realm.properties))
+在/solr/server/etc/目录下realm.properties([示例文件](conf/realm.properties))
 
 java -cp server/lib/jetty-util-9.3.14.v20161028.jar org.eclipse.jetty.util.security.Password admin admin
 admin
@@ -164,7 +164,7 @@ CRYPT:adpexzg3FUZAk
 </Get>
 ```
 
-- 在server/solr-webapp/webapp/WEB-INF/web.xml中添加如下内容
+- 在server/solr-webapp/webapp/WEB-INF/web.xml中添加如下内容([示例文件](conf/web.xml))
 ```
 <security-constraint>
     <web-resource-collection>
