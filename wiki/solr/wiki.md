@@ -119,7 +119,7 @@ SOLR_TIMEZONE="UTC+8"
 ```
  
 
-# 从solr配置 ，修改配置文件
+# 从solr配置,修改配置文件
 ```
 <requestHandler name="/replication" class="solr.ReplicationHandler" >
  <lst name="slave">
