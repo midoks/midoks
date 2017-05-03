@@ -142,7 +142,7 @@ compression:external or internal 使用SOLR自己的压缩算法或应用容器�
 
 - 生成密码
 ```
-在/solr/server/etc/目录下realm.properties([示例文件](conf/realm.properties))
+在/solr/server/etc/目录下([示例文件](conf/realm.properties))
 
 java -cp server/lib/jetty-util-9.3.14.v20161028.jar org.eclipse.jetty.util.security.Password admin admin
 admin
