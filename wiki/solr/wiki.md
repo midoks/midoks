@@ -137,7 +137,7 @@ httpBasicAuthPassword:验证密码，需和主服务器一致
 compression:external or internal 使用SOLR自己的压缩算法或应用容器的
 ```
 
-# 用户权限配置
+# 用户权限配置(简单BasicAuth)
 - http://wiki.eclipse.org/Jetty/Tutorial/Realms
 
 - 生成密码
