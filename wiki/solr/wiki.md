@@ -151,18 +151,17 @@ MD5:21232f297a57a5a743894a0e4a801fc3
 CRYPT:adpexzg3FUZAk
 ```
 
-- 在/solr5/server/etc/jetty.xml中添加内容
+- 在/server/contexts/solr-jetty-context.xml中添加内容([示例文件](/conf/solr-jetty-context.xml))
 
 ```
-<Call name="addBean">
-   <Arg>
-     <New class="org.eclipse.jetty.security.HashLoginService">
-      <Set name="name">Solr Admin</Set>
-      <Set name="config"><Property name="jetty.home" default="."/>/etc/realm.properties</Set>
-      <Set name="refreshInterval">0</Set>
-    </New>
-   </Arg>
-</Call>
+<Get name="securityHandler">  
+     <Set name="loginService">  
+             <New class="org.eclipse.jetty.security.HashLoginService">  
+                     <Set name="name">Test Reaml</Set>  
+                    <Set name="config"><SystemProperty name="jetty.home" default="."/>/etc/realm.properties</Set>  
+             </New>  
+     </Set>  
+</Get> 
 
 ```
 
