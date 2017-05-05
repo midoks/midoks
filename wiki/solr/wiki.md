@@ -125,6 +125,11 @@ SOLR_TIMEZONE="UTC+8"
  <lst name="slave">
    <str name="masterUrl">http://127.0.0.1/core0/replication</str><!--主搜索引擎服务地址-->
    <str name="pollInterval">00:00:60</str><!--同步频率，1分钟一次-->
+   <str name="compression">internal</str>  
+   <str name="httpConnTimeout">50000</str>     
+   <str name="httpReadTimeout">500000</str>  
+   <str name="httpBasicAuthUser">admin</str>  
+   <str name="httpBasicAuthPassword">admin</str> 
  </lst>
 </requestHandler>
 
