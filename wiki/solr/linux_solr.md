@@ -26,6 +26,31 @@ https://dev.mysql.com/downloads/connector/j/
 mv java* /usr/local/java
 
 
+## mmseg4j
+```
+<fieldType name="textMMcomplex" class="solr.TextField" positionIncrementGap="100" >  
+     <analyzer>  
+        <tokenizer class="com.chenlb.mmseg4j.solr.MMSegTokenizerFactory" mode="complex" dicPath="/Applications/BigData/bin/solr-6.5.1/dic"/>  
+        <filter class="solr.LowerCaseFilterFactory"/>  
+    </analyzer>  
+</fieldType>  
+
+<fieldType name="textMMMaxWord" class="solr.TextField" positionIncrementGap="100" >  
+    <analyzer>  
+        <tokenizer class="com.chenlb.mmseg4j.solr.MMSegTokenizerFactory" mode="max-word" dicPath="/Applications/BigData/bin/solr-6.5.1/dic"/>  
+        <filter class="solr.LowerCaseFilterFactory"/>  
+    </analyzer>  
+</fieldType>
+
+<fieldType name="textMMSimple" class="solr.TextField" positionIncrementGap="100" >  
+    <analyzer>  
+        <tokenizer class="com.chenlb.mmseg4j.solr.MMSegTokenizerFactory" mode="simple" dicPath="/Applications/BigData/bin/solr-6.5.1/dic"/>  
+        <filter class="solr.LowerCaseFilterFactory"/>  
+    </analyzer>  
+</fieldType>
+
+```
+
 
 
 
