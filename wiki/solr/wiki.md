@@ -201,3 +201,7 @@ documents 输入下面语句
 
 - 更新URL地址
 - http://127.0.0.1:8983/solr/comment/dataimport?command=delta-import&wt=json&clean=false&commit=true
+
+```
+curl -u admin:admin "http://127.0.0.1:8983/solr/comment/dataimport?command=delta-import&wt=json&clean=false&commit=true"
+```
