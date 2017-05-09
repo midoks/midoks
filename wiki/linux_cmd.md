@@ -4,6 +4,11 @@
 netstat -ntlp  
 ```
 
+- 时间同步
+```
+rdate -s time.nist.gov
+```
+
 - 去掉注释信息
 ```
 sudo sed '/^ *#/d' **.conf > *.bak.conf
