@@ -13,11 +13,13 @@ rdate -s time.nist.gov
 ```
 sudo sed '/^ *#/d' **.conf > *.bak.conf
 ```
+- 看/var/log/cron这个文件就可以,可以用tail -f /var/log/cron观察
 
 - 查看服务器最近操作
 ```
 more /var/log/secure 
 who /var/log/wtmp
+
 ```
 
 - 查看端口
