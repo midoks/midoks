@@ -27,7 +27,7 @@ DELIMITER ;
 
 # 创建定时任务
 ```
-CREATE EVENT `e_del_tbl_base_count`   
+CREATE EVENT `t1_del_cron`   
 ON SCHEDULE EVERY 1 DAY STARTS '2012-12-1 24:00:00'   
-ON COMPLETION NOT PRESERVE ENABLE DO CALL p_del_count (90);
+ON COMPLETION NOT PRESERVE ENABLE DO CALL t1_del_count (1);
 ```
