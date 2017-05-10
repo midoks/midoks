@@ -7,6 +7,7 @@ netstat -ntlp
 - 时间同步
 ```
 rdate -s time.nist.gov
+ntpdate -s time.windows.com
 ```
 
 - 去掉注释信息
