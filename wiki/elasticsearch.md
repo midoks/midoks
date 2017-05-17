@@ -18,7 +18,7 @@ http://www.learnes.net/
 ### 命令
 ```
 
-#后台入口
+# 插件
 bin/plugin install mobz/elasticsearch-head
 
 
@@ -27,6 +27,25 @@ bin/plugin install elasticsearch/marvel/latest
 bin/plugin install license
 
 kibana plugin --install elasticsearch/marvel/latest
+
+```
+
+# 插件
+bin/plugin install mobz/elasticsearch-head
+
+
+bin/plugin install elasticsearch/marvel/latest
+
+bin/plugin install license
+
+kibana plugin --install elasticsearch/marvel/latest
+
+```
+
+# 插件(5.4.0)
+```
+nin/elasticsearch-plugin install x-pack
+
 ```
 
 
@@ -43,3 +62,5 @@ bin/logstash-plugin install logstash-output-kafka
 ```
 
 - http://www.cnblogs.com/zeze/p/5902124.html
+
+
