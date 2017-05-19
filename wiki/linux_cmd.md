@@ -12,18 +12,21 @@ echo -n '123123' | md5sum | cut -d ' ' -f1
 
 
 - 时间同步
+
 ```
 rdate -s time.nist.gov
 ntpdate -s time.windows.com
 ```
 
 - 去掉注释信息
+
 ```
 sudo sed '/^ *#/d' **.conf > *.bak.conf
 ```
 - 看/var/log/cron这个文件就可以,可以用tail -f /var/log/cron观察
 
 - 查看服务器最近操作
+
 ```
 more /var/log/secure 
 who /var/log/wtmp
@@ -31,11 +34,13 @@ who /var/log/wtmp
 ```
 
 - 查看端口
+
 ```
 netstat -tlntp|grep -E "9200|9300"
 ```
 
 - 时间
+
 ```
 date "+%Y-%m-%d %H:%M:%S"
 date -r 1354291200
@@ -43,26 +48,31 @@ date -j -f "%Y-%m-%d %H:%M:%S" "2012-12-01 00:00:00" "+%s"
 ```
 
 - 建立简单服务器
+
 ```
 python -m SimpleHTTPServer 8080
 ```
 
 - 查看物理cpu个数
+
 ```
 grep 'physical id' /proc/cpuinfo | sort -u
 ```
 
 - 查看核心数量
+
 ```
 grep 'core id' /proc/cpuinfo | sort -u | wc -l
 ```
 
 - 查看线程数
+
 ```
 grep 'processor' /proc/cpuinfo | sort -u | wc -l
 ```
 
 # linux内核优化
+
 ```
 #表示开启SYN Cookies.当出现SYN等待队列溢出时,启用cookies来处理,
 #可防范少量SYN攻击，默认为0，表示关闭;
