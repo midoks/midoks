@@ -4,6 +4,13 @@
 netstat -ntlp  
 ```
 
+# SHELL MD5
+
+```
+echo -n '123123' | md5sum | cut -d ' ' -f1
+```
+
+
 - 时间同步
 ```
 rdate -s time.nist.gov
