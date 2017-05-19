@@ -1,3 +1,0 @@
-show variables like '%partition%';
-
-show engines;//²é¿´ÒıÇæ

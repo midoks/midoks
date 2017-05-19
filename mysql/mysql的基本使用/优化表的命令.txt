@@ -1,2 +1,0 @@
-optimize table `colsumn`;
-//优化表的命令

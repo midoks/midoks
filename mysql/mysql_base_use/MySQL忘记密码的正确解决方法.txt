@@ -1,0 +1,93 @@
+以下的文章主要介绍的是MySQL忘记密码的正确解决方法，在实际操作中如果你忘记MySQL密码是一件很头痛的事情，这篇文章主要是介绍对MySQL忘记密码的补救方案，以下就有详细内容描述，望你会有所收获。
+
+MySQL忘记密码解决方案：
+
+破解本地密码：
+
+
+Windows:
+
+1.用系统管理员登陆系统。
+
+2.停止MySQL的服务。
+
+
+3.进入命令窗口，然后进入 MySQL的安装目录，比如我的安装目录是c:\mysql,进入C:\mysql\bin
+
+
+4.跳过权限检查启动MySQL，
+
+
+c:\mysql\bin>mysqld-nt ––skip-grant-tables
+
+或则：c:\mysql\bin>mysqld ––skip-grant-tables
+
+
+mysqld.exe是微软Windows MySQL server数据库服务器相关程序。mysqld-nt.exe是MySQL Daemon数据库服务相关程序。
+
+
+MySQL忘记密码解决方案5.[未验证]
+
+重新打开一个窗口
+
+进入c:\mysql\bin目录，设置root的新密码
+
+c:\mysql\bin>mysqladmin -u root flush-privileges password "newpassword"
+
+
+c:\mysql\bin>mysqladmin -u root -p shutdown
+
+
+
+将newpassword替换为你要用的root的密码，第二个命令会提示你输入新密码，重复第一个命令输入的密码。
+
+
+5.[验证]或则:
+
+重新开打一个命令提示符的窗口(CMD)
+
+用空密码方式使用root用户登录 MySQL；
+
+mysql -u root
+
+
+修改root用户的密码；
+
+
+
+mysql> update mysql.user set password=PASSWORD('新密码') where User='root';   mysql> flush privileges;   mysql> quit  
+6.停止MySQL Server，用正常模式启动Mysql7．你可以用新的密码链接到Mysql 了。
+
+
+Unix&Linux：
+
+1.用root或者运行mysqld 的用户登录系统；
+
+
+2．利用kill命令结束掉mysqld的进程；
+
+
+3．使用–skip-grant-tables参数启动MySQL Server
+
+
+shell>mysqld_safe –skip-grant-tables &
+
+
+4.为root@localhost设置新密码
+
+
+shell>mysqladmin -u root flush-privileges password "newpassword"
+
+5.MySQL忘记密码解决方案重启MySQL Server
+
+附录：
+
+MySQL修改密码的方法大全:
+
+mysql> update user set Password=password('newpassword') where User='root';   
+mysql> flush privileges;   
+MYSQLADMIN -u root -p PASSWORD mypasswd   可以修改MYSQL文件夹中的MY.INI文件
+
+
+mysql> SET PASSWORD FOR myuser@localhost = PASSWORD('mypasswd');  mysql> GRANT USAGE ON *.* TO myuser@localhost IDENTIFIED BY 'mypassword';  
+以上的相关内容就是对MySQL忘记密码解决方案的介绍，望你能有所收获。

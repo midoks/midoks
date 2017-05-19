@@ -1,9 +1,0 @@
-//查询[显示]数据库
-mysql> show databases;
-//查询[显示]表
-mysql> show tables;
-------------------------------
-//查询表结构
-mysql> show columns from book;
-mysql> desc book;
-这两个都可以。

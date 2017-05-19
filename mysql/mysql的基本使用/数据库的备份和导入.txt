@@ -1,5 +1,0 @@
-±¸·Ý select * from table into outfile "c:/1.txt"
-»Ö¸´ load data local infile "c:/1.txt" into table
-
-"load data local infile '{$url}{$v}.txt' into table `{$v}`"
-

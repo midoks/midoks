@@ -1,0 +1,54 @@
+/**
+	mysql简单备份
+*/
+#对要保存的数据进行保存
+server1$ gzip -c /backup/mydb/mytable.MYD > mytable.MYD.gz
+#把要保存的数据保存备份的服务器上
+server1$ scp mytales.MYD.gz root@server2:/var/lib/mysql/mydb/
+
+#解压数据
+server2$ gunzip /var/lib/mysql/mydb/mytable.MYD.gz
+
+/**
+	此过程中1,gzip在服务器1上又要读又要写,scp也要在服务器1上读,
+	在服务器2上写。
+	 		2,gunzip 在服务器2上既要读又要写
+
+			这种写法可用率必要低。
+
+*/
+
+
+/**
+	mysql备份 [一步到位的写法]
+*/
+
+server1$ gzip -c /backup/mydb/mytable.MYD | ssh root@server2 "gunzip -c >/var/lib/mysql/mydb/mytable.MYD"
+
+/**
+	该写法,极大的减低了磁盘的I/O:在服务器1进行读操作，
+	在服务器2上进行写操作，这是磁盘的操作更加有序。
+
+	通过调节几个选项
+	gzip -l 使其压缩得更快，这个选项通常不会降低压缩太多，但是，明显提高压缩速度，这才是重点。
+*/
+
+
+/**
+	避免加密方面带来的系统开销
+
+*/
+#在服务器2上监听端口123456[可随意]文件的到来,
+#并把任何发送该端口的东西都压缩到指定的数据文件里。
+server2$ nc -l -p 123456 | gunzip -c >/var/lib/mysql/mydb/mytable.MYD
+#在服务器1中，压缩文件并发送到服务器server2
+server1$ gzip -c /var/lib/mysql/mydb/mytable.MYD | nc -q 1 server2 123456
+#----------------------------------
+server2$ nc -l -p 12345 | tar zxvf -
+server1$ tar -zcvf - /var/lib/mysql/mydb/mytable.MYD | nc -q l server2 123456
+
+
+/**
+  还可以使用rsync 增量备份
+*/
+
