@@ -1,14 +1,30 @@
 <?php
+
+namespace App\Utils;
+
 /**
  * ElasticSearch class
  * 参考文档:https://www.elastic.co/guide/en/elasticsearch/reference/current/docs.html
  */
 
-class ElasticSearch { 
+class ElasticSearch {
     
     public $index;
+
+    private static $instance = NULL;
  
-    public function __construct($server = 'http://localhost:9200'){
+    private function __construct(){}
+
+    //单利模式
+    public static function getInstance(){
+        if (self::$instance){
+            self::$instance = self();
+        }
+        return self::$instance;
+    }
+
+    //设置服务器地址
+    public function setServer($server = 'http://localhost:9200'){
         $this->server = $server;
     }
 
@@ -55,8 +71,8 @@ class ElasticSearch {
 
     //curl -X PUT http://localhost:9200/{INDEX}/{TYPE}/{ID} -d ...
     //添加数据
-    public function add($type, $id, $data){
-
+    public function add($type, $data, $id_pre = 'uu_'){
+        $id = $id_pre.microtime(true);
         $args = array('method' => 'PUT',
             'content' => $data, 
             'header' => 'Content-Type: application/x-www-form-urlencoded',
@@ -72,13 +88,21 @@ class ElasticSearch {
         return $this->call($type.'/'.$id, $args);
     }
 
+    //更新数据
+    public function update($type, $id,$data ){
+        $args = array('method' => 'PUT',
+            'content' => $data, 
+            'header' => 'Content-Type: application/x-www-form-urlencoded',
+            'Content-Length'=> strlen($data));
+        return $this->call($type.'/'.$id, $args);
+    }
+
     //curl -X GET http://localhost:9200/{INDEX}/{TYPE}/_search?q= ...
     //url查询
     public function query($type, $q){
         return $this->call($type . '/_search?' . http_build_query(array('q' => $q)));
     }
 
-    //
     //post data 查询
     public function search($type, $data){
         $args = array('method' => 'PUT',
