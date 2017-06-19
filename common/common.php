@@ -398,5 +398,11 @@ function is_spider(){
 }
 
 
+function userReplace($userName){
+	preg_match_all("/[\x{4e00}-\x{9fa5}A-Za-z0-9._]+/u", $userName, $match);
+	return $match;
+}
+
+
 
 ?>
