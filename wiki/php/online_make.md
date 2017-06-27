@@ -18,6 +18,7 @@ rpm -ivh http://mirrors.aliyun.com/centos/6/os/x86_64/Packages/yum-metadata-pars
 rpm -ivh http://mirrors.aliyun.com/centos/6/os/x86_64/Packages/yum-3.2.29-81.el6.centos.noarch.rpm http://mirrors.aliyun.com/centos/6/os/x86_64/Packages/yum-plugin-fastestmirror-1.1.30-40.el6.noarch.rpm  http://mirrors.aliyun.com/centos/6/os/x86_64/Packages/python-urlgrabber-3.9.1-11.el6.noarch.rpm
 ```
 
+
 #添加源
 ```
 cd /etc/yum.repos.d/
@@ -31,6 +32,11 @@ wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-
 
 http://mirror.centos.org/centos/
 http://mirrors.aliyun.com/centos/
+```
+
+#安装java1.8
+```
+yum -y install java-1.8.0-openjdk
 ```
 
 #安装yum
