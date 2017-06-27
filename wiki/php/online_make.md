@@ -4,9 +4,9 @@
 
 #删除yum
 ```
-rpm -aq | grep yum|xargs rpm -e --nodeps
-rpm -aq |grep python-iniparse | xargs rpm -e --nodeps
-rpm -aq |grep python-urlgrabber | xargs rpm -e --nodeps
+rpm -aq | grep yum | xargs rpm -e --nodeps
+rpm -aq | grep python-iniparse | xargs rpm -e --nodeps
+rpm -aq | grep python-urlgrabber | xargs rpm -e --nodeps
 
 yum install lrzsz
 ```
