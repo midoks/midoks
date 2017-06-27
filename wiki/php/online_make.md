@@ -117,6 +117,8 @@ make && make install
 wget http://cn2.php.net/distributions/php-5.6.28.tar.gz
 wget http://cn2.php.net/distributions/php-7.0.14.tar.gz
 
+wget http://cn2.php.net/distributions/php-7.1.6.tar.gz
+
 
 yum install -y openssl-devel libxml2
 
@@ -161,7 +163,7 @@ yum install -y openssl-devel libxml2
 # openresty
 
 ```
-
+http://nginx.org/download/nginx-1.10.3.tar.gz
 wget http://openresty.org/download/openresty-1.11.2.2.tar.gz
 
 ./configure \
