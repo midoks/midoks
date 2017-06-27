@@ -34,6 +34,8 @@ ntpdate -s time.windows.com
 
 ```
 sudo sed '/^ *#/d' **.conf > *.bak.conf
+
+sudo sed '/^ *;/d' www.conf > www.conf
 ```
 - 看/var/log/cron这个文件就可以,可以用tail -f /var/log/cron观察
 

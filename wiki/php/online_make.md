@@ -142,6 +142,13 @@ yum install -y openssl-devel libxml2
 --enable-soap \
 --enable-fpm
 
+./configure --prefix=/usr/local/php71 \
+--exec-prefix=/usr/local/php71 \
+--with-config-file-path=/usr/local/php71/etc \
+--enable-opcache \
+--with-curl \
+--enable-fpm \
+
 
 ./configure --prefix=/usr/local/php70 \
 --exec-prefix=/usr/local/php70 \
@@ -159,11 +166,23 @@ yum install -y openssl-devel libxml2
 
 ```
 
+#nginx 
+```
+yum -y install pcre-devel openssl openssl-devel
+wget http://nginx.org/download/nginx-1.10.3.tar.gz
+
+
+./configure \
+--prefix=/usr/local/nginx
+```
 
 # openresty
 
 ```
-http://nginx.org/download/nginx-1.10.3.tar.gz
+
+
+
+
 wget http://openresty.org/download/openresty-1.11.2.2.tar.gz
 
 ./configure \
