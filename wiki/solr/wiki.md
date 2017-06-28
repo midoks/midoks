@@ -140,6 +140,16 @@ httpReadTimeout:如果设置同步索引文件过大，则应适当提高此值�
 httpBasicAuthUser:验证用户名，需要和主服务器一致 
 httpBasicAuthPassword:验证密码，需和主服务器一致 
 compression:external or internal 使用SOLR自己的压缩算法或应用容器的
+
+<requestHandler name="/replication" class="solr.ReplicationHandler" >
+ <lst name="slave">
+   <str name="masterUrl">http://127.0.0.1/core0/replication</str>
+   <str name="pollInterval">00:00:60</str>
+   <str name="compression">internal</str>  
+   <str name="httpConnTimeout">50000</str>     
+   <str name="httpReadTimeout">500000</str>
+ </lst>
+</requestHandler>
 ```
 
 # 用户权限配置(简单BasicAuth)

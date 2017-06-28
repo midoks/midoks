@@ -145,9 +145,6 @@ yum install -y openssl-devel libxml2
 ./configure --prefix=/usr/local/php71 \
 --exec-prefix=/usr/local/php71 \
 --with-config-file-path=/usr/local/php71/etc \
-./configure --prefix=/usr/local/php71 \
---exec-prefix=/usr/local/php71 \
---with-config-file-path=/usr/local/php71 \
 --with-mysql=/usr/local/mysql \
 --with-mysqli \
 --enable-opcache \
