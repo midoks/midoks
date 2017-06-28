@@ -145,9 +145,25 @@ yum install -y openssl-devel libxml2
 ./configure --prefix=/usr/local/php71 \
 --exec-prefix=/usr/local/php71 \
 --with-config-file-path=/usr/local/php71/etc \
+./configure --prefix=/usr/local/php71 \
+--exec-prefix=/usr/local/php71 \
+--with-config-file-path=/usr/local/php71 \
+--with-mysql=/usr/local/mysql \
+--with-mysqli \
 --enable-opcache \
 --with-curl \
---enable-fpm \
+--enable-mbregex \
+--enable-mbstring \
+--enable-gd-native-ttf \
+--with-openssl \
+--with-mhash \
+--enable-pcntl \
+--enable-sockets \
+--with-xmlrpc \
+--enable-zip \
+--enable-soap \
+--enable-fpm
+
 
 
 ./configure --prefix=/usr/local/php70 \
