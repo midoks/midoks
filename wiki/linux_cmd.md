@@ -85,6 +85,16 @@ grep 'core id' /proc/cpuinfo | sort -u | wc -l
 grep 'processor' /proc/cpuinfo | sort -u | wc -l
 ```
 
+- 查看每个FPM的内存占用
+```
+ps -ylC php-fpm --sort:rss 
+
+查看FPM在你的机子上的平均内存占用
+ps --no-headers -o "rss,cmd" -C php-fpm | awk '{ sum+=$1 } END { printf ("%d%s\n", sum/NR/1024,"M") }'  
+```
+
+
+
 # linux内核优化
 
 ```
