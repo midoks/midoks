@@ -1,5 +1,6 @@
 ## 线上安装
 
+-(rpm修复) http://rpm5.org/
 
 
 #删除yum
