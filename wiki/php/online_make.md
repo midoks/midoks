@@ -11,13 +11,30 @@ rpm -aq | grep python-urlgrabber | xargs rpm -e --nodeps
 yum install lrzsz
 ```
 
-#YUM安装
+#YUM安装 (redhat5)
+```
+rpm -ivh http://mirrors.aliyun.com/centos/5/os/x86_64/CentOS/python-iniparse-0.2.3-6.el5.noarch.rpm
+rpm -ivh http://mirrors.aliyun.com/centos/5/os/x86_64/CentOS/yum-metadata-parser-1.1.2-4.el5.x86_64.rpm
+
+rpm -ivh http://mirrors.aliyun.com/centos/5/os/x86_64/CentOS/yum-3.2.22-40.el5.centos.noarch.rpm \
+http://mirrors.aliyun.com/centos/5/os/x86_64/CentOS/python-urlgrabber-3.1.0-6.el5.noarch.rpm \
+http://mirrors.aliyun.com/centos/5/os/x86_64/CentOS/yum-fastestmirror-1.1.16-21.el5.centos.noarch.rpm \
+http://mirrors.aliyun.com/centos/5/os/x86_64/CentOS/yum-metadata-parser-1.1.2-4.el5.x86_64.rpm
+
+wget -O /etc/yum.repos.d/rhel-source.repo http://mirrors.aliyun.com/repo/Centos-6.repo
+sed -i 's/$releasever/5/g' rhel-source.repo
+```
+
+
+#YUM安装 (redhat6)
 ```
 rpm -ivh http://mirrors.aliyun.com/centos/6/os/x86_64/Packages/python-iniparse-0.3.1-2.1.el6.noarch.rpm
 rpm -ivh http://mirrors.aliyun.com/centos/6/os/x86_64/Packages/yum-metadata-parser-1.1.2-16.el6.x86_64.rpm
-rpm -ivh http://mirrors.aliyun.com/centos/6/os/x86_64/Packages/yum-3.2.29-81.el6.centos.noarch.rpm http://mirrors.aliyun.com/centos/6/os/x86_64/Packages/yum-plugin-fastestmirror-1.1.30-40.el6.noarch.rpm  http://mirrors.aliyun.com/centos/6/os/x86_64/Packages/python-urlgrabber-3.9.1-11.el6.noarch.rpm
-```
 
+rpm -ivh http://mirrors.aliyun.com/centos/6/os/x86_64/Packages/yum-3.2.29-81.el6.centos.noarch.rpm \
+http://mirrors.aliyun.com/centos/6/os/x86_64/Packages/yum-plugin-fastestmirror-1.1.30-40.el6.noarch.rpm  \
+http://mirrors.aliyun.com/centos/6/os/x86_64/Packages/python-urlgrabber-3.9.1-11.el6.noarch.rpm
+```
 
 #添加源
 ```
@@ -27,70 +44,14 @@ wget -O /etc/yum.repos.d/rhel-source.repo http://mirrors.aliyun.com/repo/Centos-
 sed -i 's/$releasever/6/g' rhel-source.repo
 ```
 
-```
-wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-5.repo
-
-http://mirror.centos.org/centos/
-http://mirrors.aliyun.com/centos/
-```
-
 #安装java1.8
 ```
 yum -y install java-1.8.0-openjdk
 ```
 
-#安装yum
+
+#other
 ```
-wget http://mirrors.aliyun.com/centos/5/os/x86_64/CentOS/python-iniparse-0.2.3-6.el5.noarch.rpm
-wget http://mirrors.aliyun.com/centos/5/os/x86_64/CentOS/yum-metadata-parser-1.1.2-4.el5.x86_64.rpm
-wget http://mirrors.aliyun.com/centos/5/os/x86_64/CentOS/yum-3.2.22-40.el5.centos.noarch.rpm  
-wget http://mirrors.aliyun.com/centos/5/os/x86_64/CentOS/yum-fastestmirror-1.1.16-21.el5.centos.noarch.rpm
-wget http://mirrors.aliyun.com/centos/5/os/x86_64/CentOS/python-elementtree-1.2.6-5.x86_64.rpm
-wget http://mirrors.aliyun.com/centos/5/os/x86_64/CentOS/python-2.4.3-56.el5.x86_64.rpm
-
-wget http://mirrors.aliyun.com/centos/5/os/x86_64/CentOS/rpm-4.4.2.3-34.el5.x86_64.rpm
-
-wget http://mirrors.aliyun.com/centos/5/os/x86_64/CentOS/python-2.4.3-56.el5.x86_64.rpm 
-wget http://mirrors.aliyun.com/centos/5/os/x86_64/CentOS/python-devel-2.4.3-56.el5.x86_64.rpm  
-wget http://mirrors.aliyun.com/centos/5/os/x86_64/CentOS/python-libs-2.4.3-56.el5.x86_64.rpm 
-wget http://mirrors.aliyun.com/centos/5/os/x86_64/CentOS/rpm-python-4.4.2.3-34.el5.x86_64.rpm
-wget http://mirrors.aliyun.com/centos/5/os/x86_64/CentOS/rpm-libs-4.4.2.3-34.el5.x86_64.rpm 
-wget http://mirrors.aliyun.com/centos/5/os/x86_64/CentOS/rpm-python-4.4.2.3-34.el5.x86_64.rpm 
-wget http://mirrors.aliyun.com/centos/5/os/x86_64/CentOS/rpm-devel-4.4.2.3-34.el5.x86_64.rpm
-
-wget http://mirrors.aliyun.com/centos/5/os/x86_64/CentOS/rpm-build-4.4.2.3-34.el5.x86_64.rpm
-wget http://mirrors.aliyun.com/centos/5/os/x86_64/CentOS/rpm-libs-4.4.2.3-34.el5.x86_64.rpm 
-
-wget http://mirrors.aliyun.com/centos/6/os/x86_64/Packages/yum-3.2.29-73.el6.centos.noarch.rpm
-wget http://mirrors.aliyun.com/centos/6/os/x86_64/Packages/yum-metadata-parser-1.1.2-16.el6.x86_64.rpm
-wget http://mirrors.aliyun.com/centos/6/os/x86_64/Packages/python-urlgrabber-3.9.1-11.el6.noarch.rpm
-wget http://mirrors.aliyun.com/centos/6/os/x86_64/Packages/yum-plugin-fastestmirror-1.1.30-37.el6.noarch.rpm
-wget http://mirrors.aliyun.com/centos/6/os/x86_64/Packages/python-libs-2.6.6-64.el6.x86_64.rpm 
-wget http://mirrors.aliyun.com/centos/6/os/x86_64/Packages/python-2.6.6-64.el6.x86_64.rpm  
-
-wget http://mirrors.aliyun.com/centos/6/os/x86_64/Packages/rpm-python-4.8.0-55.el6.x86_64.rpm
-wget http://mirrors.aliyun.com/centos/6/os/x86_64/Packages/rpm-4.8.0-55.el6.x86_64.rpm
-wget http://mirrors.aliyun.com/centos/6/os/x86_64/Packages/python-pycurl-7.19.0-9.el6.x86_64.rpm 
-
-wget http://mirrors.aliyun.com/centos/6/os/x86_64/Packages/dbus-python-0.83.0-6.1.el6.x86_64.rpm  
-wget http://mirrors.aliyun.com/centos/6/os/x86_64/Packages/dbus-python-devel-0.83.0-6.1.el6.x86_64.rpm
-wget http://mirrors.aliyun.com/centos/6/os/x86_64/Packages/expat-2.0.1-11.el6_2.x86_64.rpm
-
-wget http://mirrors.aliyun.com/centos/6/os/x86_64/Packages/python-lxml-2.2.3-1.1.el6.x86_64.rpm
-
-
-
-python-pycurl-7.19.0-9.el6.x86_64
-python-2.6.6-64.el6.x86_64
-python-urlgrabber-3.9.1-11.el6.noarch
-rpm-python-4.8.0-55.el6.x86_64
-dbus-python-devel-0.83.0-6.1.el6.x86_64
-python-libs-2.6.6-64.el6.x86_64
-python-iniparse-0.2.3-6.el5.noarch
-python-elementtree-1.2.6-5.x86_64
-python-lxml-2.2.3-1.1.el6.x86_64
-dbus-python-0.83.0-6.1.el6.x86_64
-
 yum clean all
 yum makecache
 
