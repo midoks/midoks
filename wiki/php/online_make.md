@@ -1,7 +1,26 @@
 ## 线上安装
 
 -(rpm修复) http://rpm5.org/
+- https://github.com/rpm-software-management/rpm
+- wget http://ftp.rpm.org/releases/rpm-4.4.x/rpm-4.4.2.3.tar.gz
+```
 
+./configure --prefix=/usr \
+--build=x86_64-linux \
+--host=x86_64 \
+CPPFLAGS="-I/usr/include/nspr4/ -I/usr/include/nss3 -I/usr/include/linux -I/usr/include/ -std=gnu99" \
+CC="gcc -std=gnu99" 
+
+cp /usr/lib/libz.so /usr/local/lib/
+--force --nodeps 
+
+
+rpm -ivh http://mirrors.163.com/centos/5/os/i386/CentOS/openssl-devel-0.9.8e-20.el5.i386.rpm \
+http://mirrors.163.com/centos/5/os/i386/CentOS/openssl-0.9.8e-20.el5.i386.rpm
+```
+http://mirrors.aliyun.com/centos/5/os/x86_64/CentOS/python-sqlite-1.1.7-1.2.1.x86_64.rpm --force --nodeps 
+
+rpm -ivh http://mirrors.aliyun.com/centos/5/os/x86_64/CentOS/rpm-python-4.4.2.3-34.el5.x86_64.rpm --force --nodeps
 
 #删除yum
 ```
@@ -14,7 +33,7 @@ yum install lrzsz
 
 #YUM安装 (redhat5)
 ```
-rpm -ivh http://mirrors.aliyun.com/centos/5/os/x86_64/CentOS/python-iniparse-0.2.3-6.el5.noarch.rpm
+rpm -ivh http://mirrors.aliyun.com/centos/5/os/x86_64/CentOS/python-iniparse-0.2.3-6.el5.noarch.rpm 
 rpm -ivh http://mirrors.aliyun.com/centos/5/os/x86_64/CentOS/yum-metadata-parser-1.1.2-4.el5.x86_64.rpm
 
 rpm -ivh http://mirrors.aliyun.com/centos/5/os/x86_64/CentOS/yum-3.2.22-40.el5.centos.noarch.rpm \
