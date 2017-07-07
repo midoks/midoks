@@ -10,6 +10,10 @@ netstat -ntlp
 echo -n '123123' | md5sum | cut -d ' ' -f1
 ```
 
+# 找出最大目录大小
+```
+du -h --max-depth=1
+```
 
 - 时间同步
 
