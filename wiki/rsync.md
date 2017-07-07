@@ -1,0 +1,28 @@
+vi vi /etc/rsyncd.conf
+
+例子
+```
+uid = www
+gid = www
+use chroot = no
+max connections = 100
+log file = /var/log/rsyncd.log
+pid file = /var/run/rsyncd.pid
+list = false
+
+[solr_service]
+path = /var/www/solr_service
+read only = false
+hosts allow = 10.0.10.10 10.0.10.123
+
+```
+
+useradd www
+
+
+#启动
+/usr/bin/rsync --daemon
+
+
+自启动
+/etc/rc.d/rc.local
