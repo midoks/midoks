@@ -1,6 +1,9 @@
-vi vi /etc/rsyncd.conf
+#配置
+```
+vi /etc/rsyncd.conf
+```
 
-例子
+#例子
 ```
 uid = www
 gid = www
@@ -17,12 +20,9 @@ hosts allow = 10.0.10.10 10.0.10.123
 
 ```
 
+#常用命令
+```
 useradd www
-
-
-#启动
 /usr/bin/rsync --daemon
-
-
-自启动
 /etc/rc.d/rc.local
+```
