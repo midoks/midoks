@@ -13,11 +13,11 @@ lsof -i:8060
 echo -n '123123' | md5sum | cut -d ' ' -f1
 ```
 
-<<<<<<< HEAD
 # 找出最大目录大小
 ```
 du -h --max-depth=1
-=======
+```
+
 - 查看最大线程数
 ```
 cat /proc/sys/kernel/threads-max
@@ -26,7 +26,6 @@ cat /proc/sys/kernel/threads-max
 - 防止用户进程数量的默认限制(Default limit for number of user's processes to prevent)
 ```
 vi /etc/security/limits.d/90-nproc.conf
->>>>>>> origin/master
 ```
 
 - 时间同步
@@ -40,9 +39,9 @@ ntpdate -s time.windows.com
 
 ```
 sudo sed '/^ *#/d' **.conf > *.bak.conf
-
 sudo sed '/^ *;/d' www.conf > www.conf
 ```
+
 - 看/var/log/cron这个文件就可以,可以用tail -f /var/log/cron观察
 
 - 查看服务器最近操作
