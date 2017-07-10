@@ -28,6 +28,11 @@ cat /proc/sys/kernel/threads-max
 vi /etc/security/limits.d/90-nproc.conf
 ```
 
+- 删除文件
+```
+find ./ -name "tmp" | xargs rm -rf
+```
+
 - 时间同步
 
 ```
