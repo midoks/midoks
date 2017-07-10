@@ -33,6 +33,13 @@ vi /etc/security/limits.d/90-nproc.conf
 find ./ -name "tmp" | xargs rm -rf
 ```
 
+- vim ~/.vimrc {vim乱码}
+```
+set fileencodings=utf-8,ucs-bom,gb18030,gbk,gb2312,cp936
+set termencoding=utf-8
+set encoding=utf-8
+```
+
 - 时间同步
 
 ```
