@@ -160,7 +160,8 @@ yum install -y openssl-devel libxml2
 
 ```
 
-#nginx 
+# nginx
+
 ```
 yum -y install pcre-devel openssl openssl-devel
 wget http://nginx.org/download/nginx-1.10.3.tar.gz
