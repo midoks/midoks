@@ -7,7 +7,9 @@
 - ssh-keygen -t rsa -P '密码'
 
 ### 传到B中
-scp id_rsa.pub root@120.76.123.86:/root/.ssh
+scp id_rsa.pub root@127.0.0.1:/root/.ssh
+
+scp -p id_rsa.pub root@127.0.0.1:/root/.ssh/authorized_keys
 
 ### 在B中.ssh/
 - cat id_rsa.pub >> authorized_keys 
