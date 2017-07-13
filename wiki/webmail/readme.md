@@ -18,5 +18,16 @@ ln -s /tmp/mysql.sock /var/lib/mysql/mysql.sock
 # install 
 
 ```
-tar -zxvf 
+groupadd vgroup
+useradd -g vuser vgroup
+
+
+tar -zxvf extmail-1.2.tar.gz 
+tar -zxvf extman-1.1.tar.gz
+
+mkdir -p /var/www/extsuite
+mv extmail-1.2/ /var/www/extsuite/extmail
+mv extman-1.1/ /var/www/extsuite/extman
+
+
 ```
