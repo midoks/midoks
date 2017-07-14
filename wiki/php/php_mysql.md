@@ -5,6 +5,8 @@
 
 - 安装过程
 ```
+yum install ncurses* -y
+
 cmake \
 -DCMAKE_INSTALL_PREFIX=/usr/local/mysql \
 -DMYSQL_DATADIR=/usr/local/mysql/data \
@@ -55,15 +57,19 @@ chown -R mysql:mysql /usr/local/mysql
 ./bin/mysqladmin -uroot shutdown
 
 #修改密码
+select user,authentication_string from user; [mysql5.7]
 SET PASSWORD = PASSWORD('123456');
 flush privileges;
-
 update user set host = '%' where user = 'root';
+update MySQL.user set authentication_string=password('root') where user='root';
+
 
 #授权登录
-grant all privileges on *.* to 'yourname'@'%' identified by 'youpasswd';
 
+
+grant all privileges on *.* to 'yourname'@'%' identified by 'youpasswd';
 grant all privileges on *.* to 'cjs'@'%' identified by 'cjscjs123';
+
 
 #查看授权
 SELECT DISTINCT CONCAT('User: ''',user,'''@''',host,''';') AS query FROM mysql.user;

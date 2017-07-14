@@ -13,6 +13,11 @@ lsof -i:8060
 echo -n '123123' | md5sum | cut -d ' ' -f1
 ```
 
+# kill 
+```
+ps -ef| grep mysql | grep -v grep  | awk '{print $2}' | xargs kill -9
+```
+
 # 找出最大目录大小
 ```
 du -h --max-depth=1

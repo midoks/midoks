@@ -90,7 +90,9 @@ rpm -ql rpm-libs
 
 ```
 
-yum install libxml2* -y  
+yum install libxml2* -y
+yum install -y ImageMagick*
+
 
 
 wget http://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.14.tar.gz
@@ -205,4 +207,10 @@ wget http://openresty.org/download/openresty-1.11.2.2.tar.gz
 --group=www \
 --with-http_stub_status_module \
 --with-http_ssl_module \
+```
+
+#memcached
+```
+yum install memcached
+memcached -d -m 256 -u root -p 11211 -c 1024 –P /tmp/memcached.pid
 ```
