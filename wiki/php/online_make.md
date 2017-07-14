@@ -109,7 +109,7 @@ wget http://cn2.php.net/distributions/php-7.1.6.tar.gz
 yum install -y openssl-devel libxml2
 
 ./configure --prefix=/usr/local/php56 \
---exec-prefix=/usr/local/php5.6 \
+--exec-prefix=/usr/local/php56 \
 --with-config-file-path=/usr/local/php56 \
 --with-iconv=/usr/local/libiconv \
 --with-mysql=/usr/local/mysql \
