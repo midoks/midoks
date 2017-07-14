@@ -1,0 +1,23 @@
+[mysqld_multi] 
+mysqld    = /usr/local/mysql/bin/mysqld  
+mysqladmin = /usr/local/mysql/bin/mysqladmin
+log        = /tmp/mysql_multi.log 
+
+[mysqld0]
+port = 3306
+datadir = /DB/server0
+socket = /var/lib/mysql/mysql.sock
+
+[mysqld1]
+port = 3307
+datadir = /DB/server1
+socket = /var/lib/mysql/mysql1.sock
+
+
+[mysqld2]
+port = 3308
+datadir = /DB/server2
+socket = /var/lib/mysql/mysql2.sock
+
+#skip-grant-tables 
+#skip-networking
