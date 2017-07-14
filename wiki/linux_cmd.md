@@ -4,6 +4,14 @@
 netstat -ntlp  
 ```
 
+
+# dos2unix
+```
+dos2unxi filename
+
+```
+
+
 - 查看端口属于哪个程序,端口被哪个进程占用
 lsof -i:8060
 
