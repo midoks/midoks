@@ -104,6 +104,9 @@ service mysqld restart
 #停止mysql服务
 
 service mysqld stop
+
+#shell login
+/usr/local/mysql/bin/mysql -uroot -p -P 3306 -S /T/M/server0/mysql.sock
 ```
 
 

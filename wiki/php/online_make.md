@@ -110,7 +110,7 @@ yum install -y openssl-devel libxml2
 
 ./configure --prefix=/usr/local/php56 \
 --exec-prefix=/usr/local/php56 \
---with-config-file-path=/usr/local/php56 \
+--with-config-file-path=/usr/local/php56/etc \
 --with-iconv=/usr/local/libiconv \
 --with-mysql=/usr/local/mysql \
 --with-mysqli \
