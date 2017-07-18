@@ -15,6 +15,10 @@ yum -y install perl-Time-HiRes perl-Time-HiRes-Value perl-File-Tail  rrdtool rrd
 
 ln -s /tmp/mysql.sock /var/lib/mysql/mysql.sock
 
+groupadd vmail
+useradd -g vmail vmail
+mkdir -p /home/domains/test.com/midoks/Maildir/
+chown -R vmail:vmail /home/domains/test.com/midoks/Maildir/
 
 
 ```
@@ -24,6 +28,8 @@ ln -s /tmp/mysql.sock /var/lib/mysql/mysql.sock
 ```
 groupadd vgroup
 useradd -g vuser vgroup
+
+
 
 
 tar -zxvf extmail-1.2.tar.gz 
@@ -49,3 +55,7 @@ cp -rf mailgraph_ext /usr/local/
 /var/www/extsuite/extman/daemon/cmdserver -d
 
 ```
+
+
+# 参考
+- http://ywzhou.blog.51cto.com/2785388/1590022
