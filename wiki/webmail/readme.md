@@ -5,9 +5,13 @@
 
 # ready
 ```
-yum -y  install perl-FCGI
-yum install -y perl-Unix-Syslog
+yum -y install perl-FCGI
+yum -y install perl-Unix-Syslog
 yum -y install perl-DBD-MySQL
+yum -y install perl-GD*
+yum -y install perl-RRDs*
+yum -y install perl-Time-HiRes perl-Time-HiRes-Value perl-File-Tail  rrdtool rrdtool-perl 
+
 
 ln -s /tmp/mysql.sock /var/lib/mysql/mysql.sock
 
@@ -29,5 +33,19 @@ mkdir -p /var/www/extsuite
 mv extmail-1.2/ /var/www/extsuite/extmail
 mv extman-1.1/ /var/www/extsuite/extman
 
+
+yum -y install postfix
+yum remove sendmail
+
+
+#init mysql
+mysql -u root -p < /var/www/extsuite/extman/docs/extmail.sql
+mysql -u root -p < /var/www/extsuite/extman/docs/init.sql
+
+
+cp -rf mailgraph_ext /usr/local/
+/usr/local/mailgraph_ext/mailgraph-init start
+/usr/local/mailgraph_ext/qmonitor start &
+/var/www/extsuite/extman/daemon/cmdserver -d
 
 ```
