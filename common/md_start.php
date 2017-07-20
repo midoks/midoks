@@ -1,6 +1,10 @@
 <?php
 
 
+if (isset($_GET['phpinfo'])){
+	phpinfo();exit;
+}
+
 define('XHProf_Name', 'mdd');
 
 /**
