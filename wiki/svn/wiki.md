@@ -39,5 +39,9 @@ Deleting password for user test
 #../csvn/bin/htpasswd -D ../csvn/data/conf/svn_auth_file test
 #../csvn/bin/htpasswd -b ../csvn/data/conf/svn_auth_file test 1234
 ```
+
+# 语法检查
+svnlook cat /u01/svndata/svnroot/repo index.php | php -l
+
 - 参考
 http://www.it165.net/os/html/201401/7096.html
