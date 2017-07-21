@@ -10,6 +10,8 @@ abstract class BasePreCommitCheck {
   public function __construct($svnComment=''){
     $this->svnComment = $svnComment;
     $this->parseOptions();
+    $this->repoName = $repoName;
+    $this->trxNum = $trxNum;
   }
   
   abstract function getTitle();

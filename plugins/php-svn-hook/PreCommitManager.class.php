@@ -91,7 +91,7 @@ class PreCommitManager {
       try {
         require_once $this->getCheckDirectory().DIRECTORY_SEPARATOR.$checkName.'Check.class.php';
         $className = $checkName.'Check';
-        $check = new $className($mess);
+        $check = new $className($mess, $this->repoName, $this->trxNum);
         $check->runCheck($fileChanges);
         if ($check->fail()){
           $this->checksWithError[] = $check;
