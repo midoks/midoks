@@ -110,4 +110,10 @@ service mysqld stop
 ```
 
 
+# MySQL 5.7.9版本sql_mode=only_full_group_by问题
+```
+解决方法 ：执行SET GLOBAL sql_mode = ''
+```
+
+
 
