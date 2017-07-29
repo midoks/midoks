@@ -123,6 +123,11 @@ ps -ylC php-fpm --sort:rss
 ps --no-headers -o "rss,cmd" -C php-fpm | awk '{ sum+=$1 } END { printf ("%d%s\n", sum/NR/1024,"M") }'  
 ```
 
+- 正则
+```
+/^[\x{4e00}-\x{9fa5}A-Za-z0-9._]+$/u   -- 匹配中文字符
+```
+
 
 
 # linux内核优化

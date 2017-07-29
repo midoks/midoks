@@ -4,13 +4,13 @@ gem source -a https://gems.ruby-china.org/ -r  https://rubygems.org/
 
 # 添加源
 
-#安装必要的插件
+# 安装必要的插件
 gem install bundler
 gem install jekyll-paginate
 gem install pygments.rb
 gem install wdm
 
-
+```
 $ jekyll serve
 # => 一个开发服务器将会运行在 http://localhost:4000/
 
@@ -28,3 +28,4 @@ jekyll serve --watch --incremental
 =======
 $ jekyll serve --incremental
 >>>>>>> Stashed changes
+```
