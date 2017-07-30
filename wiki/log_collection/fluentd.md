@@ -18,6 +18,8 @@ sudo gem sources -a https://ruby.taobao.org/
 - mac
 /opt/td-agent/usr/sbin/td-agent-gem install fluent-plugin-elasticsearch
 /opt/td-agent/usr/sbin/td-agent-gem install fluent-plugin-typecast
+
+/opt/td-agent/usr/sbin/td-agent-gem update
 - linux
 /usr/sbin/td-agent-gem  install fluent-plugin-elasticsearch
 
