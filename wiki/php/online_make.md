@@ -98,6 +98,7 @@ rpm -ql rpm-libs
 yum install libxml2* -y
 yum install -y ImageMagick*
 yum install libmcrypt libmcrypt-devel mcrypt mhash
+yum install libpng libpng-devel libjpeg-turbo libjpeg-turbo-devel freetype freetype-devel gd
 
 
 
@@ -136,7 +137,11 @@ yum install -y openssl-devel libxml2
 --with-xmlrpc \
 --enable-zip \
 --enable-soap \
---enable-fpm
+--enable-fpm \
+--with-gd \
+--with-jpeg-dir \
+--with-png-dir \
+--with-freetype-dir 
 
 ./configure --prefix=/usr/local/php71 \
 --exec-prefix=/usr/local/php71 \
