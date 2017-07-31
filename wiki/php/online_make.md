@@ -92,6 +92,7 @@ rpm -ql rpm-libs
 
 yum install libxml2* -y
 yum install -y ImageMagick*
+yum install libmcrypt libmcrypt-devel mcrypt mhash 
 
 
 
