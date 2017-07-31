@@ -17,10 +17,15 @@ cp /usr/lib/libz.so /usr/local/lib/
 
 rpm -ivh http://mirrors.163.com/centos/5/os/i386/CentOS/openssl-devel-0.9.8e-20.el5.i386.rpm \
 http://mirrors.163.com/centos/5/os/i386/CentOS/openssl-0.9.8e-20.el5.i386.rpm
-```
+
+
 http://mirrors.aliyun.com/centos/5/os/x86_64/CentOS/python-sqlite-1.1.7-1.2.1.x86_64.rpm --force --nodeps 
 
 rpm -ivh http://mirrors.aliyun.com/centos/5/os/x86_64/CentOS/rpm-python-4.4.2.3-34.el5.x86_64.rpm --force --nodeps
+
+yum install http://ftp.sjtu.edu.cn/fedora/epel/6/x86_64/epel-release-6-8.noarch.rpm
+```
+
 
 #删除yum
 ```
@@ -92,7 +97,8 @@ rpm -ql rpm-libs
 
 yum install libxml2* -y
 yum install -y ImageMagick*
-yum install libmcrypt libmcrypt-devel mcrypt mhash 
+yum install libmcrypt libmcrypt-devel mcrypt mhash
+
 
 
 
@@ -119,6 +125,7 @@ yum install -y openssl-devel libxml2
 --with-mysqli \
 --enable-opcache \
 --with-curl \
+--with-mcrypt \
 --enable-mbregex \
 --enable-mbstring \
 --enable-gd-native-ttf \
