@@ -50,3 +50,9 @@ vm.max_map_count=655360
 并执行命令
 sysctl -p
 ```
+
+- 跨域访问
+```
+http.cors.enabled: true
+http.cors.allow-origin: /.*/
+```
