@@ -30,7 +30,7 @@ vi /etc/security/limits.conf
 
 - unable to install syscall filter
 ```
-使用心得linux版本，就不会出现此类问题了
+使用新linux版本，就不会出现此类问题了
 ```
 
 - max number of threads [1024] for user [lish] likely too low, increase to at least [2048]
