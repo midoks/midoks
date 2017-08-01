@@ -9,6 +9,15 @@
 brew switch php55-phalcon 1.3.5
 ```
 
+- mac下使用sshpass实现ssh记住密码
+```
+wget http://sourceforge.net/projects/sshpass/files/sshpass/1.05/sshpass-1.05.tar.gz  
+tar xvzf sshpass-1.05.tar.gz  
+./configure --prefix=/usr/local/Cellar/sshpass/1.05  
+make  
+sudo make install
+```
+
 
 ```
 屏幕捕捉快捷键 
