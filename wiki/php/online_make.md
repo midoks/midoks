@@ -160,7 +160,11 @@ yum install -y openssl-devel libxml2
 --with-xmlrpc \
 --enable-zip \
 --enable-soap \
---enable-fpm
+--enable-fpm \
+--with-gd \
+--with-jpeg-dir \
+--with-png-dir \
+--with-freetype-dir 
 
 
 
