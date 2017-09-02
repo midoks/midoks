@@ -16,15 +16,19 @@ brew install cmake
 brew install opencv
 ```
 
-- 创建xcode项目
+- 创建xcode项目（Command Line)
+- 添加库文件
 ```
-/usr/local/include
-/usr/local/lib
-/usr/local/Cellar/opencv/
+Build Phases -> Link Binary With Libraries -> + (shift+command+g [/usr/local/Cellar/opencv/版本/lib])
 ```
 
-- SEARCH PATHS
+- 添加文件头(SEARCH PATHS)
+```
+Build Settings -> (在搜索框输入 SEARCH PATHS)
 
+-> Header Search Paths    添加  /usr/local/include
+-> Library Search Path    添加  /usr/local/lib
+```
 
 ## 参考
 - http://blog.csdn.net/u014365862/article/details/53067565
