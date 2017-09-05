@@ -11,7 +11,11 @@
 
 php ext_skel_win32.php --extname=kkk
 
+phpsdk_buildtree.bat phpdev
+
 phpsdk_setvars.bat
+
+cd phpdev/vc14/x64
 
 buildconf --force
 
@@ -39,7 +43,7 @@ configure --disable-all --enable-cli --enable-apache2-4handler --without-mssql -
 - 遇到的问题
 
 - 1.命令缺少(mc)
-从vs2012命令行进入,不会遇到此问题( VS2012->工具->Visual Studio命令提示(C) )
+从（ vs2012 | vs2015 ）命令行进入,不会遇到此问题( vs2012 | vs2015 ->工具->Visual Studio命令提示(C) )
 ```
 Recreating build dirs
         "" -h win32\ -r x64\Release_TS\ -x x64\Release_TS\ win32\build\wsyslog.m
