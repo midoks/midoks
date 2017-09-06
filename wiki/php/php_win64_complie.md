@@ -55,7 +55,12 @@ NMAKE : fatal error U1077: “"”: 返回代码“0x1”
 
 C:/Program Files (x86)/Windows Kits/8.0/bin/x64/mc.exe(路径加入到系统变量中)
 ```
+- 环境64,32
+```
+C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\amd64\vcvars64.bat
+复制到相应的位置上
 
+```
 ### 相关文章
 - http://blog.csdn.net/letshi/article/details/45702299
 
