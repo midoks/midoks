@@ -6,6 +6,7 @@
 - http://www.cygwin.com/
 - http://gnuwin32.sourceforge.net/packages/make.htm
 - http://svn.coderepos.org/share/lang/c/libmemcached-win32/
+- https://github.com/infusion/PHP-Facedetect
 
 
 ```
@@ -28,6 +29,8 @@ nmake snap
 
 configure --disable-all --enable-cli --enable-xhprof=shared
 configure --disable-all --enable-cli --enable-md_xhprof=shared
+configure --disable-all --enable-cli --with-opencv=shared
+configure --disable-all --enable-cli --with-facedetect=shared
 
 
 configure --disable-all --enable-cli --enable-memcached=shared --with-memcached=D:/MD/php_sdk/libmemcached-win32/libmemcached-latest/libmemcached/
