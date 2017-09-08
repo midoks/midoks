@@ -33,6 +33,15 @@ configure --disable-all --enable-cli --with-opencv=shared
 configure --disable-all --enable-cli --with-facedetect=shared
 
 
+echo %lib%
+set LIB=%LIB%;D:\opencv3\opencv\build\x64\vc14\lib
+set LIB=%LIB%;D:\opencv\opencv\build\x64\vc12\lib
+
+echo %PATH%
+set PATH=%PATH%;D:\opencv3\opencv\build\include
+
+
+
 configure --disable-all --enable-cli --enable-memcached=shared --with-memcached=D:/MD/php_sdk/libmemcached-win32/libmemcached-latest/libmemcached/
 
 configure --disable-all --enable-cli --with-memcached=D:/MD/php_sdk/libmemcached-win32/libmemcached-latest/libmemcached/memcached.dll
