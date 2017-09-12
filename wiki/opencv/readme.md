@@ -6,6 +6,8 @@
 ### Linux 安装 (2.4.9)
 
 ```
+yum -y install gtk+ gtk+-devel pkgconfig libpng zlib libjpeg libtiff cmake
+
 # 下载
 wget https://github.com/opencv/opencv/archive/2.4.9.tar.gz
 
