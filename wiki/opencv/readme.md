@@ -3,6 +3,24 @@
 - http://wiki.opencv.org.cn
 - http://opencv.org
 
+### Linux 安装 (2.4.9)
+
+```
+# 下载
+wget https://github.com/opencv/opencv/archive/2.4.9.tar.gz
+
+# 解压安装包
+tar xvf 2.4.9.tar.gz
+
+# 进入opencv目录
+cd opencv-2.4.9/
+
+# 编译安装
+cmake CMakeLists.txt
+make -j $(cat /proc/cpuinfo|grep processor|wc -l)
+make install
+```
+
 
 ### Window 配置
 
