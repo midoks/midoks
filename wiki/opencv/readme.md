@@ -3,6 +3,27 @@
 - http://wiki.opencv.org.cn
 - http://opencv.org
 
+
+
+
+### Linux cmake安装
+
+```
+
+# 下载
+wget https://cmake.org/files/v3.9/cmake-3.9.2.tar.gz
+
+# 解压安装包
+tar xvf cmake-3.9.2.tar.gz
+
+# 进入opencv目录
+cd cmake-3.9.2/
+
+# 编译安装
+make -j $(cat /proc/cpuinfo|grep processor|wc -l)
+make install
+```
+
 ### Linux 安装 (2.4.9)
 
 ```
