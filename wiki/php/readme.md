@@ -95,11 +95,9 @@ rpm -ql rpm-libs
 
 ```
 
-yum install libxml2* -y
-yum install -y ImageMagick*
-yum install libmcrypt libmcrypt-devel mcrypt mhash
-yum install libpng libpng-devel libjpeg-turbo libjpeg-turbo-devel freetype freetype-devel gd
-
+yum install -y ImageMagick* libxml2*
+yum install -y libmcrypt libmcrypt-devel mcrypt mhash curl curl-devel
+yum install -y libpng libpng-devel libjpeg-turbo libjpeg-turbo-devel freetype freetype-devel gd
 
 
 
@@ -108,9 +106,9 @@ tar zxvf libiconv-1.14.tar.gz
 ./configure --prefix=/usr/local/libiconv 
 make && make install
 
+
 wget http://cn2.php.net/distributions/php-5.6.28.tar.gz
 wget http://cn2.php.net/distributions/php-7.0.14.tar.gz
-
 wget http://cn2.php.net/distributions/php-7.1.6.tar.gz
 
 
@@ -146,7 +144,6 @@ yum install -y openssl-devel libxml2
 ./configure --prefix=/usr/local/php71 \
 --exec-prefix=/usr/local/php71 \
 --with-config-file-path=/usr/local/php71/etc \
---with-mysql=/usr/local/mysql \
 --with-mysqli \
 --enable-opcache \
 --with-curl \

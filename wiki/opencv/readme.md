@@ -49,7 +49,7 @@ make install
 ### Linux 安装 (3.3.0)
 
 ```
-yum -y install gtk+ gtk+-devel pkgconfig libpng zlib libjpeg libtiff cmake
+yum -y install gtk+ gtk+-devel pkgconfig libpng zlib libjpeg libtiff cmake libavcodec-dev libavformat-dev libswscale-dev libavutil-dev
 
 # 下载
 wget https://github.com/opencv/opencv/archive/3.3.0.tar.gz
@@ -63,6 +63,7 @@ mkdir build; cd build
 
 # 编译安装
 cmake -D CMAKE_BUILD_TYPE=RELEASE -D CMAKE_INSTALL_PREFIX=/usr/local ..
+/usr/local/bin/cmake -D CMAKE_BUILD_TYPE=RELEASE -D CMAKE_INSTALL_PREFIX=/usr/local ..
 make && make install
 ```
 
