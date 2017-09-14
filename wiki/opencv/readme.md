@@ -95,3 +95,4 @@ Build Settings -> (在搜索框输入 SEARCH PATHS)
 
 ## 参考
 - http://blog.csdn.net/u014365862/article/details/53067565
+- http://libzx.so/main/learning/2015/12/24/install-opencv3-on-osx-el-capitan.html
