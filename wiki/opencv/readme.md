@@ -65,9 +65,17 @@ mkdir build; cd build
 cmake -D CMAKE_BUILD_TYPE=RELEASE -D CMAKE_INSTALL_PREFIX=/usr/local ..
 /usr/local/bin/cmake -D CMAKE_BUILD_TYPE=RELEASE -D CMAKE_INSTALL_PREFIX=/usr/local ..
 make && make install
+
+# 添加opencv_contrib
+wget -O opencv_contrib.tar.gz https://github.com/opencv/opencv_contrib/archive/master.tar.gz
+cmake -D CMAKE_BUILD_TYPE=RELEASE \
+-D CMAKE_INSTALL_PREFIX=/usr/local -D OPENCV_EXTRA_MODULES_PATH=../../opencv_contrib/modules ..
+
 ```
 
 ### Window 配置
+```
+```
 
 ### MACOSX XCODE配置
 
