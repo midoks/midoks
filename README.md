@@ -29,11 +29,28 @@ http://dpdk.org/download
 
 ### 常用跟踪调试
 ```
+#lnux
+top -p `pidof php-fpm | sed 's/[[:space:]]/,/g'`
+
+
 yum install -y strace
 
-# vim /root/.bashrc //添加以下内容
+# vim /root/.bashrc 	//*uix
 source /root/.bashrc
 function straceall {
+echo "strace $(pidof "${1}" | sed 's/\([0-9]*\)/-p \1/g')"
 strace $(pidof "${1}" | sed 's/\([0-9]*\)/-p \1/g')
 }
+
+
+brew install pidof
+brew install dtruess
+# vim ~/.bash_profile 	//mac
+source /root/.bashrc
+function straceall {
+echo "sudo dtruss $(pidof "${1}" | sed 's/\([0-9]* \)/-p \1/g')"
+sudo dtruss $(pidof "${1}" | sed 's/\([0-9]* \)/-p \1/g')
+}
+
+
 ```
