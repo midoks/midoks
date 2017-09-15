@@ -44,9 +44,7 @@ make -j $(cat /proc/cpuinfo|grep processor|wc -l)
 make install
 ```
 
-
-
-### Linux 安装 (3.3.0)
+### Linux 安装 (3.3.0) CentOS7
 
 ```
 yum -y install gtk+ gtk+-devel pkgconfig libpng zlib libjpeg libtiff cmake libavcodec-dev libavformat-dev libswscale-dev libavutil-dev

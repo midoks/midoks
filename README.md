@@ -26,3 +26,14 @@ http://openresty.org/en/
 http://dpdk.org/download
 
 ```
+
+### 常用跟踪调试
+```
+yum install -y strace
+
+# vim /root/.bashrc //添加以下内容
+source /root/.bashrc
+function straceall {
+strace $(pidof "${1}" | sed 's/\([0-9]*\)/-p \1/g')
+}
+```
