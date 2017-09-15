@@ -29,7 +29,7 @@ http://dpdk.org/download
 
 ### 常用跟踪调试
 ```
-#lnux
+#*uix
 top -p `pidof php-fpm | sed 's/[[:space:]]/,/g'`
 #mac
 top `pidof php-fpm | sed 's/\([0-9]* \)/-pid \1/g'`
