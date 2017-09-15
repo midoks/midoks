@@ -31,6 +31,8 @@ http://dpdk.org/download
 ```
 #lnux
 top -p `pidof php-fpm | sed 's/[[:space:]]/,/g'`
+#mac
+top `pidof php-fpm | sed 's/\([0-9]* \)/-pid \1/g'`
 
 
 yum install -y strace
