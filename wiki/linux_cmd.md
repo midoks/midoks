@@ -1,8 +1,22 @@
 ## 常用命令
-- 查看监听端口的软件
+
 ```
+#查看监听端口的软件
 netstat -ntlp  
+service iptables stop
+
+
+
+#centos7服务查看
+systemctl list-unit-files|grep enabled
+systemctl stop firewalld
+systemctl disable firewalld
+
+firewall-cmd --permanent --add-service=http
+firewall-cmd --permanent --zone=trusted --add-port=80/tcp
 ```
+
+
 
 
 # dos2unix
