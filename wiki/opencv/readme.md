@@ -61,14 +61,18 @@ mkdir build; cd build
 
 # 编译安装
 cmake -D CMAKE_BUILD_TYPE=RELEASE -D CMAKE_INSTALL_PREFIX=/usr/local ..
-/usr/local/bin/cmake -D CMAKE_BUILD_TYPE=RELEASE -D CMAKE_INSTALL_PREFIX=/usr/local ..
+/usr/local/bin/cmake -D CMAKE_BUILD_TYPE=RELEASE -D CMAKE_INSTALL_PREFIX=/usr/local/opencv ..
 make && make install
 
 # 添加opencv_contrib
 wget -O opencv_contrib.tar.gz https://github.com/opencv/opencv_contrib/archive/master.tar.gz
 cmake -D CMAKE_BUILD_TYPE=RELEASE \
--D CMAKE_INSTALL_PREFIX=/usr/local -D OPENCV_EXTRA_MODULES_PATH=../../opencv_contrib/modules ..
+-D CMAKE_INSTALL_PREFIX=/usr/local/opencv -D OPENCV_EXTRA_MODULES_PATH=../../opencv_contrib/modules ..
 
+# vim /root/.bashrc 	//*uix
+source /root/.bashrc
+PKG_CONFIG_PATH = $PKG_CONFIG_PATH:/usr/local/lib/pkgconfig
+export PKG_CONFIG_PATH
 ```
 
 ### Window 配置
