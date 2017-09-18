@@ -82,6 +82,7 @@ yum makecache
 
 yum install ca-certificates
 yum groupinstall -y "Development Tools"
+yum install net-tools
 
 yum groupinstall "GNOME Desktop" "Graphical Administration Tools"
 
