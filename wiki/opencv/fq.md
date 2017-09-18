@@ -9,3 +9,11 @@ firewall-cmd --zone=public --add-port=80/tcp --permanent
 systemctl stop firewalld.service  
 systemctl start firewalld.service 
 ```
+
+
+
+```
+error while loading shared libraries: libopencv_core.so.2.4: cannot open shared object file: No such file or directory
+
+在/usr/local/lib下面，在/etc/ld.so.conf.d/下面新建一个opencv.conf，里面写入/usr/local/lib，最后执行下sudo ldconfig -v即可。
+```
