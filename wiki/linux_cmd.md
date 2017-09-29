@@ -1,5 +1,14 @@
 ## 常用命令
 
+#来源
+```
+打开任何来源
+/usr/sbin/spctl --master-disable
+关闭打开任何来源
+/usr/sbin/spctl --master-enable
+
+```
+
 ```
 #查看监听端口的软件
 netstat -ntlp  
