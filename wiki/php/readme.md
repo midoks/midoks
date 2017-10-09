@@ -100,8 +100,7 @@ rpm -ql rpm-libs
 ```
 
 yum install -y ImageMagick* libxml2*
-yum install -y libmcrypt libmcrypt-devel mcrypt mhash curl curl-devel
-yum install -y libpng libpng-devel libjpeg-turbo libjpeg-turbo-devel freetype freetype-devel gd
+yum install -y libmcrypt libmcrypt-devel mcrypt mhash curl curl-devel libpng libpng-devel libjpeg-turbo libjpeg-turbo-devel freetype freetype-devel gd  openssl-devel libxml2
 
 
 
@@ -114,9 +113,7 @@ make && make install
 wget http://cn2.php.net/distributions/php-5.6.28.tar.gz
 wget http://cn2.php.net/distributions/php-7.0.14.tar.gz
 wget http://cn2.php.net/distributions/php-7.1.6.tar.gz
-
-
-yum install -y openssl-devel libxml2
+wget http://cn2.php.net/distributions/php-7.1.10.tar.gz
 
 ./configure --prefix=/usr/local/php56 \
 --exec-prefix=/usr/local/php56 \
