@@ -107,6 +107,9 @@ service mysqld stop
 
 #shell login
 /usr/local/mysql/bin/mysql -uroot -p -P 3306 -S /T/M/server0/mysql.sock
+
+#start
+/usr/local/mysql/bin/mysqld_multi --defaults-file=/var/my_multi.cnf start 0-2 &
 ```
 
 
