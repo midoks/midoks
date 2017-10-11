@@ -234,6 +234,16 @@ wget http://openresty.org/download/openresty-1.11.2.2.tar.gz
 --with-http_ssl_module \
 ```
 
+# centos7
+```
+
+chkconfig --add nginx
+
+systemctl list-unit-files | grep nginx
+systemctl list-units | grep nginx
+systemctl --failed
+systemctl kill httpd
+```
 #memcached
 ```
 yum install memcached
