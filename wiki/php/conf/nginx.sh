@@ -13,6 +13,7 @@
 . /etc/rc.d/init.d/functions
 # Source networking configuration.
 . /etc/sysconfig/network
+
 # Check that networking is up.
 [ "$NETWORKING" = "no" ] && exit 0
 nginx="/usr/local/nginx/sbin/nginx"
