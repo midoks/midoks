@@ -1,0 +1,28 @@
+.midoks_returnTop{
+	position:fixed;
+	bottom:35px;
+	right:20px;
+	width:40px;
+	height:40px;
+	background:#666;
+	display:none;
+}
+.midoks_returnTop .m{
+	position:absolute;
+	top:-2px;
+	_top:-20px;
+	width:0px;
+	height:0px;
+	left:10px;
+	border-width:10px;
+	border-color:transparent transparent #FFFFFF;
+	border-style: dashed dashed solid;
+}
+.midoks_returnTop .i{
+	position:absolute;
+	top:18px;
+	left:16px;
+	height:12px;
+	width:8px;
+	background:#FFFFFF;
+}

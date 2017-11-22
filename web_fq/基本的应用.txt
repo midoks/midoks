@@ -1,0 +1,39 @@
+typeof	运算符
+
+作用:返回一个用来表示表达式的数据类型的字符串。
+
+返回值的六种可能:
+
+"number" -> 数字类型
+"string" -> 字符串类型
+"boolen" -> 布尔类型
+"object" -> 方法类型
+"undefined"->未知类型
+---------------------------------------------------
+undefined 	//未定义
+null		//空值
+
+NOTE:在某些情况下,
+undefined==null  -->true
+undefined===null -->false
+---------------------------
+== -->不考虑数据类型
+=== ->会判断数据类型
+--------------------------------------------------
+函数的作用域
+	var yourname = '你';//[局部变量]
+	myname = '我'; 		// myname <-> windows.myname[全部变量]
+
+NOTE:Javascript执行引擎不是一行一行解释和执行代码的,而是一块一块解释和执行代码的。
+
+------------------------------------------------------
+两种URL编码:
+	encodeURI();//只编码了中文
+	decodeURI();
+	encodeURIComponent();//特殊字符和中文都编码了
+	decodeURIComponent();
+NOTE:因为encodeURIComponent()编码比encodeURI()编码来的更加彻底。
+一般来来说encodeURIComponent()的使用频率要高一些
+	escape();unescape();//只能编码ASCII字符,现在基本不在使用
+------------------------------------------------------
+
