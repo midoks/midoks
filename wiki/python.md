@@ -6,6 +6,9 @@
 brew install mysql-connector-c
 
 
+-- mysql
+https://dev.mysql.com/downloads/file/?id=458964
+https://sourceforge.net/projects/mysql-python/?source=dlpt
 pip install MySQL-python
 ```
 
