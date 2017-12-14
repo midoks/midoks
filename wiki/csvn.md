@@ -21,9 +21,18 @@ ln -s /csvn/csvn-httpd /etc/csvn-httpd
 
 ```
 
+
+
 - 启动服务：csvn csvn-httpd
 ```
 service csvn start
 service csvn-httpd start
 
+```
+
+- 地址访问
+```
+http://ip:3343
+admin
+admin
 ```
