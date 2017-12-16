@@ -180,6 +180,10 @@ wget http://cn2.php.net/distributions/php-7.1.10.tar.gz
 --with-ldap \
 --with-ldap-sasl \
 
+
+#内存不够,解决方法
+--disable-fileinfo 
+
 ```
 
 # nginx
