@@ -74,6 +74,9 @@ grant all privileges on *.* to 'cjs'@'%' identified by 'cjscjs123';
 #查看授权
 SELECT DISTINCT CONCAT('User: ''',user,'''@''',host,''';') AS query FROM mysql.user;
 
+#删除权限
+Delete FROM user Where User='test' and Host='localhost';
+
 启动MySQL
 添加服务，拷贝服务脚本到init.d目录，并设置开机启动
 
@@ -111,6 +114,7 @@ service mysqld stop
 #start
 /usr/local/mysql/bin/mysqld_multi --defaults-file=/var/my_multi.cnf start 0-2 &
 ```
+
 
 
 # MySQL 5.7.9版本sql_mode=only_full_group_by问题
