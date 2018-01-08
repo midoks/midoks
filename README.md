@@ -27,6 +27,22 @@ http://dpdk.org/download
 
 ```
 
+### 常用
+```
+sublime 分屏 切换快捷键
+- ctrl+shift+2,3,4,5
+- ctrl+tab
+
+vim 分屏 切换快捷键
+- vim -o3 f1 f2 f3
+- sp file  	水平分屏
+- vsp file   垂直分屏
+- ctrl + w + w
+- ctrl + w + h  左
+- ctrl + w + l  右
+```
+
+
 ### 常用跟踪调试
 ```
 #*uix
