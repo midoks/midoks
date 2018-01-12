@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>demo</title>
+</head>
+<body>
+<video preload="metadata" width="860" id="player" height="485" controls="true" preload="auto" oncontextmenu="return false" ></video>
+<script type="text/javascript">
+	
+/*
+JS部分
+没处理兼容什么的
+*/
+var video = document.getElementById("player");
+window.URL = window.URL || window.webkitURL;
+var xhr = new XMLHttpRequest();
+// xhr.open("GET", "1.mp4", true);
+xhr.open("GET", "mm.mp4", true);
+/*
+正常我们用AJAX请求的是后台的借口
+这里直接请求的是一个.MP4的文件；
+如果你的视频文件和你项目没在同一个域下，会有跨域问题的；
+*/
+xhr.responseType = "blob";
+xhr.onload = function() {
+  if (this.status == 200) {
+       var blob = this.response;
+       video.onload = function(e) {
+           window.URL.revokeObjectURL(video.src);
+       };
+       video.src = window.URL.createObjectURL(blob);
+    }
+ }
+ xhr.send();
+</script>
+
+</body>
+</html>
