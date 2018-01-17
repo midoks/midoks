@@ -42,6 +42,18 @@ vim 分屏 切换快捷键
 - ctrl + w + l  右
 ```
 
+### sublime phpfmt 设置
+```
+{
+	"version": 1,
+	"enable_auto_align": true,//自动调整对齐
+	"indent_with_space": true,//自动空格，tab不会出现
+	"psr4": true,
+	"php_bin":"~~/php.exe",//环境没有配置php时，需要添加此项，指向php.exe
+}
+
+```
+
 
 ### 常用跟踪调试
 ```
