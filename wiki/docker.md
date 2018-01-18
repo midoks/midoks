@@ -1,6 +1,17 @@
 ### Docker 安装
 - http://www.docker.com/
 
+# Linux安装
+```
+sudo yum install -y yum-utils device-mapper-persistent-data lvm2
+
+sudo yum-config-manager --add-repo http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
+
+sudo yum -y makecache fast
+sudo yum -y install docker-ce
+sudo service docker start
+```
+
 # docker 常用命令
 ```
 docker info

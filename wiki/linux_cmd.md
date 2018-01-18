@@ -81,6 +81,8 @@ set encoding=utf-8
 ```
 rdate -s time.nist.gov
 ntpdate -s time.windows.com
+
+* * * * * rdate -s time.nist.gov
 ```
 
 - 去掉注释信息
