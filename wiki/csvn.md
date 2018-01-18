@@ -36,3 +36,38 @@ http://ip:3343
 admin
 admin
 ```
+
+
+## 自动化配置
+```
+- 通过sh,可以svn代码
+vi /home/www/.subversion/servers
+store-passwords = yes
+store-plaintext-passwords = yes
+
+- 设置权限
+visudo
+www     ALL=(ALL)       ALL
+chown -R www:www /var/www
+
+```
+
+## svn hook (post-commit)
+```
+#!/bin/sh
+
+REPOS="$1"
+REV="$2"
+
+REPOS_NAME=${REPOS##*/}
+
+WEB_PATH=/var/www/$REPOS_NAME
+SVN_PATH=http://127.0.0.1:18080/svn/$REPOS_NAME
+
+if [ ! -d  $WEB_PATH ]; then
+	svn co $SVN_PATH $WEB_PATH --username=admin --password=admin
+fi
+
+svn update --username admin --password admin
+```
+
