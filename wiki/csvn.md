@@ -71,3 +71,31 @@ fi
 svn update --username admin --password admin
 ```
 
+## svn hook (pre-commit)
+```
+#!/bin/sh
+
+
+REPOS="$1"
+TXN="$2"
+
+
+SVNLOOK=/usr/bin/svnlook
+LOGMSG=`$SVNLOOK log -t "$TXN" "$REPOS" | grep "[a-zA-Z0-9]" | wc -c` 
+if [ "$LOGMSG" -lt 5 ];#要求注释不能少于5个字符，您可自定义 
+then 
+  echo -e "\nlen:"$LOGMSG  1>&2
+  echo -e "Log message cann't be empty! you must input more than 5 chars as comment!." 1>&2 
+  exit 1 
+fi 
+
+
+# Make sure that the log message contains some text.
+$SVNLOOK log -t "$TXN" "$REPOS" | \
+   grep "[a-zA-Z0-9]" > /dev/null || exit 1
+
+echo -e "ererrrrr" 1>&2
+# All checks passed, so allow the commit.
+exit 1
+```
+
