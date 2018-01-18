@@ -68,6 +68,7 @@ if [ ! -d  $WEB_PATH ]; then
 	svn co $SVN_PATH $WEB_PATH --username=admin --password=admin
 fi
 
+cd $WEB_PATH
 svn update --username admin --password admin
 ```
 
