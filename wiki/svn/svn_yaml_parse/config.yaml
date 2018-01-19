@@ -1,0 +1,11 @@
+
+domain:
+- name: "text.com:80"
+- name: "_:3307"
+
+nginx:
+- rewrite: "rewrite ^/(.*)$ /index.php/$1 last"
+- index: "index.php index.html index.htm"
+
+
+
