@@ -86,6 +86,9 @@ export LC_CTYPE=zh_CN.UTF-8
 REPOS="$1"
 TXN="$2"
 
+REPOS_NAME=${REPOS##*/}
+WEB_PATH=/var/www/$REPOS_NAME
+
 SVNLOOK=/usr/bin/svnlook
 LOGMSG=`$SVNLOOK log -t "$TXN" "$REPOS" | grep "[a-zA-Z0-9]" | wc -c` 
 if [ "$LOGMSG" -lt 5 ];#要求注释不能少于5个字符，您可自定义 
@@ -95,14 +98,7 @@ then
   exit 1 
 fi 
 
-
-# Make sure that the log message contains some text.
-$SVNLOOK log -t "$TXN" "$REPOS" | \
-   grep "[a-zA-Z0-9]" > /dev/null || exit 1
-
-echo -e "ererrrrr" 1>&2
-# All checks passed, so allow the commit.
-exit 1
+/usr/local/php71/bin/php /var/www/php_config_yaml/parse.php $WEB_PATH $1 $2
 ```
 
 
