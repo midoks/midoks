@@ -1,6 +1,11 @@
 ### Docker 安装
 - http://www.docker.com/
 
+### 集群相关
+```
+
+```
+
 # Linux安装
 ```
 sudo yum install -y yum-utils device-mapper-persistent-data lvm2
