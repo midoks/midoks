@@ -83,22 +83,20 @@ svn update --username admin --password admin
 export LC_ALL=en_US.UTF-8
 export LC_CTYPE=zh_CN.UTF-8
 
+#!/bin/sh
+
+
 REPOS="$1"
 TXN="$2"
 
 REPOS_NAME=${REPOS##*/}
 WEB_PATH=/var/www/$REPOS_NAME
+NGINX_PATH=/usr/local/nginx
 
 SVNLOOK=/usr/bin/svnlook
-LOGMSG=`$SVNLOOK log -t "$TXN" "$REPOS" | grep "[a-zA-Z0-9]" | wc -c` 
-if [ "$LOGMSG" -lt 5 ];#要求注释不能少于5个字符，您可自定义 
-then 
-  echo -e "\nlen:"$LOGMSG  1>&2
-  echo -e "Log message cann't be empty! you must input more than 5 chars as comment!." 1>&2 
-  exit 1 
-fi 
 
-/usr/local/php71/bin/php /var/www/php_config_yaml/parse.php $WEB_PATH $1 $2
+
+/usr/local/php71/bin/php /var/www/php_config_yaml/parse.php $NGINX_PATH $WEB_PATH $1 $2
 ```
 
 
