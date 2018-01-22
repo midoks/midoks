@@ -98,6 +98,7 @@ SVNLOOK=/usr/bin/svnlook
 
 /usr/local/php71/bin/php /var/www/php_config_yaml/parse.php $NGINX_PATH $WEB_PATH $1 $2
 ```
+- [yaml_parse](https://github.com/midoks/midoks/tree/master/wiki/svn/svn_yaml_parse)
 
 
 ### FAQ
