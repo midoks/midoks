@@ -33,7 +33,7 @@ rpm -aq | grep yum | xargs rpm -e --nodeps
 rpm -aq | grep python-iniparse | xargs rpm -e --nodeps
 rpm -aq | grep python-urlgrabber | xargs rpm -e --nodeps
 
-yum install lrzsz
+
 ```
 
 #YUM安装 (redhat5)
@@ -80,9 +80,10 @@ yum -y install java-1.8.0-openjdk
 yum clean all
 yum makecache
 
-yum install ca-certificates
+yum install -y ca-certificates
 yum groupinstall -y "Development Tools"
-yum install net-tools
+yum install -y net-tools
+yum install -y lrzsz
 
 yum groupinstall "GNOME Desktop" "Graphical Administration Tools"
 
