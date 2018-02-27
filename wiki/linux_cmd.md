@@ -9,6 +9,18 @@
 
 ```
 
+
+# 获取最新版本号
+```
+svn log -l 1 --username username --password password | sed -n '2p' | awk -F'|' '{print $1}' | sed 's/r//g'
+```
+
+# 获取更改文件列表
+```
+svnlook changed -r 1343 /svn/repo
+```
+
+
 ```
 #查看监听端口的软件
 netstat -ntlp  
