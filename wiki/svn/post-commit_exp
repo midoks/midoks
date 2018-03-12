@@ -1,0 +1,53 @@
+#!/bin/sh
+
+export LC_CTYPE=zh_CN.UTF-8
+
+REPOS="$1"
+REV="$2"
+
+
+cd /var/www/pro/
+SVN_VERSION=`svn log -l 1 --username cjs --password cjs | sed -n '2p' | awk -F'|' '{print $1}' | sed 's/r//g'`
+
+echo $SVN_VERSION
+
+
+
+SVN_FILE=`svnlook changed /opt/svn/pro | awk -F'/' '{print $1}'| sed 's/[[:space:]]//g' | uniq`
+
+echo $SVN_FILE
+echo "SVN_FILE_CHANGE_END.."
+
+IS_ROOT_UPDATE=no
+
+for i in $SVN_FILE
+do
+	t=${i:1:100}
+	echo /var/www/pro/$t
+	
+	if [ ! -d /var/www/pro/$t ];then
+		IS_ROOT_UPDATE=yes	
+	fi
+
+	if [ -f /var/www/pro/$t ];then
+		IS_ROOT_UPDATE=yes
+	fi
+done
+
+
+if [ "yes" == "$IS_ROOT_UPDATE" ];then
+	echo root update
+	svn update /var/www/pro/ --username cjs --password cjs123!2We
+	rsync -avz --delete --exclude=*security* --exclude=*svn* --exclude=*error*  --exclude=*html.php* --exclude=*globaltop.* --exclude=*.log*   /var/www/pro/ rsync://10.0.0.62/shzt/
+	rsync -avz --delete --exclude=*security* --exclude=*svn* --exclude=*error*  --exclude=*html.php* --exclude=*globaltop.* --exclude=*.log*  /var/www/pro/ rsync://10.0.0.61/shzt/
+else
+	echo dir update
+
+	for i in $SVN_FILE
+	do
+		t=${i:1:100}
+		svn update /var/www/pro/$t --username cjs --password cjs
+		rsync -avz --delete  --exclude=*svn*  /var/www/pro/$t rsync://10.0.0.62/shzt/
+		rsync -avz --delete  --exclude=*svn*  /var/www/pro/$t rsync://10.0.0.61/shzt/
+	done
+fi
