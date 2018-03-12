@@ -88,3 +88,12 @@ sudo dtruss $(pidof "${1}" | sed 's/\([0-9]* \)/-p \1/g')
 
 
 ```
+
+### iptables
+```
+iptables -A INPUT -p tcp -s 218.247.181.51 -j ACCEPT
+
+#删除规则
+iptables -D INPUT 2 
+
+```
