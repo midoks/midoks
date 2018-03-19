@@ -1,2 +1,2 @@
 ipconfig /flushdns
-DNS ½âÎö»º´æ
+DNS æ¸…ç©º
