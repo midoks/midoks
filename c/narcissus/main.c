@@ -18,6 +18,9 @@ int main(int argc, char const *argv[])
 		}
 	}
 
+	//发出声音
+	printf("\a");
+
 
 	return 0;
 }
