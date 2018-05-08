@@ -1,48 +1,48 @@
-//»ù±¾ÀàÐÍ:Object,Array,String,Function,Number...
+//åŸºæœ¬ç±»åž‹:Object,Array,String,Function,Number...
 
 --
 function oo(name){
-	var _name = name;//±äÁ¿
+	var _name = name;//å˜é‡
 }
 function pp(){
-	Parent.call(this,name);//¼Ì³Ð·ÖÀà
+	Parent.call(this,name);//ç»§æ‰¿åˆ†ç±»
 }
 -------------------------
-//ÔÚJavaScript±à³ÌÓïÑÔÖÐ,Ö»ÓÐObjectºÍFunctionÁ½ÖÖÀàÐÍ¾ßÓÐ¶ÔÏó»¯ÄÜÁ¦
-//·½·¨¶ÔÏó:Ò»ÖÖÊÇÓÃÀ´µ÷ÓÃÖ´ÐÐ,Ò»ÖÖ¾ÍÊÇ×÷Îª¶ÔÏó½øÐÐ´¦Àí.
+//åœ¨JavaScriptç¼–ç¨‹è¯­è¨€ä¸­,åªæœ‰Objectå’ŒFunctionä¸¤ç§ç±»åž‹å…·æœ‰å¯¹è±¡åŒ–èƒ½åŠ›
+//æ–¹æ³•å¯¹è±¡:ä¸€ç§æ˜¯ç”¨æ¥è°ƒç”¨æ‰§è¡Œ,ä¸€ç§å°±æ˜¯ä½œä¸ºå¯¹è±¡è¿›è¡Œå¤„ç†.
 -----------------------------------------------------------------
 
 --constructor
-	¶Ô´´½¨¶ÔÏóµÄº¯ÊýµÄÒýÓÃ(Ö¸Õë),¶ÔÓëObeject¶ÔÏó,¸ÃÖ¸ÕëÖ¸ÏòÔ­Ê¼µÄObjectº¯Êý
+	å¯¹åˆ›å»ºå¯¹è±¡çš„å‡½æ•°çš„å¼•ç”¨(æŒ‡é’ˆ),å¯¹ä¸ŽObejectå¯¹è±¡,è¯¥æŒ‡é’ˆæŒ‡å‘åŽŸå§‹çš„Objectå‡½æ•°
 --prototype
-	¶Ô¸Ã¶ÔÏóµÄ¶ÔÏóÔ­ÐÍµÄÒýÓÃ.¶ÔÓÚËùÓÐµÄ¶ÔÏó,ËüÄ¬ÈÏ·µ»ØObject¶ÔÏóµÄÒ»¸öÊµÀý.
+	å¯¹è¯¥å¯¹è±¡çš„å¯¹è±¡åŽŸåž‹çš„å¼•ç”¨.å¯¹äºŽæ‰€æœ‰çš„å¯¹è±¡,å®ƒé»˜è®¤è¿”å›žObjectå¯¹è±¡çš„ä¸€ä¸ªå®žä¾‹.
 --toString()
-	·µ»Ø¶ÔÏóµÄÔ­Ê¼×Ö·û´®±íÊ¾.¶ÔÓÚObject¶ÔÏó,ECMA-262Ã»ÓÐ¶¨ÒåÕâ¸öÖµ,ËùÒÔ²»Í¬µÄECMAScriptÊµÏÖ¾ßÓÐ²»Í¬µÄÖµ.
+	è¿”å›žå¯¹è±¡çš„åŽŸå§‹å­—ç¬¦ä¸²è¡¨ç¤º.å¯¹äºŽObjectå¯¹è±¡,ECMA-262æ²¡æœ‰å®šä¹‰è¿™ä¸ªå€¼,æ‰€ä»¥ä¸åŒçš„ECMAScriptå®žçŽ°å…·æœ‰ä¸åŒçš„å€¼.
 --valueOf()
-	·µ»Ø×îÊÊºÏ¸Ã¶ÔÏóµÄÔ­Ê¼Öµ.¶ÔÓÚÐí¶à¶ÔÏó,¸Ã·½·¨·µ»ØµÄÖµ¶¼ÓëtoString()µÄ·µ»ØÖµÏàÍ¬.
+	è¿”å›žæœ€é€‚åˆè¯¥å¯¹è±¡çš„åŽŸå§‹å€¼.å¯¹äºŽè®¸å¤šå¯¹è±¡,è¯¥æ–¹æ³•è¿”å›žçš„å€¼éƒ½ä¸ŽtoString()çš„è¿”å›žå€¼ç›¸åŒ.
 --hasOwnProperty(property)
-	ÅÐ¶Ï¶ÔÏóÊÇ·ñÓÐ×ÅÄ³¸öÌØ¶¨µÄÊôÐÔ¡£±ØÐëÓÃ×Ö·û´®Ö¸¶¨¸ÃÊôÐÔ.
+	åˆ¤æ–­å¯¹è±¡æ˜¯å¦æœ‰ç€æŸä¸ªç‰¹å®šçš„å±žæ€§ã€‚å¿…é¡»ç”¨å­—ç¬¦ä¸²æŒ‡å®šè¯¥å±žæ€§.
 --isPrototypeOf(object)
-	ÅÐ¶Ï¸Ã¶ÔÏóÊÇ·ñÎªÁíÒ»¸ö¶ÔÏóµÄÔ­ÐÍ.
+	åˆ¤æ–­è¯¥å¯¹è±¡æ˜¯å¦ä¸ºå¦ä¸€ä¸ªå¯¹è±¡çš„åŽŸåž‹.
 --propertyIsEnumberable
-	ÅÐ¶Ï¸ø¶¨µÄÊôÐÔÊÇ·ñ¿ÉÒÔ ÓÃfor..inÓï¾ä½øÐÐÃ¶¾Ù.
+	åˆ¤æ–­ç»™å®šçš„å±žæ€§æ˜¯å¦å¯ä»¥ ç”¨for..inè¯­å¥è¿›è¡Œæžšä¸¾.
 --------------------------------------------------------------------------------
-ÃæÏò¶ÔÏóÔ­ÐÍÊ½¼Ì³Ð|
+é¢å‘å¯¹è±¡åŽŸåž‹å¼ç»§æ‰¿|
 -------------------
-//»ùÀàµÄ¹¹Ôìº¯Êý
+//åŸºç±»çš„æž„é€ å‡½æ•°
 function Parent(){}
-//×ÓÀà¹¹Ôìº¯Êý
+//å­ç±»æž„é€ å‡½æ•°
 function Child(){}
-//½¨Á¢Ò»¸ö»ùÀàµÄ¶ÔÏó×÷Îª×ÓÀàÔ­ÐÍµÄÔ­ÐÍ(Ô­ÐÍ¼Ì³Ð)
+//å»ºç«‹ä¸€ä¸ªåŸºç±»çš„å¯¹è±¡ä½œä¸ºå­ç±»åŽŸåž‹çš„åŽŸåž‹(åŽŸåž‹ç»§æ‰¿)
 Child.prototype = new Parent();
-//ÊµÀý»¯child()¶ÔÏó
+//å®žä¾‹åŒ–child()å¯¹è±¡
 var child = new Child();
 -------------------------------------------------------------------------------
-ÃæÏò¶ÔÏóÀàÊ½¼Ì³Ð|
+é¢å‘å¯¹è±¡ç±»å¼ç»§æ‰¿|
 -----------------
 -----------------------------------------------------------------------------------
 Function.prototype.toString = function(){										  |
-		return "ÎÒÊÇËùÓÐfunctionµÄtoString·½·¨,¸úÎÒÍ¬ÑùÀàÐÍµÄ¶¼¼Ì³ÐÁËÎÒÕâ¸ö·½·¨"; |
+		return "æˆ‘æ˜¯æ‰€æœ‰functionçš„toStringæ–¹æ³•,è·Ÿæˆ‘åŒæ ·ç±»åž‹çš„éƒ½ç»§æ‰¿äº†æˆ‘è¿™ä¸ªæ–¹æ³•"; |
 	}                                                                             |
 	                                                                              |
 	var obj = new Object();                                                       |
@@ -56,7 +56,7 @@ Function.prototype.toString = function(){										  |
 	alert(func instanceof Function);                                              |
 -----------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------
-	//¸¸Àà                                                 
+	//çˆ¶ç±»                                                 
 	function Parent(name, age, sex){
 		this.name = name;
 		this.age = age;
@@ -66,9 +66,9 @@ Function.prototype.toString = function(){										  |
 			alert(this.name + " - " + this.age + " - " + this.sex);
 		}
 	}
-	//×ÓÀà
+	//å­ç±»
 	function Child(name, age, sex, work){
-		//Ê¹ÓÃcall·½·¨¼Ì³Ð¸¸ÀàµÄ¹¦ÄÜ.
+		//ä½¿ç”¨callæ–¹æ³•ç»§æ‰¿çˆ¶ç±»çš„åŠŸèƒ½.
 		Parent.call(this, name, age, sex);
 		
 		this.work = work;
