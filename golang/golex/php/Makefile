@@ -10,3 +10,6 @@ lex.go: lex.l
 
 clean:
 	rm -f lex lex.go lex.yy.go y.output *~
+
+test:
+	cat i.php | ./lex
