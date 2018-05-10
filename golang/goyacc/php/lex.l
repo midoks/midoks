@@ -216,16 +216,30 @@ __NAMESPACE__           fmt.Printf("TOKEN:%q\n", y.buf)
 {TOKENS}|[{}"`]         fmt.Printf("TOKEN:%q\n", y.buf)
 
 \#|\/\/          
-
                         for {
                             c = y.getc()
                             switch c {
                                 case '\n':
                                     y.token = T_COMMENT
                                     //fmt.Printf("TOKEN:%q,pos:%d\n", y.buf,y.current)
-                                    goto yystate0
+                                    goto label_loop
                                 default:
                                     continue
+                            }
+                        }
+                        label_loop:
+
+(\/\*|\/\*\*){WHITESPACE}
+
+                        for {
+                            c = y.getc()
+                            if ( c == '*' ){
+                                c = y.getc()
+                                if ( c == '/' ){  
+                                    y.getc()
+                                    fmt.Printf("TOKEN-SS:%q,pos:%d\n", y.buf,y.current)
+                                    break
+                                }
                             }
                         }
 

@@ -28,6 +28,7 @@ import (
     value float64
 }
 
+
 %token END         "end of file"
 %token T_EXIT      "exit (T_EXIT)"
 %token T_COMMENT   "comment (T_COMMENT)"
@@ -66,5 +67,7 @@ exp:      NUM                { $$ = $1          }
 %%
 
 func main() {
+    //t := newLexer(bufio.NewReader(os.Stdin))
+    //fmt.Printf("p:%s\n", t)
     os.Exit(yyParse(newLexer(bufio.NewReader(os.Stdin))))
 }
