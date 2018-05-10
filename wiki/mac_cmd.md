@@ -1,7 +1,15 @@
 # 命令
+mac常用方法
 
 
 # 快捷键
+- xcode插件
+```
+#安装
+curl -fsSL https://raw.githubusercontent.com/supermarin/Alcatraz/master/Scripts/install.sh | sh
+#卸载
+rm -rf ~/Library/Application\ Support/Developer/Shared/Xcode/Plug-ins/Alcatraz.xcplugin
+```
 
 - brew版本切换命令
 
