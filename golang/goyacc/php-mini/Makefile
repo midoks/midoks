@@ -24,4 +24,4 @@ test7:
 
 
 iphp:
-	sh /Applications/mdserver/bin/reinstall/php72_log.sh
+	sh /Applications/mdserver/bin/reinstall/php72.3_log.sh
