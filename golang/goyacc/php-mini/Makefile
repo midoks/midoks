@@ -18,3 +18,10 @@ clean:
 
 test:
 	cat i.php | ./php
+
+test7:
+	cat i.php | /Applications/mdserver/bin/php/php72d/bin/php 
+
+
+iphp:
+	sh /Applications/mdserver/bin/reinstall/php72_log.sh
