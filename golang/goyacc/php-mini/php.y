@@ -18,7 +18,7 @@ package main
 import (
     "bufio"
     "fmt"
-    "math"
+    //"math"
     "os"
 )
 
@@ -32,14 +32,15 @@ import (
 %token END         "end of file"
 %token T_EXIT      "exit (T_EXIT)"
 %token T_COMMENT   "comment (T_COMMENT)"
-%token NUM
+%token T_LNUMBER   "integer number (T_LNUMBER)"
+%token T_DNUMBER   "floating-point number (T_DNUMBER)"
+%token T_STRING    "identifier (T_STRING)"
 
-%left   '-' '+'
-%left   '*' '/'
-%left   NEG     /* negation--unary minus */
-%right  '^'     /* exponentiation */
+%left   '+' '-' '.'
+%left   '*' '/' '%'
 
-%type   <value> NUM, exp
+
+%type  <value> T_DNUMBER  expr
 
 %% /* Rules */
 
@@ -47,27 +48,21 @@ start:
     top_statement_list
 ;
 
-top_statement_list:    /* empty */
-        | top_statement_list line
+top_statement_list:
+    expr
 ;
 
-line:     '\n'
-        | exp '\n'  { fmt.Printf("\t%.10g\n", $1) }
+expr:   T_DNUMBER   { fmt.Printf("\t%.10g\n", $1 ); }
+        | expr '+' expr  { fmt.Printf("\t%.10g:%.10g\n", $1 ,$3);    }
+        | expr '-' expr  { fmt.Printf("\t%.10g:%.10g\n", $1 ,$3);    }
 ;
 
-exp:      NUM                { $$ = $1          }
-        | exp '+' exp        { $$ = $1 + $3     }
-        | exp '-' exp        { $$ = $1 - $3     }
-        | exp '*' exp        { $$ = $1 * $3     }
-        | exp '/' exp        { $$ = $1 / $3     }
-        | '-' exp  %prec NEG { $$ = -$2         }
-        | exp '^' exp        { $$ = math.Pow($1, $3) }
-        | '(' exp ')'        { $$ = $2;         }
-;
+
+
 %%
 
 func main() {
     //t := newLexer(bufio.NewReader(os.Stdin))
-    //fmt.Printf("p:%s\n", t)
+    //fmt.Printf("p:%p\n", t)
     os.Exit(yyParse(newLexer(bufio.NewReader(os.Stdin))))
 }

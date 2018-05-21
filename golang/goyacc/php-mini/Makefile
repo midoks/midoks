@@ -1,10 +1,11 @@
-all: php.lex.go php.yacc.go
+
+all: php.yacc.go php.lex.go
 	gofmt -l -s -w *.go
 	go build $^
-	mv php.lex php
+	mv php.yacc php
 
 run: all
-	./php
+	cat i.php | ./php
 
 php.lex.go: php.l
 	golex -o $@ $<
@@ -14,7 +15,7 @@ php.yacc.go: php.y
 
 
 clean:
-	rm -f php php.yacc.go php.lex.go php.lex.go php.yacc.go y.output *~
+	rm -f php php.yacc.go php.lex.go php.lex.go php.yacc.go php.yacc y.output *~
 
 test:
 	cat i.php | ./php

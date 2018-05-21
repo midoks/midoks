@@ -12,12 +12,12 @@ import (
     "bufio"
     "log"
     "fmt"
+    "strconv"
 )
 
 type yylexer struct{
     src     *bufio.Reader
     buf     []byte
-    token   int
     empty   bool
     current byte
 }
@@ -47,7 +47,7 @@ func (y yylexer) Error(e string) {
 
 
 func (y *yylexer) Lex(lval *yySymType) int {
-    // var err error
+    var err error
     c := y.current
     if y.empty {
         c, y.empty = y.getc(), false
@@ -81,9 +81,7 @@ die                     fmt.Printf("TOKEN:%q\n", y.buf)
 function                fmt.Printf("TOKEN:%q\n", y.buf)
 const                   fmt.Printf("TOKEN:%q\n", y.buf)
 return                  fmt.Printf("TOKEN:%q\n", y.buf)
-yield{WHITESPACE}from[\^a-zA-Z0-9_\x80-\xff] 
                         fmt.Printf("TOKEN:%q\n", y.buf)
-yield                   fmt.Printf("TOKEN:%q\n", y.buf)
 try                     fmt.Printf("TOKEN:%q\n", y.buf)
 catch                   fmt.Printf("TOKEN:%q\n", y.buf)
 finally                 fmt.Printf("TOKEN:%q\n", y.buf)
@@ -101,7 +99,6 @@ foreach                 fmt.Printf("TOKEN:%q\n", y.buf)
 endforeach              fmt.Printf("TOKEN:%q\n", y.buf)
 declare                 fmt.Printf("TOKEN:%q\n", y.buf)
 enddeclare              fmt.Printf("TOKEN:%q\n", y.buf)
-instanceof              fmt.Printf("TOKEN:%q\n", y.buf)
 as                      fmt.Printf("TOKEN:%q\n", y.buf)
 switch                  fmt.Printf("TOKEN:%q\n", y.buf)
 endswitch               fmt.Printf("TOKEN:%q\n", y.buf)
@@ -112,11 +109,6 @@ continue                fmt.Printf("TOKEN:%q\n", y.buf)
 goto                    fmt.Printf("TOKEN:%q\n", y.buf)
 echo                    fmt.Printf("TOKEN:%q\n", y.buf)
 print                   fmt.Printf("TOKEN:%q\n", y.buf)
-class                   fmt.Printf("TOKEN:%q\n", y.buf)
-interface               fmt.Printf("TOKEN:%q\n", y.buf)
-trait                   fmt.Printf("TOKEN:%q\n", y.buf)
-extends                 fmt.Printf("TOKEN:%q\n", y.buf)
-implements              fmt.Printf("TOKEN:%q\n", y.buf)
 
 new                     fmt.Printf("TOKEN:%q\n", y.buf)
 clone                   fmt.Printf("TOKEN:%q\n", y.buf)
@@ -128,25 +120,8 @@ include_once            fmt.Printf("TOKEN:%q\n", y.buf)
 require                 fmt.Printf("TOKEN:%q\n", y.buf)
 require_once            fmt.Printf("TOKEN:%q\n", y.buf)
 
-namespace               fmt.Printf("TOKEN:%q\n", y.buf)
-use                     fmt.Printf("TOKEN:%q\n", y.buf)
-
-insteadof               fmt.Printf("TOKEN:%q\n", y.buf)
-global                  fmt.Printf("TOKEN:%q\n", y.buf)
 isset                   fmt.Printf("TOKEN:%q\n", y.buf)
 empty                   fmt.Printf("TOKEN:%q\n", y.buf)
-__halt_compiler         fmt.Printf("TOKEN:%q\n", y.buf)
-static                  fmt.Printf("TOKEN:%q\n", y.buf)
-abstract                fmt.Printf("TOKEN:%q\n", y.buf)
-final                   fmt.Printf("TOKEN:%q\n", y.buf)
-private                 fmt.Printf("TOKEN:%q\n", y.buf)
-protected               fmt.Printf("TOKEN:%q\n", y.buf)
-public                  fmt.Printf("TOKEN:%q\n", y.buf)
-unset                   fmt.Printf("TOKEN:%q\n", y.buf)
-list                    fmt.Printf("TOKEN:%q\n", y.buf)
-array                   fmt.Printf("TOKEN:%q\n", y.buf)
-callable                fmt.Printf("TOKEN:%q\n", y.buf)
-
 
 \+\+                    fmt.Printf("TOKEN:%q\n", y.buf)
 \-\-                    fmt.Printf("TOKEN:%q\n", y.buf)
@@ -183,14 +158,35 @@ XOR                     fmt.Printf("TOKEN:%q\n", y.buf)
 {                       fmt.Printf("TOKEN:%q\n", y.buf)
 \${                     fmt.Printf("TOKEN:%q\n", y.buf)
 }                       fmt.Printf("TOKEN:%q\n", y.buf)
-{LABEL}[[}]             fmt.Printf("TOKEN-LABEL2:%q\n", y.buf)
 
 
 
 {BNUM}                  fmt.Printf("TOKEN-BNUM:%q\n", y.buf)
-{LNUM}                  fmt.Printf("TOKEN-LNUM:%q\n", y.buf)
+                        if lval.value, err = strconv.ParseFloat(string(y.buf), 64); err != nil {
+                            log.Fatal(err)
+                        }
+                        return T_LNUMBER
+
+{LNUM}                  
+                        if lval.value, err = strconv.ParseFloat(string(y.buf), 64); err != nil {
+                            log.Fatal(err)
+                        }
+                        return T_LNUMBER
+
 {HNUM}                  fmt.Printf("TOKEN-HNUM:%q\n", y.buf)
-{DNUM}|{EXPONENT_DNUM}  fmt.Printf("TOKEN-HNUM:%q\n", y.buf)
+                        if lval.value, err = strconv.ParseFloat(string(y.buf), 64); err != nil {
+                            log.Fatal(err)
+                        }
+                        return T_LNUMBER
+
+{DNUM}|{EXPONENT_DNUM}  fmt.Printf("TOKEN-KHNUM:%q\n", y.buf)
+                        
+                        if lval.value, err = strconv.ParseFloat(string(y.buf), 64); err != nil {
+                            log.Fatal(err)
+                        }
+
+                        fmt.Printf("lval:%q\n",lval.value)
+                        return T_DNUMBER
 
 __CLASS__               fmt.Printf("TOKEN:%q\n", y.buf)
 __TRAIT__               fmt.Printf("TOKEN:%q\n", y.buf)
@@ -202,32 +198,27 @@ __DIR__                 fmt.Printf("TOKEN:%q\n", y.buf)
 __NAMESPACE__           fmt.Printf("TOKEN:%q\n", y.buf)
 
 
-
-
 ->                      fmt.Printf("TOKEN:%q\n", y.buf)
 =>                      fmt.Printf("TOKEN:%q\n", y.buf)
 
-\${LABEL}\-\>[a-zA-Z_\x80-\xff]      
+\${LABEL}\-\>[a-zA-Z_\x80-\xff]   
                         fmt.Printf("TOKEN:%q\n", y.buf)
 \${LABEL}\[             fmt.Printf("TOKEN:%q\n", y.buf)
 \${LABEL}               fmt.Printf("TOKEN:%q\n", y.buf)
 {LABEL}                 fmt.Printf("TOKEN:%q\n", y.buf)
 
-{TOKENS}|[{}"`]         fmt.Printf("TOKEN:%q\n", y.buf)
 
 \#|\/\/          
                         for {
                             c = y.getc()
                             switch c {
                                 case '\n':
-                                    y.token = T_COMMENT
-                                    //fmt.Printf("TOKEN:%q,pos:%d\n", y.buf,y.current)
-                                    goto label_loop
+                                
+                                    return T_COMMENT
                                 default:
                                     continue
                             }
                         }
-                        label_loop:
 
 (\/\*|\/\*\*){WHITESPACE}
 
@@ -243,26 +234,6 @@ __NAMESPACE__           fmt.Printf("TOKEN:%q\n", y.buf)
                             }
                         }
 
-::                      fmt.Printf("TOKEN:%q\n", y.buf)
-\\                      fmt.Printf("TOKEN:%q\n", y.buf)
-\.\.\.                  fmt.Printf("TOKEN:%q\n", y.buf)
-\?\?                    fmt.Printf("TOKEN:%q\n", y.buf)
-
-({TABS_AND_SPACES}(int|integer){TABS_AND_SPACES})
-                        fmt.Printf("TOKEN:%q\n", y.buf)
-({TABS_AND_SPACES}(real|double|float){TABS_AND_SPACES})
-                        fmt.Printf("TOKEN:%q\n", y.buf)
-({TABS_AND_SPACES}(string|binary){TABS_AND_SPACES})
-                        fmt.Printf("TOKEN:%q\n", y.buf)
-({TABS_AND_SPACES}(array){TABS_AND_SPACES})
-                        fmt.Printf("TOKEN:%q\n", y.buf)
-({TABS_AND_SPACES}(object){TABS_AND_SPACES})
-                        fmt.Printf("TOKEN:%q\n", y.buf)
-({TABS_AND_SPACES}(bool|boolean){TABS_AND_SPACES})
-                        fmt.Printf("TOKEN:%q\n", y.buf)
-({TABS_AND_SPACES}(unset){TABS_AND_SPACES})
-                        fmt.Printf("TOKEN:%q\n", y.buf)
-
 \<\?\=                  fmt.Printf("TOKEN:%q\n", y.buf)
 \<\?php                 fmt.Printf("TOKEN:%q\n", y.buf)
 \?>                     fmt.Printf("TOKEN:%q\n", y.buf)
@@ -270,11 +241,13 @@ __NAMESPACE__           fmt.Printf("TOKEN:%q\n", y.buf)
 [ \n\r\t\\\'\#]         fmt.Printf("TOKEN:%q\n", y.buf)
 
 .                       fmt.Printf("char:%q\n", y.buf)
-\0                      fmt.Printf("end\n")
-                        y.token = END
+\0                      
+                        if lval.value, err = strconv.ParseFloat(string("2.12"), 64); err != nil {
+                            log.Fatal(err)
+                        }
                         return 0
 
 %%
     y.empty = true
-    return int(y.token)
+    return int(c)
 }
