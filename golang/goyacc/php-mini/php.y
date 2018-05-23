@@ -40,13 +40,15 @@ import (
 %left   '*' '/' '%'
 
 
-%type  <value> T_DNUMBER  expr
+%type  <value>  T_DNUMBER expr
 
 %% /* Rules */
 
 start:
     top_statement_list
 ;
+
+
 
 top_statement_list:
     expr

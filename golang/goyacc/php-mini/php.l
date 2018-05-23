@@ -185,7 +185,7 @@ XOR                     fmt.Printf("TOKEN:%q\n", y.buf)
                             log.Fatal(err)
                         }
 
-                        fmt.Printf("lval:%q\n",lval.value)
+                        //fmt.Printf("lval:%q\n",lval.value)
                         return T_DNUMBER
 
 __CLASS__               fmt.Printf("TOKEN:%q\n", y.buf)
