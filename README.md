@@ -46,6 +46,11 @@ View -> Show Console（或者使用快捷键 command + ` ）
 https://packagecontrol.io/installation
 ```
 
+## 删除@权限
+```
+xattr -c *
+```
+
 
 ### 常用跟踪调试
 ```
