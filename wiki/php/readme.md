@@ -191,6 +191,9 @@ wget http://cn2.php.net/distributions/php-7.1.10.tar.gz
 
 ```
 
+
+## /usr/lib/systemd/system
+
 # nginx
 
 ```
@@ -209,7 +212,6 @@ tar -zxvf nginx-1.15.2.tar.gz
 --prefix=/usr/local/nginx \
 --with-http_stub_status_module \
 --with-http_ssl_module
-
 
 ```
 
