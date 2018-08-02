@@ -197,6 +197,9 @@ wget http://cn2.php.net/distributions/php-7.1.10.tar.gz
 yum -y install pcre-devel openssl openssl-devel
 wget http://nginx.org/download/nginx-1.10.3.tar.gz
 wget http://nginx.org/download/nginx-1.13.5.tar.gz
+wget http://nginx.org/download/nginx-1.15.2.tar.gz
+
+tar -zxvf nginx-1.15.2.tar.gz
 
 ./configure \
 --prefix=/usr/local/nginx
