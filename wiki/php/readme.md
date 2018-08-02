@@ -67,6 +67,10 @@ cd /etc/yum.repos.d/
 rm -rf *
 wget -O /etc/yum.repos.d/rhel-source.repo http://mirrors.aliyun.com/repo/Centos-6.repo
 sed -i 's/$releasever/6/g' rhel-source.repo
+
+sed -i 's/$releasever/7/g' CentOS-Base.repo
+yum clean all
+yum makecache
 ```
 
 #安装java1.8
