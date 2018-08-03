@@ -51,6 +51,10 @@ https://packagecontrol.io/installation
 xattr -c *
 ```
 
+## 设置服务器时区
+```
+echo "TZ='Asia/Beijing'; export TZ" >> /etc/profile; source /etc/profile
+```
 
 ### 常用跟踪调试
 ```
