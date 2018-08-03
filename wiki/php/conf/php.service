@@ -1,0 +1,10 @@
+[Unit]
+Description=php
+After=network.target
+[Service]
+Type=forking
+ExecStart=/usr/local/php/sbin/php-fpm
+ExecStop=/bin/pkill -9 php-fpm
+PrivateTmp=true
+[Install]
+WantedBy=multi-user.target

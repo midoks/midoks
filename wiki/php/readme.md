@@ -67,6 +67,10 @@ cd /etc/yum.repos.d/
 rm -rf *
 wget -O /etc/yum.repos.d/rhel-source.repo http://mirrors.aliyun.com/repo/Centos-6.repo
 sed -i 's/$releasever/6/g' rhel-source.repo
+
+sed -i 's/$releasever/7/g' CentOS-Base.repo
+yum clean all
+yum makecache
 ```
 
 #安装java1.8
@@ -187,12 +191,18 @@ wget http://cn2.php.net/distributions/php-7.1.10.tar.gz
 
 ```
 
+
+## /usr/lib/systemd/system
+
 # nginx
 
 ```
 yum -y install pcre-devel openssl openssl-devel
 wget http://nginx.org/download/nginx-1.10.3.tar.gz
 wget http://nginx.org/download/nginx-1.13.5.tar.gz
+wget http://nginx.org/download/nginx-1.15.2.tar.gz
+
+tar -zxvf nginx-1.15.2.tar.gz
 
 ./configure \
 --prefix=/usr/local/nginx
@@ -202,7 +212,6 @@ wget http://nginx.org/download/nginx-1.13.5.tar.gz
 --prefix=/usr/local/nginx \
 --with-http_stub_status_module \
 --with-http_ssl_module
-
 
 ```
 

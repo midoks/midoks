@@ -22,10 +22,6 @@ $ jekyll serve --detach
 $ jekyll serve --watch
 # => 和`jekyll serve`相同，但是会查看变更并且自动再生成。
 
-<<<<<<< Updated upstream
 $增量更新
 jekyll serve --watch --incremental
-=======
-$ jekyll serve --incremental
->>>>>>> Stashed changes
 ```
