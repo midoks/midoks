@@ -45,6 +45,11 @@ View -> Show Console（或者使用快捷键 command + ` ）
 
 https://packagecontrol.io/installation
 ```
+### php语法检车
+
+```
+find ./app/ -name "*.php" | xargs -n 1 /usr/local/product/php-5.5.18/bin/php -l
+```
 
 ## 删除@权限
 ```
