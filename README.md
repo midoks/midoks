@@ -51,7 +51,7 @@ https://packagecontrol.io/installation
 find ./app/ -name "*.php" | xargs -n 1 /usr/local/product/php-5.5.18/bin/php -l
 ```
 
-## 删除@权限
+## mac删除@权限
 ```
 xattr -c *
 ```
@@ -63,6 +63,9 @@ echo "TZ='Asia/Beijing'; export TZ" >> /etc/profile; source /etc/profile
 
 ### 常用跟踪调试
 ```
+
+find /data -type f -size +100M  -print0 | xargs -0 du -h | sort -nr
+
 #*uix
 top -p `pidof php-fpm | sed 's/[[:space:]]/,/g'`
 #mac
