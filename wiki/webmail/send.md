@@ -84,6 +84,7 @@ DATA
 From:midoks@test.com
 To:<midoks@163.com>
 Subject:test
+
 test
 .
 QUIT250 Mail OK queued as mx3,NcCowACXgEvdnYNbYbVoOg--.25780S3 1535352352
