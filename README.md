@@ -15,6 +15,13 @@ http://dpdk.org/download
 
 ```
 
+##vpn
+```
+wget --no-check-certificate https://raw.githubusercontent.com/teddysun/across/master/l2tp.sh
+chmod +x l2tp.sh
+./l2tp.sh
+```
+
 ### 常用
 ```
 sublime 分屏 切换快捷键
