@@ -91,7 +91,7 @@ strace $(pidof "${1}" | sed 's/\([0-9]*\)/-p \1/g')
 
 function straceallr {
 echo "strace $(ps -ef|grep ${1} | grep -v grep | awk '{print $2}' |sed 's/\([0-9]*\)/-p \1/g'| tr '\n' ' ')"
-strace $(ps -ef|grep ${1} | grep -v grep | awk '{print $2}' |sed 's/\([0-9]*\)/-p \1/g' tr '\n' ' ')
+strace $(ps -ef|grep ${1} | grep -v grep | awk '{print $2}' |sed 's/\([0-9]*\)/-p \1/g' | tr "\n" " ")
 }
 
 
