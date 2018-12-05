@@ -23,6 +23,10 @@ chmod +x l2tp.sh
 ```
 
 ### 常用
+
+- sudo spctl --master-disable
+这条命令作用就是使得mac运行安装任何来源App,不然的话，安装破解的cornerstone会显示文件损坏
+
 ```
 sublime 分屏 切换快捷键
 - ctrl+shift+2,3,4,5
@@ -93,6 +97,13 @@ function straceallr {
 echo "strace $(ps -ef|grep ${1} | grep -v grep | awk '{print $2}' |sed 's/\([0-9]*\)/-p \1/g'| tr '\n' ' ')"
 strace $(ps -ef|grep ${1} | grep -v grep | awk '{print $2}' |sed 's/\([0-9]*\)/-p \1/g' | tr "\n" " ")
 }
+
+strace -T -e clone $(ps -ef|grep gearmand | grep -v grep | awk '{print $2}' |sed 's/\([0-9]*\)/-p \1/g' | tr "\n" " ")
+
+strace -eclone $(ps -ef|grep gearmand | grep -v grep | awk '{print $2}' |sed 's/\([0-9]*\)/-p \1/g' | tr "\n" " ")
+
+
+strace -c $(ps -ef|grep gearmand | grep -v grep | awk '{print $2}' |sed 's/\([0-9]*\)/-p \1/g' | tr "\n" " ")
 
 
  
