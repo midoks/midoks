@@ -65,6 +65,7 @@ find ./app/ -name "*.php" | xargs -n 1 /usr/local/product/php-5.5.18/bin/php -l
 ## mac删除@权限
 ```
 xattr -c *
+find . -type d -name ".svn"|xargs rm -rf
 ```
 
 ## 设置服务器时区
