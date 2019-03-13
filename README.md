@@ -73,6 +73,13 @@ find . -type d -name ".svn"|xargs rm -rf
 echo "TZ='Asia/Beijing'; export TZ" >> /etc/profile; source /etc/profile
 ```
 
+## 磁盘格式化
+```
+mkfs.ext4 /dev/sdb
+mount -t ext4 /dev/sdb /home
+```
+
+
 ### 常用跟踪调试
 ```
 
