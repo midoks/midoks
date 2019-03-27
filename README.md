@@ -62,6 +62,11 @@ https://packagecontrol.io/installation
 find ./app/ -name "*.php" | xargs -n 1 /usr/local/product/php-5.5.18/bin/php -l
 ```
 
+### 杀死僵尸进程
+```
+ps -A -o stat,ppid,pid,cmd | grep -e '^[Zz]' | awk '{print $2}' | xargs kill -9
+```
+
 ## mac删除@权限
 ```
 xattr -c *
