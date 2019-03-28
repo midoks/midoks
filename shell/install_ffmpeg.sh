@@ -75,8 +75,6 @@ else
 fi
 
 
-
-
 cd ~/ffmpeg_sources
 curl -O -L https://archive.mozilla.org/pub/opus/opus-1.3.tar.gz
 tar xzvf opus-1.3.tar.gz
