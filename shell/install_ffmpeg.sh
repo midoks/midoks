@@ -1,21 +1,37 @@
 #!/bin/bash
 
-cd ~/ffmpeg_sources
-curl -O -L https://www.nasm.us/pub/nasm/releasebuilds/2.14.02/nasm-2.14.02.tar.bz2
-tar xjvf nasm-2.14.02.tar.bz2
-cd nasm-2.14.02
-./autogen.sh
-./configure --prefix="$HOME/ffmpeg_build" --bindir="$HOME/bin"
-make
-make install
 
-cd ~/ffmpeg_sources
-curl -O -L http://www.tortall.net/projects/yasm/releases/yasm-1.3.0.tar.gz
-tar xzvf yasm-1.3.0.tar.gz
-cd yasm-1.3.0
-./configure --prefix="$HOME/ffmpeg_build" --bindir="$HOME/bin"
-make
-make install
+which "nasm" > /dev/null
+if [ $? -eq 0 ]
+then
+    echo 'nasm is exist'
+else
+    cd ~/ffmpeg_sources
+    curl -O -L https://www.nasm.us/pub/nasm/releasebuilds/2.14.02/nasm-2.14.02.tar.bz2
+    tar xjvf nasm-2.14.02.tar.bz2
+    cd nasm-2.14.02
+    ./autogen.sh
+    ./configure --prefix="$HOME/ffmpeg_build" --bindir="$HOME/bin"
+    make
+    make install
+fi
+
+
+which "yasm" > /dev/null
+if [ $? -eq 0 ]
+then
+    echo 'yasm is exist'
+else
+    cd ~/ffmpeg_sources
+    curl -O -L http://www.tortall.net/projects/yasm/releases/yasm-1.3.0.tar.gz
+    tar xzvf yasm-1.3.0.tar.gz
+    cd yasm-1.3.0
+    ./configure --prefix="$HOME/ffmpeg_build" --bindir="$HOME/bin"
+    make
+    make install
+fi
+
+
 
 
 cd ~/ffmpeg_sources
