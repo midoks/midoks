@@ -60,14 +60,21 @@ make
 make install
 
 
+which "lame" > /dev/null
+if [ $? -eq 0 ]
+then
+    echo 'lame is exist'
+else
+    cd ~/ffmpeg_sources
+    curl -O -L https://downloads.sourceforge.net/project/lame/lame/3.100/lame-3.100.tar.gz
+    tar xzvf lame-3.100.tar.gz
+    cd lame-3.100
+    ./configure --prefix="$HOME/ffmpeg_build" --bindir="$HOME/bin" --disable-shared --enable-nasm
+    make
+    make install
+fi
 
-cd ~/ffmpeg_sources
-curl -O -L https://downloads.sourceforge.net/project/lame/lame/3.100/lame-3.100.tar.gz
-tar xzvf lame-3.100.tar.gz
-cd lame-3.100
-./configure --prefix="$HOME/ffmpeg_build" --bindir="$HOME/bin" --disable-shared --enable-nasm
-make
-make install
+
 
 
 cd ~/ffmpeg_sources
