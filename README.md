@@ -84,6 +84,11 @@ mkfs.ext4 /dev/sdb
 mount -t ext4 /dev/sdb /home
 ```
 
+## vps [openvz|kvm]
+```
+yum -y install virt-what && virt-what
+```
+
 
 ### 常用跟踪调试
 ```
