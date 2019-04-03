@@ -67,6 +67,11 @@ find ./app/ -name "*.php" | xargs -n 1 /usr/local/product/php-5.5.18/bin/php -l
 ps -A -o stat,ppid,pid,cmd | grep -e '^[Zz]' | awk '{print $2}' | xargs kill -9
 ```
 
+### PHPINFO
+```
+php -r "phpinfo();"
+```
+
 ## mac删除@权限
 ```
 xattr -c *
