@@ -78,6 +78,11 @@ xattr -c *
 find . -type d -name ".svn"|xargs rm -rf
 ```
 
+## mac删除.DS_Store
+```
+find . -name .DS_Store -print0 | xargs -0 git rm -f --ignore-unmatch
+```
+
 ## 设置服务器时区
 ```
 echo "TZ='Asia/Beijing'; export TZ" >> /etc/profile; source /etc/profile
