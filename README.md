@@ -22,6 +22,13 @@ chmod +x l2tp.sh
 ./l2tp.sh
 ```
 
+##bbr
+```
+wget --no-check-certificate https://github.com/teddysun/across/raw/master/bbr.sh
+chmod +x bbr.sh
+./bbr.sh
+```
+
 ### 常用
 
 - sudo spctl --master-disable
