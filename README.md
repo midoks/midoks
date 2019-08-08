@@ -156,6 +156,11 @@ sed '/^ *#/d' **.conf > *.bak.conf
 
 ```
 
+# 查询进程使用的文件
+```
+lsof -n -P | grep PID
+```
+
 ### iptables
 ```
 iptables -A INPUT -p tcp -s 218.247.181.51 -j ACCEPT
