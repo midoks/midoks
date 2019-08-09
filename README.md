@@ -133,6 +133,12 @@ echo "strace $(ps -ef|grep ${1} | grep -v grep | awk '{print $2}' |sed 's/\([0-9
 strace $(ps -ef|grep ${1} | grep -v grep | awk '{print $2}' |sed 's/\([0-9]*\)/-p \1/g' | tr "\n" " ")
 }
 
+mac 
+function straceallr {
+echo "sudo struss $(ps -ef|grep ${1} | grep -v grep | awk '{print $2}' |sed 's/\([0-9]*\)/-p \1/g'| tr '\n' ' ')"
+sudo struss $(ps -ef|grep ${1} | grep -v grep | awk '{print $2}' |sed 's/\([0-9]*\)/-p \1/g' | tr "\n" " ")
+}
+
 strace -T -e clone $(ps -ef|grep gearmand | grep -v grep | awk '{print $2}' |sed 's/\([0-9]*\)/-p \1/g' | tr "\n" " ")
 
 strace -eclone $(ps -ef|grep gearmand | grep -v grep | awk '{print $2}' |sed 's/\([0-9]*\)/-p \1/g' | tr "\n" " ")
