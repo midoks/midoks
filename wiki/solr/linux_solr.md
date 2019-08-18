@@ -12,19 +12,15 @@ http://blog.csdn.net/zoubf/article/details/51505940
 - wget http://apache.opencas.org/tomcat/tomcat-8/v8.0.33/bin/apache-tomcat-8.0.33.tar.gz
 
 
-- linux需要下载solr-*.tgz ,(window)zip文件才有效
-http://archive.apache.org/dist/lucene/solr/6.0.0/solr-6.0.0.zip
-
+# linux需要下载solr-*.tgz ,(window)zip文件才有效
+- http://archive.apache.org/dist/lucene/solr/6.0.0/solr-6.0.0.zip
 安装solr(官方说明)
-https://cwiki.apache.org/confluence/display/solr/Installing+Solr
-
+- https://cwiki.apache.org/confluence/display/solr/Installing+Solr
 ##java mysql 驱动
-https://dev.mysql.com/downloads/connector/j/
-
-### 
+- https://dev.mysql.com/downloads/connector/j/
+#
 
 mv java* /usr/local/java
-
 
 ## mmseg4j
 ```
@@ -61,6 +57,7 @@ PATH=$JAVA_HOME/bin:$PATH
 export JAVA_HOME PATH
 ```
 写入:
+```
 /etc/profile.d/jdk.sh
 执行,生效
 ./etc/profile.d/jdk.sh 
@@ -68,10 +65,7 @@ export JAVA_HOME PATH
 tar zxvf tomcat-*.tar.gz 
 && mv tomcat /usr/local/tomcat 
 && /usr/local/tomcat/bin/startup.sh
-
-
-
-
+```
 
 $ bin/solr start
 $ bin/solr start -f
