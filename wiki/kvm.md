@@ -8,6 +8,6 @@ virt-manager -c test:///default
 ```
 
 ```
-virt-manager -c 'qemu+ssh://user@libvirthost/system?socket=/var/run/libvirt/libvirt-sock'
-virt-viewer -c 'qemu+ssh://user@libvirthost/system?socket=/var/run/libvirt/libvirt-sock'
+virt-manager -c 'qemu+ssh://root@192.168.6.10/system?socket=/var/run/libvirt/libvirt-sock'
+virt-viewer -c 'qemu+ssh://root@192.168.6.10/system?socket=/var/run/libvirt/libvirt-sock'
 ```
