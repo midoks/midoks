@@ -55,7 +55,7 @@ void print_bin(int n)
 
 int main(){
 	printf("%s\n", "test");
-	uchar a1 = 0x0FF;
+	uchar a1 = 0x0F;
 	uchar *a = &a1;
 
 	printf("a1:%hhu\n", a1);
