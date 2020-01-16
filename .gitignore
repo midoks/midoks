@@ -21,3 +21,7 @@
 *.exe
 *.out
 *.app
+c/cmake_t/CMakeFiles/*
+c/cmake_t/cmake_install.cmake
+c/cmake_t/CMakeCache.txt
+c/cmake_t/Makefile
