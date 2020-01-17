@@ -29,6 +29,8 @@ static inline uint16 uint2korr(const uchar *A)
               ((uint16) (A[1]) << 8))
     ;
 }
+
+
 void print_bin(int n)
 {
     int l = sizeof(n)*8;//总位数。
