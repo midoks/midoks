@@ -57,11 +57,17 @@ void print_bin(int n)
 
 int main(){
 	printf("%s\n", "test");
-	uchar a1 = 0x0F;
-	uchar *a = &a1;
 
-	printf("a1:%hhu\n", a1);
-	printf("a1[int]:%d\n", (int)a1);
+  uchar *a1 = NULL;
+  a1 = malloc(sizeof(uchar)*1);
+  *a1 = 0x1;
+
+	uchar *a = a1;
+
+
+
+	printf("a1:%s\n", a1);
+	printf("a1[int]:%s\n", a1);
 	print_bin((int)a1);
 
 	printf("\n");
@@ -74,4 +80,6 @@ int main(){
 	printf("a[order uint2korr]:%hu\n", b);
 	print_bin((int)b);
 	printf("\n");
+
+  free(a1);
 }

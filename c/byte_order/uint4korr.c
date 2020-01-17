@@ -66,14 +66,17 @@ void print_bin(int n)
 
 int main(){
 	printf("%s\n", "test uint4korr");
-	uchar a1 = 0xF;
-	uchar *a = &a1;
+
+  uchar *p = NULL;
+  p = malloc(sizeof(uchar)*1);
+  *p = 'a';
+
+	uchar *a = p;
 
   printf("a point len:%ld\n", sizeof(&a));
 
-	printf("a1:%u\n", a1);
-	printf("a1[int]:%d\n", (uint32)a1);
-	print_bin((uint32)a1);
+	printf("p:%s\n", p);
+	print_bin((uint32)p);
 
 	printf("\n");
 	printf("a:%u\n", *a);
@@ -82,7 +85,21 @@ int main(){
 
 
 	uint32 b = uint4korr(a);
-	printf("a[order uint4korr]:%u\n", b);
+	printf("a[order uint4korr b1]:%u\n", b);
 	print_bin((uint32)b);
 	printf("\n");
+
+  printf("---------- seg -----------\n");
+
+  printf("\n");
+
+  print_bin((uint32)(a+2));
+  printf("\n");
+
+  uint32 b2 = uint4korr(a+2);
+  printf("a[order uint4korr b2]:%u\n", b2);
+  print_bin((uint32)b2);
+  printf("\n");
+
+  free(p);
 }
