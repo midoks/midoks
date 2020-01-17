@@ -66,7 +66,7 @@ void print_bin(int n)
 
 int main(){
 	printf("%s\n", "test uint4korr");
-	uchar a1 = 0xFF;
+	uchar a1 = 0xF;
 	uchar *a = &a1;
 
   printf("a point len:%ld\n", sizeof(&a));
@@ -81,8 +81,8 @@ int main(){
 	printf("\n");
 
 
-	uint16 b = uint4korr(a);
-	printf("a[order uint4korr]:%hu\n", b);
+	uint32 b = uint4korr(a);
+	printf("a[order uint4korr]:%u\n", b);
 	print_bin((uint32)b);
 	printf("\n");
 }
