@@ -93,10 +93,10 @@ int main(){
 
   printf("\n");
 
-  print_bin((uint32)(a+2));
+  print_bin((uint32)(a-1));
   printf("\n");
 
-  uint32 b2 = uint4korr(a+2);
+  uint32 b2 = uint4korr(a-1);
   printf("a[order uint4korr b2]:%u\n", b2);
   print_bin((uint32)b2);
   printf("\n");
