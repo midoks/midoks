@@ -79,6 +79,11 @@ ps -A -o stat,ppid,pid,cmd | grep -e '^[Zz]' | awk '{print $2}' | xargs kill -9
 php -r "phpinfo();"
 ```
 
+### iftop流量查看
+```
+iftop -i eth2 -n  -P
+```
+
 ## mac删除@权限
 ```
 xattr -c *
