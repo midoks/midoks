@@ -29,6 +29,12 @@ chmod +x bbr.sh
 ./bbr.sh
 ```
 
+##ssh代理
+```
+ssh -D 8081 root@ip
+socket 127.0.0.1 8081
+```
+
 ### 常用
 
 - sudo spctl --master-disable
