@@ -68,6 +68,8 @@ vim 分屏 切换快捷键
 View -> Show Console（或者使用快捷键 command + ` ）
 
 https://packagecontrol.io/installation
+
+composer install --ignore-platform-reqs
 ```
 ### php语法检车
 
