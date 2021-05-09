@@ -188,3 +188,12 @@ iptables -A INPUT -p tcp -s 218.247.181.51 -j ACCEPT
 iptables -D INPUT 2 
 
 ```
+
+##
+```
+wget http://people.redhat.com/~rjones/virt-what/files/virt-what-1.15.tar.gz
+tar zxf virt-what-1.15.tar.gz
+cd virt-what-1.15/
+./configure && make && make install
+virt-what
+```
