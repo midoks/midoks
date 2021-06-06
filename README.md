@@ -197,3 +197,11 @@ cd virt-what-1.15/
 ./configure && make && make install
 virt-what
 ```
+
+## golang
+```
+export GOROOT=/usr/lib/golang
+export GOPATH=/usr/local/go
+export PATH=$PATH:$GOROOT/bin:$GOPATH/bin
+export GO111MODULE=on
+```

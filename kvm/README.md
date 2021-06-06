@@ -24,7 +24,7 @@ virt-install \
 --name=kvm-1 \
 --vcpus=1 \
 --memory=1024 \
---location=/data/iso/CentOS-7-x86_64-Minimal-2009.iso \
+--location=/data/iso/CentOS-7-x86_64-Minimal-1611.iso \
 --disk path=/data/vm/kvm-1.qcow2,size=10,format=qcow2 \
 --network bridge=virbr0 \
 --graphics none \
