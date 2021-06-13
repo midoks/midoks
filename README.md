@@ -3,7 +3,7 @@
 Record my code snippet
 
 ### 我的相关地址
-- [我的博客](http://midoks.cachecha.com)
+- [我的博客](http://www.cachecha.com)
 - [我的微博](http://weibo.com/u/1504761980)
 
 
