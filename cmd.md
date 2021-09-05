@@ -175,6 +175,14 @@ sed '/^ *#/d' **.conf > *.bak.conf
 
 ```
 
+# 跟踪端口通信数据
+```
+#然后可以指定端口 或者 正则表达式
+ngrep port 80
+ngrep -q '^GET .* HTTP/1.[01]'
+```
+
+
 # 查询进程使用的文件
 ```
 lsof -n -P | grep PID
