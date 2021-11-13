@@ -206,6 +206,13 @@ cd virt-what-1.15/
 virt-what
 ```
 
+## MAC优化
+```
+当管理员要维护一些数据的时候可以暂时停止Spotlight服务程序，这样他不会干扰你的备份数据工作。
+停止: sudo mdutil -i off / #停止Volume／上的Spotlight索引服务
+运行: sudo mdutil -i on / #启动Volume／上的Spotlight索引服务
+```
+
 ## golang
 ```
 export GOROOT=/usr/lib/golang
