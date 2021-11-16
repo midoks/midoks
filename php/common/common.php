@@ -425,5 +425,27 @@ function getDistance($from, $to, $km = true, $decimal=2){
 }
 
 
+/**
+ * 查找前缀
+ **/
+function find_prefix($str, $find) {
+    $ss = strlen($str);
+    $ff = strlen($find);
+
+    if ($ss != $ff){
+        return false
+    }
+
+    if ($ss < $ff){
+        return false
+    }
+
+    $prefix = substr($str, 0, $ff);
+    if ($prefix == $find){
+        return true;
+    }
+    return false
+}
+
 
 ?>
