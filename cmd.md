@@ -35,6 +35,10 @@ ssh -D 8081 root@ip
 socket 127.0.0.1 8081
 ```
 
+```
+echo  "Host *\n\tServerAliveInterval 60" > ~/.ssh/config
+```
+
 ### 常用
 
 - sudo spctl --master-disable
