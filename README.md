@@ -2,6 +2,11 @@
 
 Record my code snippet
 
+![visitors](https://visitor-badge.glitch.me/badge?page_id=midoks&left_color=green&right_color=red)
+
+
+![](https://github-readme-stats.vercel.app/api?username=midoks)
+
 ### 我的相关地址
 - [我的博客](http://www.cachecha.com)
 - [我的微博](http://weibo.com/u/1504761980)
