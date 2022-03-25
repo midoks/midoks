@@ -178,7 +178,7 @@ sudo dtruss $(pidof "${1}" | sed 's/\([0-9]* \)/-p \1/g')
 sed '/^ *#/d' **.conf > *.bak.conf
 
 
-
+## strace python
 strace $(ps -ef|grep python | grep -v grep | grep app | awk '{print $2}' | sed 's/\([0-9]*\)/-p \1/g' |tr "\n" " ")
 ```
 
