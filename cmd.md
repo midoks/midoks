@@ -15,21 +15,31 @@ http://dpdk.org/download
 
 ```
 
-##vpn
+## aria2c
+
+```
+aria2c --enable-rpc --rpc-allow-origin-all -c -D
+```
+
+
+## vpn
+
 ```
 wget --no-check-certificate https://raw.githubusercontent.com/teddysun/across/master/l2tp.sh
 chmod +x l2tp.sh
 ./l2tp.sh
 ```
 
-##bbr
+## bbr
+
 ```
 wget --no-check-certificate https://github.com/teddysun/across/raw/master/bbr.sh
 chmod +x bbr.sh
 ./bbr.sh
 ```
 
-##ssh代理
+## ssh代理
+
 ```
 ssh -D 8081 root@ip
 socket 127.0.0.1 8081
@@ -182,7 +192,7 @@ sed '/^ *#/d' **.conf > *.bak.conf
 strace $(ps -ef|grep python | grep -v grep | grep app | awk '{print $2}' | sed 's/\([0-9]*\)/-p \1/g' |tr "\n" " ")
 ```
 
-# 跟踪端口通信数据
+## 跟踪端口通信数据
 ```
 #然后可以指定端口 或者 正则表达式
 ngrep port 80
@@ -190,7 +200,7 @@ ngrep -q '^GET .* HTTP/1.[01]'
 ```
 
 
-# 查询进程使用的文件
+## 查询进程使用的文件
 ```
 lsof -n -P | grep PID
 ```
