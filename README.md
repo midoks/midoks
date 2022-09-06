@@ -17,4 +17,4 @@ Record my code snippet
 - https://github.com/midoks/midoks/blob/master/cmd.md
 
 
-捐赠地址 USDT（TRC20）：TM1p4FcH3w8MGJ6MWRWd2waMiDXPcSEYVZ
+捐赠地址 USDT（TRC20）：TVbNgrpeGBGZVm5gTLa21ADP7RpnPFhjya
