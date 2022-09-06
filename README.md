@@ -15,3 +15,6 @@ Record my code snippet
 ### 常用命令
 
 - https://github.com/midoks/midoks/blob/master/cmd.md
+
+
+捐赠地址（TRC20）：TM1p4FcH3w8MGJ6MWRWd2waMiDXPcSEYVZ
