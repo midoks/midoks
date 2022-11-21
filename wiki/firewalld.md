@@ -21,6 +21,7 @@
 
 3.配置firewalld-cmd
 
+查看所有规则： firewall-cmd --list-all
 查看版本： firewall-cmd --version
 查看帮助： firewall-cmd --help
 显示状态： firewall-cmd --state
