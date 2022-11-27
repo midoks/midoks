@@ -447,5 +447,21 @@ function find_prefix($str, $find) {
     return false
 }
 
+/**
+ * 生成随机密码
+ **/
+function createRandPassword($intPwLength) {
+    $arrRand    = array_merge(range(0, 9), range('a', 'z'), range('A', 'Z'));
+    $strRandPwd = '';
+    $intArrLen  = count($arrRand);
+    for ($i = 0; $i < $intPwLength; $i++) {
+        $intRand = mt_rand(0, $intArrLen - 1); //mt_rand(min,max)函数返回随机整数
+        $strRandPwd .= $arrRand[$intRand];
+    }
+    $strRandPwd = ucfirst($strRandPwd);
+    return $strRandPwd;
+}
+
+
 
 ?>
