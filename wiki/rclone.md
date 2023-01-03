@@ -6,6 +6,26 @@
 curl https://rclone.org/install.sh | sudo bash
 
 yum install fuse -y
+
+
+
+```
+
+# 验证
+
+- google 验证的时候,需要通过google页面验证。
+- 最好开两个cmd.一个配置，一个接收code,如下。
+
+```
+2023/01/03 08:45:09 NOTICE: Got code
+Paste the following into your remote machine --->
+xxx
+<---End paste
+```
+
+
+```
+ssh -L localhost:53682:localhost:53682 root@xx.xx.xx.xx 
 ```
 
 # 一件安装
@@ -13,5 +33,6 @@ yum install fuse -y
 ```
 curl -fsSL https://raw.githubusercontent.com/midoks/midoks/master/shell/rclone_install.sh | bash
 ```
+
 
 
