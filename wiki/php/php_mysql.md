@@ -68,7 +68,7 @@ update MySQL.user set authentication_string=password('root') where user='root';
 
 
 grant all privileges on *.* to 'yourname'@'%' identified by 'youpasswd';
-grant all privileges on *.* to 'cjs'@'%' identified by 'cjscjs123';
+grant all privileges on *.* to 'midoks'@'%' identified by 'cjscjs123';
 
 
 #查看授权
