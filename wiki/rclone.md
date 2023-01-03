@@ -11,7 +11,7 @@ yum install fuse -y
 # 一件安装
 
 ```
-
+curl -fsSL https://raw.githubusercontent.com/midoks/midoks/master/shell/rclone_install.sh | bash
 ```
 
 
