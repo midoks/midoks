@@ -5,7 +5,7 @@
 
 curl https://rclone.org/install.sh | sudo bash
 
-
+yum install fuse -y
 ```
 
 # 一件安装
