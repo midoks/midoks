@@ -6,9 +6,13 @@
 curl https://rclone.org/install.sh | sudo bash
 
 yum install fuse -y
+apt install fuse -y
 
- 
-rclone mount gdrive: /gdrive --allow-other --allow-non-empty --vfs-cache-mode writes &
+#挂载
+rclone mount gdrive: /gdrive --allow-other --allow-non-empty --vfs-cache-mode writes --daemon
+
+#取消挂载
+fusermount -qzu <本地路径>
 ```
 
 # 验证
