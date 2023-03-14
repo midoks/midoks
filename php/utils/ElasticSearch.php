@@ -17,7 +17,7 @@ class ElasticSearch {
 
     //单利模式
     public static function getInstance() {
-        if (self::$instance) {
+        if (!self::$instance) {
             self::$instance = new self;
         }
         return self::$instance;
