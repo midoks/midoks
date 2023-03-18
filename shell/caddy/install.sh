@@ -8,7 +8,6 @@ if [ ! -f $TMP_FILE ];then
 	wget --no-check-certificate -O $TMP_FILE $CADDY_FILE
 fi
 
-
 cd /tmp
 tar -zxvf caddy_2.6.4_linux_amd64.tar.gz
 
