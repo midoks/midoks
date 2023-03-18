@@ -12,4 +12,8 @@ cd /tmp
 tar -zxvf caddy_2.6.4_linux_amd64.tar.gz
 
 
+# /usr/lib/systemd/system
+# /lib/systemd/system
+
+
 echo "111"

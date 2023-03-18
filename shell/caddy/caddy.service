@@ -1,0 +1,15 @@
+# It's not recommended to modify this file in-place, because it
+# will be overwritten during upgrades.  If you want to customize,
+# the best way is to use the "systemctl edit" command.
+
+[Unit]
+Description=caddy service
+After=network.target
+
+[Service]
+ExecStart=/opt/caddy/caddy file-server --browse --root /www/file-server --listen :9527
+ExecReload=/bin/kill -USR2 $MAINPID
+PrivateTmp=false
+
+[Install]
+WantedBy=multi-user.target
