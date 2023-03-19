@@ -27,6 +27,8 @@ rm -rf $systemd_dir/caddy.service
 wget -O $systemd_dir/caddy.service https://raw.githubusercontent.com/midoks/midoks/master/shell/caddy/caddy.service
 # fi
 
+systemctl daemon-reload
+
 systemctl enable caddy
 service caddy start
 
