@@ -23,6 +23,30 @@ if [ ! -d $SOFT_DIR ];then
 	mkdir -p $SOFT_DIR
 fi
 
+# - mysql start
+MY_DIR=$SOFT_DIR/openresty
+if [ ! -d $MY_DIR ];then
+	mkdir -p $MY_DIR
+fi
+if [ ! -f ${MY_DIR}/mysql-5.5.62.tar.gz ];then
+	wget -O ${MY_DIR}/mysql-5.5.62.tar.gz https://dev.mysql.com/get/Downloads/MySQL-5.5/mysql-5.5.62.tar.gz
+fi
+
+if [ ! -f ${MY_DIR}/mysql-5.6.50.tar.gz ];then
+	wget -O ${MY_DIR}/mysql-5.6.50.tar.gz https://cdn.mysql.com/Downloads/MySQL-5.6/mysql-5.6.50.tar.gz
+fi
+
+if [ ! -f ${MY_DIR}/mysql-boost-5.7.39.tar.gz ];then
+	wget -O ${MY_DIR}/mysql-boost-5.7.39.tar.gz https://cdn.mysql.com/archives/mysql-5.7/mysql-boost-5.7.39.tar.gz
+fi
+
+if [ ! -f ${MY_DIR}/mysql-boost-8.0.30.tar.gz ];then
+	wget -O ${MY_DIR}/mysql-boost-8.0.30.tar.gz https://cdn.mysql.com/archives/mysql-8.0/mysql-boost-8.0.30.tar.gz
+fi
+
+
+# - mysql end
+
 # - openresty start
 OP_DIR=$SOFT_DIR/openresty
 if [ ! -d $OP_DIR ];then
