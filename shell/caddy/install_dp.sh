@@ -17,6 +17,56 @@ if [ ! -f ${LIB_DIR}/rpcsvc-proto-1.4.tar.gz ];then
 	wget -O ${LIB_DIR}/rpcsvc-proto-1.4.tar.gz https://github.com/thkukuk/rpcsvc-proto/releases/download/v1.4/rpcsvc-proto-1.4.tar.gz
 fi
 
+if [ ! -f ${LIB_DIR}/freetype-2.12.1.tar.gz ];then
+	wget -O ${LIB_DIR}/freetype-2.12.1.tar.gz https://download.savannah.gnu.org/releases/freetype/freetype-2.12.1.tar.gz
+fi
+
+if [ ! -f ${LIB_DIR}/freetype-2.7.1.tar.gz ];then
+	wget -O ${LIB_DIR}/freetype-2.7.1.tar.gz https://download.savannah.gnu.org/releases/freetype/freetype-2.7.1.tar.gz
+fi
+
+if [ ! -f ${LIB_DIR}/icu4c-52_2-src.tgz ];then
+	wget -O ${LIB_DIR}/icu4c-52_2-src.tgz https://github.com/unicode-org/icu/releases/download/release-52-2/icu4c-52_2-src.tgz
+fi
+
+if [ ! -f ${LIB_DIR}/libiconv-1.15.tar.gz ];then
+	wget -O ${LIB_DIR}/libiconv-1.15.tar.gz https://github.com/midoks/mdserver-web/releases/download/init/libiconv-1.15.tar.gz
+fi
+
+if [ ! -f ${LIB_DIR}/libmcrypt-2.5.8.tar.gz ];then
+	wget -O ${LIB_DIR}/libmcrypt-2.5.8.tar.gz https://sourceforge.net/projects/mcrypt/files/Libmcrypt/2.5.8/libmcrypt-2.5.8.tar.gz
+fi
+
+if [ ! -f ${LIB_DIR}/libmemcached-1.0.18.tar.gz ];then
+	wget -O ${LIB_DIR}/libmemcached-1.0.18.tar.gz https://launchpad.net/libmemcached/1.0/1.0.18/+download/libmemcached-1.0.18.tar.gz
+fi
+
+if [ ! -f ${LIB_DIR}/libsodium-1.0.18-stable.tar.gz ];then
+	wget -O ${LIB_DIR}/libsodium-1.0.18-stable.tar.gz https://download.libsodium.org/libsodium/releases/libsodium-1.0.18-stable.tar.gz
+fi
+
+if [ ! -f ${LIB_DIR}/libzip-1.3.2.tar.gz ];then
+	wget -O ${LIB_DIR}/libzip-1.3.2.tar.gz https://nih.at/libzip/libzip-1.3.2.tar.gz
+fi
+
+if [ ! -f ${LIB_DIR}/oniguruma-6.9.4.tar.gz ];then
+	wget -O ${LIB_DIR}/oniguruma-6.9.4.tar.gz https://github.com/kkos/oniguruma/archive/v6.9.4.tar.gz
+fi
+
+
+if [ ! -f ${LIB_DIR}/openssl-1.1.1p.tar.gz ];then
+	wget -O ${LIB_DIR}/openssl-1.1.1p.tar.gz https://www.openssl.org/source/openssl-1.1.1p.tar.gz
+fi
+
+
+if [ ! -f ${LIB_DIR}/openssl-1.0.2q.tar.gz ];then
+	wget -O ${LIB_DIR}/openssl-1.0.2q.tar.gz https://github.com/midoks/mdserver-web/releases/download/init/openssl-1.0.2q.tar.gz
+fi
+
+if [ ! -f ${LIB_DIR}/zlib-1.2.11.tar.gz ];then
+	wget -O ${LIB_DIR}/zlib-1.2.11.tar.gz https://github.com/madler/zlib/archive/v1.2.11.tar.gz
+fi
+
 
 # lib end
 
