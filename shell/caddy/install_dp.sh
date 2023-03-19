@@ -2,6 +2,10 @@
 
 # 依赖库安装
 
+get_latest_release() {
+    curl -sL "https://api.github.com/repos/$1/releases/latest" | grep '"tag_name":' | cut -d'"' -f4
+}
+
 ROOT_DIR=/www/file-server
 
 
@@ -122,6 +126,28 @@ fi
 # - openresty end
 
 
+
+# - webstats start
+WB_DIR=$SOFT_DIR/webstats
+
+if [ ! -d $WB_DIR ];then
+	mkdir -p $WB_DIR
+fi
+
+GEO_VERSION=$(get_latest_release "P3TERX/GeoLite.mmdb")
+if [ ! -f ${WB_DIR}/GeoLite2-City.mmdb ];then
+	wget --no-check-certificate -O ${WB_DIR}/GeoLite2-City.mmdb https://github.com/P3TERX/GeoLite.mmdb/releases/download/${GEO_VERSION}/GeoLite2-City.mmdb
+fi
+
+if [ ! -f ${WB_DIR}/lsqlite3_fsl09y.zip ];then
+	wget --no-check-certificate -O ${WB_DIR}/lsqlite3_fsl09y.zip http://lua.sqlite.org/index.cgi/zip/lsqlite3_fsl09y.zip?uuid=fsl_9y
+fi
+
+if [ ! -f ${WB_DIR}/luarocks-3.5.0.tar.gz ];then
+	wget --no-check-certificate -O ${WB_DIR}/luarocks-3.5.0.tar.gz http://luarocks.org/releases/luarocks-3.5.0.tar.gz
+fi
+
+# - webstats end
 
 # soft end
 
