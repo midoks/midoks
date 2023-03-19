@@ -30,7 +30,7 @@ if [ ! -d $SOFT_DIR ];then
 fi
 
 # - mysql start
-MY_DIR=$SOFT_DIR/openresty
+MY_DIR=$SOFT_DIR/mysql
 if [ ! -d $MY_DIR ];then
 	mkdir -p $MY_DIR
 fi
