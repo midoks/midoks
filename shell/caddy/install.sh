@@ -8,6 +8,7 @@ if [ ! -f $TMP_FILE ];then
 fi
 
 mkdir -p /opt/caddy
+mkdir -p /www/file-server
 
 if [ ! -f /opt/caddy/caddy ];then
 
