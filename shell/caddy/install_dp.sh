@@ -12,6 +12,12 @@ if [ ! -d $LIB_DIR ];then
 	mkdir -p $LIB_DIR
 fi
 
+
+if [ ! -f ${LIB_DIR}/rpcsvc-proto-1.4.tar.gz ];then
+	wget -O ${LIB_DIR}/rpcsvc-proto-1.4.tar.gz https://github.com/thkukuk/rpcsvc-proto/releases/download/v1.4/rpcsvc-proto-1.4.tar.gz
+fi
+
+
 # lib end
 
 
