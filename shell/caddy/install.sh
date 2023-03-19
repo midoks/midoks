@@ -27,6 +27,9 @@ rm -rf $systemd_dir/caddy.service
 wget -O $systemd_dir/caddy.service https://raw.githubusercontent.com/midoks/midoks/master/shell/caddy/caddy.service
 # fi
 
+systemctl enable caddy
+service caddy start
+
 rm -rf /tmp/LICENSE
 rm -rf /tmp/README.md
 rm -rf /tmp/caddy_2.6.4_linux_amd64.tar.gz
