@@ -69,6 +69,8 @@ fi
 if [ ! -f ${OP_DIR}/openresty-1.21.4.1.tar.gz ];then
 	wget -O ${OP_DIR}/openresty-1.21.4.1.tar.gz https://openresty.org/download/openresty-1.21.4.1.tar.gz
 fi
+# - openresty end
+
 
 
 # soft end
