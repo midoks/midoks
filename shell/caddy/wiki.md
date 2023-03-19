@@ -9,9 +9,12 @@ curl --insecure -fsSL https://raw.githubusercontent.com/midoks/midoks/master/she
 # 调式
 ```
 caddy file-server --browse --root ~/mysite --listen :2015
-
-
-
 ```
 
 - https://caddyserver.com/docs
+
+
+# 安装依赖
+```
+curl --insecure -fsSL https://raw.githubusercontent.com/midoks/midoks/master/shell/caddy/install_dp.sh | bash
+```
