@@ -7,7 +7,7 @@ Description=caddy service
 After=network.target
 
 [Service]
-ExecStart=/opt/caddy/caddy file-server --browse --root /www/file-server --listen :9527
+ExecStart=/opt/caddy/caddy file-server --browse --root /www/file-server --listen :9528
 ExecReload=/bin/kill -USR2 $MAINPID
 PrivateTmp=false
 
