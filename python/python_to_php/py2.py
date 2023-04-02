@@ -1,3 +1,5 @@
+# coding:utf-8
+
 import os
 
 from cryptography.hazmat.primitives import padding
@@ -73,3 +75,8 @@ class AESCrypto(object):
             raise Exception('无效的加密信息!')
         else:
             return uppadded_data
+
+
+if __name__ == "__main__":
+    r = AESCrypto.encrypt("abcd123")
+    print(r)
