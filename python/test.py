@@ -23,8 +23,9 @@ def calcV1(base, b=10000, p=0.05):
     return base, x
 
 
-# print(calc(7000, 0.05, 100))
+print(calc(2500, 0.05, 2))
 
-print(calcV1(100000, 100, 0.15))
+print(16 * 6.8)
+# print(calcV1(100000, 100, 0.15))
 
 # print(math.pow(2, 10))

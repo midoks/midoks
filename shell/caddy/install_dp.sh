@@ -83,6 +83,17 @@ if [ ! -d $SOFT_DIR ];then
 	mkdir -p $SOFT_DIR
 fi
 
+# - ftp start
+FTP_DIR=$SOFT_DIR/ftp
+if [ ! -d $FTP_DIR ];then
+	mkdir -p $FTP_DIR
+fi
+
+if [ ! -f ${FTP_DIR}/pure-ftpd-1.0.49.tar.gz ];then
+	wget -O ${FTP_DIR}/pure-ftpd-1.0.49.tar.gz https://github.com/jedisct1/pure-ftpd/releases/download/1.0.49/pure-ftpd-1.0.49.tar.gz
+fi
+
+
 # - mysql start
 MY_DIR=$SOFT_DIR/mysql
 if [ ! -d $MY_DIR ];then
