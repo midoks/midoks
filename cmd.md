@@ -108,7 +108,7 @@ iftop -i eth2 -n  -P
 
 ## mac删除@权限
 ```
-xattr -c *
+xattr -cr *
 find . -type d -name ".svn"|xargs rm -rf
 ```
 
@@ -232,6 +232,16 @@ virt-what
 当管理员要维护一些数据的时候可以暂时停止Spotlight服务程序，这样他不会干扰你的备份数据工作。
 停止: sudo mdutil -i off / #停止Volume／上的Spotlight索引服务
 运行: sudo mdutil -i on / #启动Volume／上的Spotlight索引服务
+```
+
+## 临时设置/销毁Git代理
+
+```
+git config --global http.proxy 'socks5://127.0.0.1:1082'
+git config --global https.proxy 'socks5://127.0.0.1:1082'
+
+git config --global --unset http.proxy
+git config --global --unset https.proxy
 ```
 
 ## golang
