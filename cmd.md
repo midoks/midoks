@@ -202,11 +202,22 @@ strace $(ps -ef|grep python | grep -v grep | grep app | awk '{print $2}' | sed '
 ngrep port 80
 ngrep -q '^GET .* HTTP/1.[01]'
 ```
+## 服务流量统计
 
+```
+apt/yum install -y nethogs
+nethogs -d 5
+```
 
 ## 查询进程使用的文件
 ```
 lsof -n -P | grep PID
+```
+
+## 正在使用cpu的进程
+
+```
+ps aux | awk '$3>0{print}'
 ```
 
 ### iptables
