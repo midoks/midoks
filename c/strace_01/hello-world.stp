@@ -1,0 +1,5 @@
+# hello-world.stp
+probe begin {
+  print("hello world\n")
+  exit()
+}
