@@ -1,5 +1,7 @@
 #!/usr/bin/perl
 
+use 5.010;
+
 # perl array_list.pl
 
 
@@ -7,3 +9,5 @@
 
 print "\n";
 print "@grades\n";
+
+say "test";
