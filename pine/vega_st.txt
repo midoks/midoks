@@ -1,0 +1,32 @@
+// This source code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// © TenCloud
+
+//@version=5
+strategy("第一个指标VeGa隧道交易策略",shorttitle = "VeGa隧道交易策略", overlay = true, initial_capital = 1000)
+
+ema144 = ta.ema(close, 144)
+ema169 = ta.ema(close, 169)
+
+ema576 = ta.ema(close, 576)
+ema676 = ta.ema(close, 676)
+l1 = plot(ema144, color=color.green,title = "ema144")
+l2 = plot(ema169, color = color.green, title = "ema169")
+
+l3 = plot(ema576, color=color.red,title = "ema576")
+l4 = plot(ema676, color = color.red, title = "ema676")
+
+
+// buy = ta.crossover(ema10,ema100)
+// sell = ta.crossunder(ema10,ema100)
+
+// if buy
+//     strategy.entry("long1", strategy.long,1, comment="开多单")
+
+// if sell
+//     strategy.close("long1", qty_percent = 100,comment = "平仓多单")
+// plotchar(buy, text = "buy", color=color.green)
+// plotchar(sell, text="sell", color=color.red)
+
+// l_color = ema10>ema100 ? color.green:color.red
+
+// fill(l1,l2,color=color.new(l_color,70))

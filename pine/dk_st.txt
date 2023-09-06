@@ -1,0 +1,31 @@
+// This source code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// © nopainsnogainslf
+
+//@version=5
+indicator("多空排列指标", overlay=true)
+
+ma_60 = ta.ema(close, 60)
+
+ma_5 = ta.ema(close, 5)
+ma_15 = ta.ema(close, 15)
+ma_30 = ta.ema(close, 30)
+
+long_condition_1 = ma_5 > ma_60
+long_condition_2 = ma_15 > ma_60
+long_condition_3 = ma_30 > ma_60
+long_condition = long_condition_1 and long_condition_2 and long_condition_3
+
+short_condition_1 = ma_5 < ma_60
+short_condition_2 = ma_15 < ma_60
+short_condition_3 = ma_30 < ma_60
+short_condition = short_condition_1 and short_condition_2 and short_condition_3
+
+plot(ma_5)
+plot(ma_15)
+plot(ma_30)
+plot(ma_60, color=color.orange, linewidth=3)
+
+
+plotshape(long_condition, title="多头排列", style=shape.circle, location=location.bottom, color=color.green)
+
+plotshape(short_condition, title="空头排列", style=shape.circle, location=location.bottom, color=color.red)
