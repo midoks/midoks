@@ -33,6 +33,11 @@ if [ ! -f ${LIB_DIR}/icu4c-52_2-src.tgz ];then
 	wget -O ${LIB_DIR}/icu4c-52_2-src.tgz https://github.com/unicode-org/icu/releases/download/release-52-2/icu4c-52_2-src.tgz
 fi
 
+if [ ! -f ${LIB_DIR}/icu4c-55_2-src.tgz ];then
+	wget -O ${LIB_DIR}/icu4c-55_2-src.tgz https://github.com/unicode-org/icu/releases/download/release-55-2/icu4c-55_2-src.tgz
+fi
+
+
 if [ ! -f ${LIB_DIR}/libiconv-1.15.tar.gz ];then
 	wget -O ${LIB_DIR}/libiconv-1.15.tar.gz https://github.com/midoks/mdserver-web/releases/download/init/libiconv-1.15.tar.gz
 fi
