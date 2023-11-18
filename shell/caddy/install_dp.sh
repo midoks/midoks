@@ -178,8 +178,8 @@ fi
 
 # - keepalived start
 KP_DIR=$SOFT_DIR/keepalived
-if [ ! -d $WB_DIR ];then
-	mkdir -p $WB_DIR
+if [ ! -d $KP_DIR ];then
+	mkdir -p $KP_DIR
 fi
 
 if [ ! -f ${KP_DIR}/haproxy-2.6.4.tar.gz ];then
