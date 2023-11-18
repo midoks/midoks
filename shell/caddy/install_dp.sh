@@ -175,6 +175,19 @@ fi
 
 # - webstats end
 
+
+# - keepalived start
+KP_DIR=$SOFT_DIR/keepalived
+if [ ! -d $WB_DIR ];then
+	mkdir -p $WB_DIR
+fi
+
+if [ ! -f ${KP_DIR}/haproxy-2.6.4.tar.gz ];then
+	wget --no-check-certificate -O ${KP_DIR}/haproxy-2.6.4.tar.gz https://www.haproxy.org/download/2.6/src/haproxy-2.6.4.tar.gz
+fi
+
+# - webstats end
+
 # soft end
 
 
