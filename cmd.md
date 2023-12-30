@@ -196,6 +196,24 @@ sed '/^ *#/d' **.conf > *.bak.conf
 strace $(ps -ef|grep python | grep -v grep | grep app | awk '{print $2}' | sed 's/\([0-9]*\)/-p \1/g' |tr "\n" " ")
 ```
 
+## php-fpm的高CPU使用率排查方法
+
+```
+grep -v "^$" www.log.slow.tmp | cut -d " " -f 3,2 | sort | uniq -c | sort -k1,1nr | head -n 50
+```
+
+## 查看占用内存最高的5个进程
+
+```
+ps aux | sort -k4nr | head -n 5
+```
+
+## 查看占用cpu最高的5个进程
+
+```
+ps aux | sort -k3nr | head -n 5
+```
+
 ## 跟踪端口通信数据
 ```
 #然后可以指定端口 或者 正则表达式
