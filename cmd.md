@@ -196,11 +196,6 @@ sed '/^ *#/d' **.conf > *.bak.conf
 strace $(ps -ef|grep python | grep -v grep | grep app | awk '{print $2}' | sed 's/\([0-9]*\)/-p \1/g' |tr "\n" " ")
 ```
 
-## php-fpm的高CPU使用率排查方法
-
-```
-grep -v "^$" www.log.slow.tmp | cut -d " " -f 3,2 | sort | uniq -c | sort -k1,1nr | head -n 50
-```
 
 ## 查看占用内存最高的5个进程
 
@@ -225,6 +220,24 @@ ngrep -q '^GET .* HTTP/1.[01]'
 ```
 apt/yum install -y nethogs
 nethogs -d 5
+```
+
+## PHP-FPM
+```
+1、查看php-fpm的进程个数
+ps -ef |grep "php-fpm"|grep "pool"|wc -l
+
+2、查看每个php-fpm占用的内存大小
+ps -ylC php-fpm --sort:rss
+
+3.查看PHP-FPM在你的机器上的平均内存占用
+ps --no-headers -o "rss,cmd" -C php-fpm | awk '{ sum+=$1 } END { printf ("%d%s\n", sum/NR/1024,"M") }'
+
+4.查看单个php-fpm进程消耗内存的明细
+pmap $(pgrep php-fpm) | less
+
+5.php-fpm的高CPU使用率排查方法
+grep -v "^$" www.log.slow.tmp | cut -d " " -f 3,2 | sort | uniq -c | sort -k1,1nr | head -n 50
 ```
 
 ## 查询进程使用的文件
