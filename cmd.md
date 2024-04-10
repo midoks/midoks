@@ -276,6 +276,11 @@ virt-what
 运行: sudo mdutil -i on / #启动Volume／上的Spotlight索引服务
 ```
 
+## MAC修复，文件已经损坏的提示
+```
+sudo xattr -r -d com.apple.quarantine /xx.xx
+```
+
 ## 临时设置/销毁Git代理
 
 ```
