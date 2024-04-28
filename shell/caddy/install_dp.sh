@@ -120,6 +120,14 @@ if [ ! -f ${MY_DIR}/mysql-boost-8.0.30.tar.gz ];then
 	wget -O ${MY_DIR}/mysql-boost-8.0.30.tar.gz https://cdn.mysql.com/archives/mysql-8.0/mysql-boost-8.0.30.tar.gz
 fi
 
+if [ ! -f ${MY_DIR}/mysql-boost-8.2.0.tar.gz ];then
+	wget -O ${MY_DIR}/mysql-boost-8.2.0.tar.gz https://cdn.mysql.com/archives/mysql-8.2/mysql-boost-8.2.0.tar.gz
+fi
+
+if [ ! -f ${MY_DIR}/mysql-boost-8.3.0.tar.gz ];then
+	wget -O ${MY_DIR}/mysql-boost-8.3.0.tar.gz https://cdn.mysql.com/archives/mysql-8.3/mysql-boost-8.3.0.tar.gz
+fi
+
 
 # - mysql end
 
@@ -147,6 +155,11 @@ fi
 
 if [ ! -f ${OP_DIR}/openresty-1.21.4.3.tar.gz ];then
 	wget -O ${OP_DIR}/openresty-1.21.4.3.tar.gz https://openresty.org/download/openresty-1.21.4.3.tar.gz
+fi
+
+
+if [ ! -f ${OP_DIR}/openresty-1.25.3.1.tar.gz ];then
+	wget -O ${OP_DIR}/openresty-1.25.3.1.tar.gz https://openresty.org/download/openresty-1.25.3.1.tar.gz
 fi
 
 # - openresty end
