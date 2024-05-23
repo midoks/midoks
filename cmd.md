@@ -293,6 +293,16 @@ virt-what
 sudo xattr -r -d com.apple.quarantine /xx.xx
 ```
 
+## sqlite修复
+```
+error: database disk image is malformed
+
+sqlite3 test.db ".dump" >> back.sql
+cat ./back.sql.sql | grep -v TRANSACTION | grep -v ROLLBACK | grep -v COMMIT >./new_back.sql
+#sqlite3 test.db ".dump" | grep -v TRANSACTION | grep -v ROLLBACK | grep -v COMMIT  | grep -v "ERROR" >> new_back.sql
+sqlite3 test.db < new_back.sql
+```
+
 ## 临时设置/销毁Git代理
 
 ```
