@@ -313,6 +313,11 @@ git config --global --unset http.proxy
 git config --global --unset https.proxy
 ```
 
+### pip
+```
+pip install urllib3==1.23 -i https://pypi.tuna.tsinghua.edu.cn/simple
+```
+
 ## golang
 ```
 export GOROOT=/usr/lib/golang
