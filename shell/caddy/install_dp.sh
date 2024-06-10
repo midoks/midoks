@@ -128,6 +128,10 @@ if [ ! -f ${MY_DIR}/mysql-boost-8.3.0.tar.gz ];then
 	wget -O ${MY_DIR}/mysql-boost-8.3.0.tar.gz https://cdn.mysql.com//Downloads/MySQL-8.3/mysql-boost-8.3.0.tar.gz
 fi
 
+if [ ! -f ${MY_DIR}/mysql-boost-8.4.0.tar.gz ];then
+	wget -O ${MY_DIR}/mysql-boost-8.4.0.tar.gz https://cdn.mysql.com//Downloads/MySQL-8.4/mysql-boost-8.4.0.tar.gz
+fi
+
 
 # - mysql end
 
