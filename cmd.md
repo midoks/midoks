@@ -303,6 +303,11 @@ cat ./back.sql.sql | grep -v TRANSACTION | grep -v ROLLBACK | grep -v COMMIT >./
 sqlite3 test.db < new_back.sql
 ```
 
+## 查看端口占用
+```
+netstat -ntulp
+```
+
 ## 临时设置/销毁Git代理
 
 ```
