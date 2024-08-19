@@ -33,6 +33,11 @@ if [ ! -f ${LIB_DIR}/icu4c-52_2-src.tgz ];then
 	wget -O ${LIB_DIR}/icu4c-52_2-src.tgz https://github.com/unicode-org/icu/releases/download/release-52-2/icu4c-52_2-src.tgz
 fi
 
+if [ ! -f ${LIB_DIR}/icu4c-55_2-src.tgz ];then
+	wget -O ${LIB_DIR}/icu4c-55_2-src.tgz https://github.com/unicode-org/icu/releases/download/release-55-2/icu4c-55_2-src.tgz
+fi
+
+
 if [ ! -f ${LIB_DIR}/libiconv-1.15.tar.gz ];then
 	wget -O ${LIB_DIR}/libiconv-1.15.tar.gz https://github.com/midoks/mdserver-web/releases/download/init/libiconv-1.15.tar.gz
 fi
@@ -115,6 +120,18 @@ if [ ! -f ${MY_DIR}/mysql-boost-8.0.30.tar.gz ];then
 	wget -O ${MY_DIR}/mysql-boost-8.0.30.tar.gz https://cdn.mysql.com/archives/mysql-8.0/mysql-boost-8.0.30.tar.gz
 fi
 
+if [ ! -f ${MY_DIR}/mysql-boost-8.2.0.tar.gz ];then
+	wget -O ${MY_DIR}/mysql-boost-8.2.0.tar.gz https://cdn.mysql.com/archives/mysql-8.2/mysql-boost-8.2.0.tar.gz
+fi
+
+if [ ! -f ${MY_DIR}/mysql-boost-8.3.0.tar.gz ];then
+	wget -O ${MY_DIR}/mysql-boost-8.3.0.tar.gz https://cdn.mysql.com//Downloads/MySQL-8.3/mysql-boost-8.3.0.tar.gz
+fi
+
+if [ ! -f ${MY_DIR}/mysql-8.4.0.tar.gz ];then
+	wget -O ${MY_DIR}/mysql-8.4.0.tar.gz https://cdn.mysql.com//Downloads/MySQL-8.4/mysql-8.4.0.tar.gz
+fi
+
 
 # - mysql end
 
@@ -139,6 +156,20 @@ if [ ! -f ${OP_DIR}/openresty-1.21.4.2.tar.gz ];then
 	wget -O ${OP_DIR}/openresty-1.21.4.2.tar.gz https://openresty.org/download/openresty-1.21.4.2.tar.gz
 fi
 
+
+if [ ! -f ${OP_DIR}/openresty-1.21.4.3.tar.gz ];then
+	wget -O ${OP_DIR}/openresty-1.21.4.3.tar.gz https://openresty.org/download/openresty-1.21.4.3.tar.gz
+fi
+
+
+if [ ! -f ${OP_DIR}/openresty-1.25.3.1.tar.gz ];then
+	wget -O ${OP_DIR}/openresty-1.25.3.1.tar.gz https://openresty.org/download/openresty-1.25.3.1.tar.gz
+fi
+
+if [ ! -f ${OP_DIR}/openresty-1.25.3.2.tar.gz ];then
+	wget -O ${OP_DIR}/openresty-1.25.3.2.tar.gz https://openresty.org/download/openresty-1.25.3.2.tar.gz
+fi
+
 # - openresty end
 
 
@@ -161,6 +192,19 @@ fi
 
 if [ ! -f ${WB_DIR}/luarocks-3.5.0.tar.gz ];then
 	wget --no-check-certificate -O ${WB_DIR}/luarocks-3.5.0.tar.gz http://luarocks.org/releases/luarocks-3.5.0.tar.gz
+fi
+
+# - webstats end
+
+
+# - keepalived start
+HA_DIR=$SOFT_DIR/haproxy
+if [ ! -d $HA_DIR ];then
+	mkdir -p $HA_DIR
+fi
+
+if [ ! -f ${HA_DIR}/haproxy-2.6.4.tar.gz ];then
+	wget --no-check-certificate -O ${HA_DIR}/haproxy-2.6.4.tar.gz https://www.haproxy.org/download/2.6/src/haproxy-2.6.4.tar.gz
 fi
 
 # - webstats end

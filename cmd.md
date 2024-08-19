@@ -196,6 +196,19 @@ sed '/^ *#/d' **.conf > *.bak.conf
 strace $(ps -ef|grep python | grep -v grep | grep app | awk '{print $2}' | sed 's/\([0-9]*\)/-p \1/g' |tr "\n" " ")
 ```
 
+
+## 查看占用内存最高的5个进程
+
+```
+ps aux | sort -k4nr | head -n 5
+```
+
+## 查看占用cpu最高的5个进程
+
+```
+ps aux | sort -k3nr | head -n 5
+```
+
 ## 跟踪端口通信数据
 ```
 #然后可以指定端口 或者 正则表达式
@@ -207,6 +220,24 @@ ngrep -q '^GET .* HTTP/1.[01]'
 ```
 apt/yum install -y nethogs
 nethogs -d 5
+```
+
+## PHP-FPM
+```
+1、查看php-fpm的进程个数
+ps -ef |grep "php-fpm"|grep "pool"|wc -l
+
+2、查看每个php-fpm占用的内存大小
+ps -ylC php-fpm --sort:rss
+
+3.查看PHP-FPM在你的机器上的平均内存占用
+ps --no-headers -o "rss,cmd" -C php-fpm | awk '{ sum+=$1 } END { printf ("%d%s\n", sum/NR/1024,"M") }'
+
+4.查看单个php-fpm进程消耗内存的明细
+pmap $(pgrep php-fpm) | less
+
+5.php-fpm的高CPU使用率排查方法
+grep -v "^$" www.log.slow.tmp | cut -d " " -f 3,2 | sort | uniq -c | sort -k1,1nr | head -n 50
 ```
 
 ## 查询进程使用的文件
@@ -229,6 +260,18 @@ iptables -D INPUT 2
 
 ```
 
+### 磁盘读写测速
+```
+apt install -y hdparm
+
+fdisk -l
+
+hdparm -Tt /dev/sda5
+hdparm -Tt /dev/sda1
+
+hdparm -Tt /dev/nvme0n1p1
+```
+
 ## 判断出当前环境所使用的虚拟技术
 ```
 wget http://people.redhat.com/~rjones/virt-what/files/virt-what-1.15.tar.gz
@@ -245,6 +288,26 @@ virt-what
 运行: sudo mdutil -i on / #启动Volume／上的Spotlight索引服务
 ```
 
+## MAC修复，文件已经损坏的提示
+```
+sudo xattr -r -d com.apple.quarantine /xx.xx
+```
+
+## sqlite修复
+```
+error: database disk image is malformed
+
+sqlite3 test.db ".dump" >> back.sql
+cat ./back.sql.sql | grep -v TRANSACTION | grep -v ROLLBACK | grep -v COMMIT >./new_back.sql
+#sqlite3 test.db ".dump" | grep -v TRANSACTION | grep -v ROLLBACK | grep -v COMMIT  | grep -v "ERROR" >> new_back.sql
+sqlite3 test.db < new_back.sql
+```
+
+## 查看端口占用
+```
+netstat -ntulp
+```
+
 ## 临时设置/销毁Git代理
 
 ```
@@ -253,6 +316,11 @@ git config --global https.proxy 'socks5://127.0.0.1:1082'
 
 git config --global --unset http.proxy
 git config --global --unset https.proxy
+```
+
+### pip
+```
+pip install urllib3==1.23 -i https://pypi.tuna.tsinghua.edu.cn/simple
 ```
 
 ## golang
