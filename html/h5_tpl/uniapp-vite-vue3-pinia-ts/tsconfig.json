@@ -1,0 +1,45 @@
+{
+  "extends": "@vue/tsconfig/tsconfig.json",
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "sourceMap": true,
+    "skipLibCheck": true,
+    "allowJs": true, // 允许编译javascript文件。
+    "checkJs": true, // 报告 javascript 文件中的错误
+    "jsx": "preserve", // 指定 jsx 代码的生成: 'preserve', 'react-native', or 'react'
+    //开启严格模式
+    "strict": true,
+    "noImplicitAny": false, //关闭any类型
+    "isolatedModules": false,
+    "noImplicitThis": true, // 不允许使用不明确类型的this
+    "removeComments": true, // 删除编译后的所有的注释
+    "allowUnreachableCode": true, // 是否允许存在永远无法被执行的代码， 当设置为false即不允许存在，eslint会提示错误修复
+    /* 模块解析选项 */
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ]
+    },
+    // "outDir": "./dist",
+    "outDir": "./Scripts/TSOutput",
+    "lib": [
+      "esnext",
+      "dom"
+    ],
+    "types": [
+      "@dcloudio/types"
+    ]
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.d.ts",
+    "src/**/*.tsx",
+    "src/**/*.vue"
+  ],
+  /* 用来排除哪些ts文件需要被编译 */
+  "exclude": [
+    "node_modules"
+  ]
+}

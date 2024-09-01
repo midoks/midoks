@@ -1,0 +1,5 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# 根据./lintsstagedrc.cjs配置格式化并提交代码
+npm run lint:lint-staged

@@ -1,0 +1,9 @@
+/* stylelint-disable scss/at-rule-no-unknown */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* stylelint-disable-next-line selector-type-no-unknown */
+page {
+    height: 100%;
+}
