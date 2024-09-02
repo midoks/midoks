@@ -1,35 +1,35 @@
 // 文字水平对齐方式 ********************************************
 @each $var in (left, center, right) {
-  .text-#{$var} {
-    text-align: $var;
-  }
+    .text-#{$var} {
+        text-align: $var;
+    }
 }
 
 // ********************************************
 
 .overflow-x-scroll {
-  overflow-x: scroll; // 水平方向超出滚动
+    overflow-x: scroll; // 水平方向超出滚动
 }
 .overflow-y-scroll {
-  overflow-y: scroll; // 垂直方向超出滚动
+    overflow-y: scroll; // 垂直方向超出滚动
 }
 .overflow-y-auto {
-  overflow-y: auto; // 垂直方向高度超出后才显示滚动条
+    overflow-y: auto; // 垂直方向高度超出后才显示滚动条
 }
 .overflow-x-hidden {
-  overflow-x: hidden;
+    overflow-x: hidden;
 }
 
 // 字体 ********************************************
 .font-bold {
-  font-weight: bold;
+    font-weight: bold;
 }
 
 @each $key, $val in ('sm': 24rpx, 'base': 28rpx, 'lg': 32rpx) {
-  // font-size-base
-  .font-size-#{$key} {
-    font-size: $val !important;
-  }
+    // font-size-base
+    .font-size-#{$key} {
+        font-size: $val !important;
+    }
 }
 
 // 边框颜色 ********************************************
@@ -59,10 +59,10 @@
 // }
 
 .w-full {
-  width: 100%;
+    width: 100%;
 }
 .h-full {
-  height: 100%;
+    height: 100%;
 }
 
 // 宽高
@@ -79,15 +79,15 @@
 // }
 
 .position-relative {
-  position: relative; // 父：相
+    position: relative; // 父：相
 }
 .position-absolute {
-  position: absolute; // 子：绝
+    position: absolute; // 子：绝
 }
 
 // 元素显示模式 eg: display-inline-block
 @each $val in block, inline, inline-block {
-  .display-#{$val} {
-    display: #{$val};
-  }
+    .display-#{$val} {
+        display: #{$val};
+    }
 }
