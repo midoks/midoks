@@ -8,7 +8,7 @@
 
 <script setup>
 const { proxy } = getCurrentInstance();
-console.log(proxy);
+//console.log(proxy);
 const bannerList = ref([
   'http://127.0.0.1:886/2023-09-11/1701130377848147968-美图35.jpg',
   'http://127.0.0.1:886/2023-09-11/1701131110123294720-美图13.png',
