@@ -28,3 +28,4 @@ c/cmake_t/Makefile
 c/cmake_t/hello
 /html/h5_tpl/uniapp-vite-vue3-pinia-ts
 /html/h5_tpl/uni-preset-vue-vite-base/node_modules
+*.log
