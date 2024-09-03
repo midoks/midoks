@@ -30,3 +30,4 @@ c/cmake_t/hello
 /html/h5_tpl/uni-preset-vue-vite-base/node_modules
 *.log
 html/h5_tpl/uni-preset-vue-vite-base/pnpm-lock.yaml
+/rust/one/test01/target
