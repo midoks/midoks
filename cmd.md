@@ -22,6 +22,17 @@ aria2c --enable-rpc --rpc-allow-origin-all -c -D
 ```
 
 
+## apt-listchanges --apt Segmentation fault
+```
+
+Segmentation fault
+E: Sub-process /usr/bin/apt-listchanges --apt || test $? -lt 10 returned an error code (1)
+E: Failure running script /usr/bin/apt-listchanges --apt || test $? -lt 10
+
+修改/etc/apt/apt.conf.d/20listchanges文件,注释掉第一行.
+#DPkg::Pre-Install-Pkgs { "/usr/bin/apt-listchanges --apt || test $? -lt 10"; };
+```
+
 ## vpn
 
 ```
