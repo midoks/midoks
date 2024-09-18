@@ -69,6 +69,6 @@
     "@esbuild/darwin-x64": "^0.20.2",
     "@rollup/rollup-darwin-x64": "^4.21.2",
     "@vue/runtime-core": "^3.4.21",
-    "vite": "5.2.8"
+    "vite": "5.4.6"
   }
 }
