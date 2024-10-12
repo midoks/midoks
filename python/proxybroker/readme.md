@@ -8,3 +8,6 @@ bash <(curl -sSL https://raw.githubusercontent.com/midoks/choose-linux-python/ma
 
 - 加入计划任务
 /usr/local/python3.8.17/bin/python3 /opt/proxybroker/gproxy.py
+
+- 代理信息在此文件中
+/tmp/tmp_proxy.json
