@@ -329,6 +329,11 @@ git config --global --unset http.proxy
 git config --global --unset https.proxy
 ```
 
+## 时间
+```
+date "+%Y-%m-%d %H:%M:%S"
+```
+
 ### pip
 ```
 pip install urllib3==1.23 -i https://pypi.tuna.tsinghua.edu.cn/simple
