@@ -31,3 +31,5 @@ c/cmake_t/hello
 *.log
 html/h5_tpl/uni-preset-vue-vite-base/pnpm-lock.yaml
 /rust/one/test01/target
+node_modules
+/cloudflare/worker/cacheimage
