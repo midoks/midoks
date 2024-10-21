@@ -13,7 +13,7 @@ import { Buffer } from 'node:buffer';
 
 export default {
     async fetch(request, env, ctx) {
-        console.log("test");
+        // console.log("test");
 
         const cache = caches.default;
         const reqUrl = url.parse(request.url);
