@@ -25,11 +25,13 @@ export default {
                 if (image_url == "favicon.ico"){
                     return new Response('ok!');
                 }
+
+                image_url = decodeURIComponent(image_url);
                 console.log('fetch pre:'+image_url);
                 const buff = Buffer.from(image_url, 'base64');
                 image_url = buff.toString('utf-8');
-
-                console.log('fetch:'+image_url);
+                
+                console.log('fetch2:'+image_url);
                 const cacheKey = new Request(image_url);
 
                 const hasCache = await cache.match(cacheKey);
