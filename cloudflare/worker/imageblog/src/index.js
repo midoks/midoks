@@ -11,6 +11,12 @@
 import url from 'url';
 import { Buffer } from 'node:buffer';
 
+const corsHeaders = {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "GET,HEAD,POST,OPTIONS",
+    "Access-Control-Max-Age": "86400",
+}
+
 export default {
     async fetch(request, env, ctx) {
         // console.log("test");
@@ -30,7 +36,7 @@ export default {
                 console.log('fetch pre:'+image_url);
                 const buff = Buffer.from(image_url, 'base64');
                 image_url = buff.toString('utf-8');
-                
+
                 console.log('fetch2:'+image_url);
                 const cacheKey = new Request(image_url);
 
@@ -52,6 +58,7 @@ export default {
                 // 返回体构造
                 const imageResponse = new Response(imageRes.body, {
                     headers: {
+                        ...corsHeaders,
                         'cache-control': 'public,max-age=86400',
                     },
                 });
