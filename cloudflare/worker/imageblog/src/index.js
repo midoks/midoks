@@ -50,15 +50,15 @@ export default {
                 // const imageBytes = new Uint8Array(await imageRes.arrayBuffer());
 
                 // 返回体构造
-                // const imageResponse = new Response(imageRes.body, {
-                //     headers: {
-                //         'cache-control': 'public,max-age=86400',
-                //     },
-                // });
+                const imageResponse = new Response(imageRes.body, {
+                    headers: {
+                        'cache-control': 'public,max-age=86400',
+                    },
+                });
 
                 // 写入缓存
-                ctx.waitUntil(cache.put(cacheKey, imageRes.clone()));
-                return imageRes;
+                ctx.waitUntil(cache.put(cacheKey, imageResponse.clone()));
+                return imageResponse;
 
             } catch (error) {
                 console.error('process:error', error.name, error.message, error);
