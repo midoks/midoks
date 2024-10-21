@@ -1,0 +1,8 @@
+#:schema node_modules/wrangler/config-schema.json
+name = "imageblog"
+main = "src/index.js"
+compatibility_date = "2023-05-18"
+
+[observability]
+enabled = true
+head_sampling_rate = 1
