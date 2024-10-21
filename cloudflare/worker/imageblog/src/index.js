@@ -33,7 +33,7 @@ export default {
 
             const hasCache = await cache.match(cacheKey);
             if (hasCache) {
-                console.log('cache: hit');
+                console.log('cache: hit:'+cacheKey);
                 return hasCache;
             }
 
