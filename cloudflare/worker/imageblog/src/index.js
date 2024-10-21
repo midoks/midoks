@@ -34,7 +34,7 @@ export default {
 
                 const hasCache = await cache.match(cacheKey);
                 if (hasCache) {
-                    console.log('cache: hit:'+cacheKey);
+                    console.log('cache: hit:'+image_url);
                     return hasCache;
                 }
 
