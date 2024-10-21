@@ -13,6 +13,7 @@ import { Buffer } from 'node:buffer';
 
 const corsHeaders = {
     "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Header": "*",
     "Access-Control-Allow-Methods": "GET,HEAD,POST,OPTIONS",
     "Access-Control-Max-Age": "86400",
 }
