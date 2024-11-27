@@ -1,4 +1,7 @@
 # P
+bin
+lib
+include
 .DS_Store
 *.DS_Store
 .log
@@ -21,6 +24,8 @@
 *.exe
 *.out
 *.app
+pyvenv.cfg
+__pycache__
 c/cmake_t/CMakeFiles/*
 c/cmake_t/cmake_install.cmake
 c/cmake_t/CMakeCache.txt
@@ -33,3 +38,4 @@ html/h5_tpl/uni-preset-vue-vite-base/pnpm-lock.yaml
 /rust/one/test01/target
 node_modules
 /cloudflare/worker/cacheimage
+/python/python_bug_flask/logs/
