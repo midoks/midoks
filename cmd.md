@@ -334,6 +334,12 @@ git config --global --unset https.proxy
 date "+%Y-%m-%d %H:%M:%S"
 ```
 
+## sublime 语法提示插件
+```
+sublimeLinter
+sublimeLinter-php
+```
+
 ### pip
 ```
 pip install urllib3==1.23 -i https://pypi.tuna.tsinghua.edu.cn/simple
