@@ -39,3 +39,4 @@ html/h5_tpl/uni-preset-vue-vite-base/pnpm-lock.yaml
 node_modules
 /cloudflare/worker/cacheimage
 /python/python_bug_flask/logs/
+/rust/test02/target
