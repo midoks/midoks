@@ -40,3 +40,4 @@ node_modules
 /cloudflare/worker/cacheimage
 /python/python_bug_flask/logs/
 /rust/test02/target
+/rust/rrr/target
