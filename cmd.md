@@ -340,6 +340,15 @@ sublimeLinter
 sublimeLinter-php
 ```
 
+## 甲骨文服务器防火墙设置
+```
+iptables -P INPUT ACCEPT
+iptables -P FORWARD ACCEPT
+iptables -P OUTPUT ACCEPT
+iptables -F
+
+```
+
 ### pip
 ```
 pip install urllib3==1.23 -i https://pypi.tuna.tsinghua.edu.cn/simple
