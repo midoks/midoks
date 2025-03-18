@@ -354,6 +354,15 @@ iptables -F
 ## 长时间观察
 ```
 watch -n 1 'netstat -an|grep SYN_RECV'
+watch -n 1 'netstat -an|grep SYN_RECV | wc -l'
+```
+### 断开连接
+```
+apt install -y dsniff
+tcpkill -i ens5 host xxx
+tcpkill -i ens5 port 443
+
+iptables -A INPUT -s 45.177.192.0/24 -j DROP
 ```
 
 ### pip
