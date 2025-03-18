@@ -353,6 +353,8 @@ iptables -F
 
 ## 长时间观察
 ```
+apt install net-tools
+
 watch -n 1 'netstat -an|grep SYN_RECV'
 watch -n 1 'netstat -an|grep SYN_RECV | wc -l'
 ```
