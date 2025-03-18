@@ -351,6 +351,11 @@ iptables -F
 
 ```
 
+## 长时间观察
+```
+watch -n 1 'netstat -an|grep SYN_RECV'
+```
+
 ### pip
 ```
 pip install urllib3==1.23 -i https://pypi.tuna.tsinghua.edu.cn/simple
