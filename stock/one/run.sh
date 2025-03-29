@@ -32,6 +32,7 @@ BS_CMD(){
 }
 
 BS_RUNTIME(){
+    cd code && rm -rf *.csv
     python3 download.py
     python3 analysis.py
 }
