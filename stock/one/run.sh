@@ -1,9 +1,33 @@
+#!/bin/bash
+PATH=/usr/local/bin:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
+
+if [ -f bin/activate ];then
+    source bin/activate
+fi
+
+BS_VERSION(){
+    echo "0.0.30"
+}
+
+BS_VENV(){
+    python3 -m venv .
+    source bin/activate && pip install baostock
+}
 
 BS_HELP(){
     echo "bash run.sh run|r            -> 策略1"
+    echo "bash run.sh venv             -> 创建venv环境"
+    echo "bash run.sh version|v        -> 版本信息"
 }
+
+BS_CMD(){
+    python3 analysis.py
+}
+
 
 case "$1" in
     "run" | "r") BS_CMD ;;
+    "version" | "v") BS_VERSION;;
+    "venv") BS_VENV;;
     *) BS_HELP;;
 esac
