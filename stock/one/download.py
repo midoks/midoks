@@ -62,7 +62,7 @@ for gp_code in clist:
     # 周月线指标：date,code,open,high,low,close,volume,amount,adjustflag,turn,pctChg
     rs = bs.query_history_k_data_plus(gp_code,
         "date,code,open,high,low,close,preclose,volume,amount,adjustflag,turn,tradestatus,pctChg,isST",
-        start_date='2025-03-21', end_date='2025-03-28',
+        start_date='2025-03-24', end_date='2025-03-28',
         frequency="d", adjustflag="3")
     print('query_history_k_data_plus respond error_code:'+rs.error_code)
     print('query_history_k_data_plus respond  error_msg:'+rs.error_msg)

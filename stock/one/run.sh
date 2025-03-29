@@ -17,7 +17,7 @@ BS_VENV(){
 BS_HELP(){
     echo "bash run.sh run|r            -> 策略1"
     echo "bash run.sh venv             -> 创建venv环境"
-    echo "bash run.sh download         -> 下载数据"
+    echo "bash run.sh download|d       -> 下载数据"
     echo "bash run.sh version|v        -> 版本信息"
 }
 
@@ -33,7 +33,7 @@ BS_CMD(){
 
 case "$1" in
     "run" | "r") BS_CMD ;;
-    "download" ) BS_DOWNLOAD ;;
+    "download"| "d"  ) BS_DOWNLOAD ;;
     "version" | "v") BS_VERSION;;
     "venv") BS_VENV;;
     *) BS_HELP;;
