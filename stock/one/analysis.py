@@ -40,10 +40,17 @@ def strategyA1(pd_obj):
     # print(pd_obj.loc[0])
     # 过滤异常数据
     # print("volume",pd_obj.loc[0]["volume"])
-
     if (pd_obj.loc[0]["volume"] == ""):
         return False
+
+    if pd_obj.loc[1]["pctChg"] == "":
+        return False
+
     if float(pd_obj.loc[0]["pctChg"]) > 9.95:
+        return False
+
+    # print("pctChg:",pd_obj.loc[1]["code"],pd_obj.loc[1]["pctChg"])
+    if float(pd_obj.loc[1]["pctChg"]) > 9.95:
         return True
 
     return False
