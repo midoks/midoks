@@ -20,6 +20,11 @@ BS_HELP(){
     echo "bash run.sh version|v        -> 版本信息"
 }
 
+
+BS_DOWNLOAD(){
+    python3 download.py
+}
+
 BS_CMD(){
     python3 analysis.py
 }
@@ -27,6 +32,7 @@ BS_CMD(){
 
 case "$1" in
     "run" | "r") BS_CMD ;;
+    "download" ) BS_DOWNLOAD ;;
     "version" | "v") BS_VERSION;;
     "venv") BS_VENV;;
     *) BS_HELP;;
