@@ -15,11 +15,11 @@ BS_VENV(){
 }
 
 BS_HELP(){
-    echo "bash run.sh run|r            -> 策略1"
-    echo "bash run.sh r2               -> 下载最新数据并执行策略"
-    echo "bash run.sh venv             -> 创建venv环境"
-    echo "bash run.sh download|d       -> 下载数据"
-    echo "bash run.sh version|v        -> 版本信息"
+    echo "./run.sh run|r            -> 策略1"
+    echo "./run.sh r2               -> 下载最新数据并执行策略"
+    echo "./run.sh venv             -> 创建venv环境"
+    echo "./run.sh download|d       -> 下载数据"
+    echo "./run.sh version|v        -> 版本信息"
 }
 
 
@@ -32,7 +32,7 @@ BS_CMD(){
 }
 
 BS_RUNTIME(){
-    cd code && rm -rf *.csv
+    rm -rf ./code/*.csv
     python3 download.py
     python3 analysis.py
 }
