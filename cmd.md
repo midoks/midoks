@@ -321,6 +321,11 @@ sqlite3 test.db < new_back.sql
 netstat -ntulp
 ```
 
+## 检查进程最大打开文件数
+```
+cat /proc/$(pgrep xx)/limits | grep "Max open files"
+```
+
 ## 临时设置/销毁Git代理
 
 ```
