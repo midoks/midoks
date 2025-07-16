@@ -2,6 +2,7 @@
 
 ```
 cargo new test01
+cargo new test_pingora
 cargo run
 
 

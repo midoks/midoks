@@ -42,3 +42,4 @@ node_modules
 /rust/test02/target
 /rust/rrr/target
 /stock/one/code
+/rust/test_pingora/target
