@@ -17,4 +17,8 @@ fn main() {
     for number in 1..5 {
         println!("{number}")
     }
+
+    for ch in 'a'..='z' {
+        println!("{ch}")
+    }
 }
