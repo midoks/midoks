@@ -21,4 +21,17 @@ fn main() {
     for ch in 'a'..='z' {
         println!("{ch}")
     }
+
+    let s1 = String::from("Hello world");
+    let s2 = s1.clone();
+
+    println!("{s1}");
+    println!("{s2}");
+
+    let a = 10u32;
+    let b = a;
+
+    println!("{a}");
+    println!("{b}");
+    println!("{a}");
 }
