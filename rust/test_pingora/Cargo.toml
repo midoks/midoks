@@ -4,4 +4,5 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-pingora = "0.5"
+pingora = { version = "0.5" }
+async-trait = "0.1"  # 添加 async-trait 依赖

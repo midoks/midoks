@@ -13,4 +13,8 @@ fn main() {
 
     println!("{:?}", std::mem::size_of::<A>()); // 8
     let _v = A { a: 1, b: 2, c: 3 };
+
+    for number in 1..5 {
+        println!("{number}")
+    }
 }
