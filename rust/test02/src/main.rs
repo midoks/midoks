@@ -34,4 +34,15 @@ fn main() {
     println!("{a}");
     println!("{b}");
     println!("{a}");
+
+    let mut c = 10u32;
+    // let d = c;
+    // *d = 20;
+
+    let _e = &mut c;
+    // *e = 20;
+
+    // println!("{c}");
+    // println!("{d}");
+    println!("{c}");
 }
