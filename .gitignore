@@ -43,5 +43,5 @@ node_modules
 /rust/rrr/target
 /stock/one/code
 /rust/test_pingora/target
-rust/test02/src/main
 */*/target
+main
