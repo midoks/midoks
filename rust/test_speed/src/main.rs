@@ -64,12 +64,14 @@ impl DiskBenchmark {
         let mut file = File::open(&self.file_path)?;
         let mut buffer = vec![0u8; self.block_size];
         let mut rng = rand::rng();
+
         let max_offset = self.file_size - self.block_size;
 
         let start = Instant::now();
 
         for _ in 0..iterations {
             let offset = rng.random_range(0..=max_offset) as u64;
+            // println!("随机数: {offset}");
             file.seek(SeekFrom::Start(offset))?;
             file.read_exact(&mut buffer)?;
         }
