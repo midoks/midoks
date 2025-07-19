@@ -3,10 +3,21 @@
 // 基本概念
 // 生命周期是 Rust 中引用有效的作用域。Rust 编译器通过生命周期分析来确保所有引用都是有效的。
 
+// 'static => 'a
+
+static ASTRING: &'static str = "abc";
+
+fn foo() -> &'static str {
+    // let s = "abc".to_string();
+    // &s
+    ASTRING
+}
+
 fn main() {
-    let s = "abc".to_string();
+    // let s = "abc".to_string();
+    // let a = &s;
+    // println!("{}!", a);
 
-    let a = &s;
-
-    println!("{}!", a);
+    let p = foo();
+    println!("{}", p);
 }
