@@ -22,9 +22,7 @@ use lazy_static::lazy_static;
 // 后端服务器列表
 lazy_static! {
     static ref BACKEND_SERVERS: Vec<&'static str> = vec![
-        "http://127.0.0.1:8081",
-        "http://127.0.0.1:8082",
-        "http://127.0.0.1:8083",
+        "http://127.0.0.1:8888",
     ];
 }
 
@@ -43,6 +41,8 @@ async fn proxy_request(
     let path = parts.uri.path_and_query().map(|pq| pq.as_str()).unwrap_or("/");
     let new_uri = format!("{}{}", backend, path).parse().unwrap();
     parts.uri = new_uri;
+
+    println!("{:?}", parts);
     parts.headers.remove("host");
 
     // 转发请求

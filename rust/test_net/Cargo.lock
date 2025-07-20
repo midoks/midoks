@@ -461,17 +461,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "reverse_proxy_rs"
-version = "0.1.0"
-dependencies = [
- "hyper",
- "hyper-util",
- "lazy_static",
- "rand",
- "tokio",
-]
-
-[[package]]
 name = "rustc-demangle"
 version = "0.1.25"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -544,6 +533,17 @@ checksum = "8e1d1b10ced5ca923a1fcb8d03e96b8d3268065d724548c0211415ff6ac6bac4"
 dependencies = [
  "core-foundation-sys",
  "libc",
+]
+
+[[package]]
+name = "test_net"
+version = "0.1.0"
+dependencies = [
+ "hyper",
+ "hyper-util",
+ "lazy_static",
+ "rand",
+ "tokio",
 ]
 
 [[package]]
