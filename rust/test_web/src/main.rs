@@ -3,6 +3,8 @@ use mime_guess::from_path;
 use rust_embed::RustEmbed;
 use std::borrow::Cow;
 
+mod api;
+
 // 嵌入静态文件
 #[derive(RustEmbed)]
 #[folder = "static/"]
@@ -31,7 +33,7 @@ async fn index() -> impl Responder {
 
 #[get("/")]
 async fn hello() -> impl Responder {
-    HttpResponse::Ok().body("Hello world!")
+    HttpResponse::Ok().body("Hello worlds!")
 }
 
 #[get("/ec")]
@@ -39,17 +41,17 @@ async fn ec(req_body: String) -> impl Responder {
     HttpResponse::Ok().body(req_body)
 }
 
-#[post("/echo")]
+#[post("/echos")]
 async fn echo(req_body: String) -> impl Responder {
     HttpResponse::Ok().body(req_body)
 }
 
 async fn echh() -> impl Responder {
-    HttpResponse::Ok().body("ff")
+    HttpResponse::Ok().body("ffdd")
 }
 
 async fn manual_hello() -> impl Responder {
-    HttpResponse::Ok().body("Hey there!")
+    HttpResponse::Ok().body("Hey there2!")
 }
 
 #[actix_web::main]
@@ -57,6 +59,7 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(|| {
         App::new()
             .service(web::resource("/{_:.*}").route(web::get().to(handle_static)))
+            .service(web::scope("/api").service(api::hello))
             // .service(hello)
             // .service(echo)
             // .route("/echh", web::get().to(echh))
