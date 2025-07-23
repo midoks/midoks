@@ -28,7 +28,7 @@ async fn handle_static(req: HttpRequest) -> impl Responder {
 // 首页重定向
 async fn index() -> impl Responder {
     HttpResponse::Found()
-        .append_header(("Location", "/index.html"))
+        .append_header(("Location", "/static/index.html"))
         .finish()
 }
 
