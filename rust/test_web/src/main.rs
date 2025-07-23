@@ -3,7 +3,8 @@ use mime_guess::from_path;
 use rust_embed::RustEmbed;
 use std::borrow::Cow;
 
-mod api;
+mod app;
+use app::api;
 
 // 嵌入静态文件
 #[derive(RustEmbed)]
@@ -13,8 +14,7 @@ struct Asset;
 // 处理静态文件请求
 async fn handle_static(req: HttpRequest) -> impl Responder {
     let path = req.path().trim_start_matches('/');
-
-    println!("{}", path);
+    // println!("{}", path);
     match Asset::get(path) {
         Some(content) => {
             let mime = from_path(path).first_or_octet_stream();
@@ -34,7 +34,7 @@ async fn index() -> impl Responder {
 
 #[get("/")]
 async fn hello() -> impl Responder {
-    HttpResponse::Ok().body("Hello worlds!")
+    HttpResponse::Ok().body("Hello world!")
 }
 
 #[get("/ec")]
