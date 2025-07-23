@@ -7,13 +7,14 @@ mod api;
 
 // 嵌入静态文件
 #[derive(RustEmbed)]
-#[folder = "static/"]
+#[folder = "public/"]
 struct Asset;
 
 // 处理静态文件请求
 async fn handle_static(req: HttpRequest) -> impl Responder {
     let path = req.path().trim_start_matches('/');
 
+    println!("{}", path);
     match Asset::get(path) {
         Some(content) => {
             let mime = from_path(path).first_or_octet_stream();
@@ -58,7 +59,7 @@ async fn manual_hello() -> impl Responder {
 async fn main() -> std::io::Result<()> {
     HttpServer::new(|| {
         App::new()
-            .service(web::resource("/{_:.*}").route(web::get().to(handle_static)))
+            .service(web::resource("/static/{_:.*}").route(web::get().to(handle_static)))
             .service(web::scope("/api").service(api::hello))
             // .service(hello)
             // .service(echo)
