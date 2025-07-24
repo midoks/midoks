@@ -1,40 +1,44 @@
-use clap::Parser;
+use crate::service::{MathService, MathServiceServer};
+use tarpc::context;
+use tarpc::tokio_serde::formats::Json;
 use tokio::net::TcpListener;
 
-mod client;
-mod server;
-mod service;
+#[derive(Clone)]
+struct MathServer;
 
-/// Tarpc 示例程序
-#[derive(Parser, Debug)]
-#[clap(version, about, long_about = None)]
-struct Args {
-    /// 运行模式 (server/client)
-    #[clap(short, long, default_value = "server")]
-    mode: String,
+#[tarpc::server]
+impl MathService for MathServer {
+    async fn add(self, _: context::Context, a: i32, b: i32) -> i32 {
+        a + b
+    }
 
-    /// 服务器地址 (仅客户端需要)
-    #[clap(short, long, default_value = "127.0.0.1:8080")]
-    addr: String,
+    async fn factorial(self, _: context::Context, n: u64) -> Result<u64, String> {
+        if n > 20 {
+            return Err("Number too large!".to_string());
+        }
+        Ok((1..=n).product())
+    }
 }
 
-#[tokio::main]
-async fn main() -> anyhow::Result<()> {
-    let args = Args::parse();
+pub async fn run_server(listener: TcpListener) -> anyhow::Result<()> {
+    println!("Server running on {}", listener.local_addr()?);
 
-    match args.mode.to_lowercase().as_str() {
-        "server" => {
-            println!("Starting server on {}", args.addr);
-            let listener = TcpListener::bind(&args.addr).await?;
-            server::run_server(listener).await
-        }
-        "client" => {
-            println!("Connecting to server at {}", args.addr);
-            client::run_client(&args.addr).await
-        }
-        _ => {
-            eprintln!("Invalid mode. Use 'server' or 'client'.");
-            std::process::exit(1);
-        }
+    loop {
+        let (socket, addr) = listener.accept().await?;
+        println!("New client connected: {}", addr);
+
+        let transport = tarpc::serde_transport::new(
+            tarpc::tokio_util::codec::length_delimited::LengthDelimitedCodec::builder()
+                .new_framed(socket),
+            Json::default(),
+        );
+
+        let server = MathServiceServer::new(MathServer);
+
+        tokio::spawn(async move {
+            if let Err(e) = server.serve(transport).await {
+                eprintln!("Server error: {}", e);
+            }
+        });
     }
 }

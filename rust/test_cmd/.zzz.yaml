@@ -5,12 +5,12 @@ dirfilter:
 - .git
 - public
 - scripts
-- vendor
+- target
 - logs
 - templates
 ext:
-- go
-lang: ""
+- rs
+lang: rust
 enablerun: true
 action:
   before:
