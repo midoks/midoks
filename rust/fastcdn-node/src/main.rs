@@ -19,20 +19,7 @@ struct Cli {
     #[command(subcommand)]
     command: Commands,
 }
-
-/// 文件信息显示格式
-#[derive(ValueEnum, Clone, Debug)]
-enum InfoFormat {
-    /// 纯文本格式
-    Text,
-    /// JSON格式
-    Json,
-    /// YAML格式
-    Yaml,
-}
-
-
-/// 支持的操作命令
+/// subcommand operation mode
 #[derive(Subcommand, Debug)]
 enum Commands {
     /// start the fastcdn node server
@@ -60,43 +47,6 @@ enum Commands {
         /// 递归复制目录
         #[arg(short, long)]
         recursive: bool,
-    },
-
-    /// 移动或重命名文件
-    Move {
-        /// 源文件路径
-        source: PathBuf,
-
-        /// 目标路径
-        destination: PathBuf,
-
-        /// 覆盖已存在的文件
-        #[arg(short, long)]
-        force: bool,
-    },
-
-    /// 删除文件或目录
-    Delete {
-        /// 目标路径
-        target: PathBuf,
-
-        /// 递归删除目录
-        #[arg(short, long)]
-        recursive: bool,
-
-        /// 不显示确认提示
-        #[arg(short = 'y', long)]
-        no_confirm: bool,
-    },
-
-    /// 查看文件信息
-    Info {
-        /// 目标文件路径
-        file: PathBuf,
-
-        /// 信息显示格式
-        #[arg(short, long, value_enum, default_value_t = InfoFormat::Text)]
-        format: InfoFormat,
     },
 
     /// test function
@@ -136,33 +86,6 @@ fn main() {
                 force,
                 recursive
             );
-        }
-        Commands::Move {
-            source,
-            destination,
-            force,
-        } => {
-            println!(
-                "执行移动操作: {} -> {} (force: {})",
-                source.display(),
-                destination.display(),
-                force
-            );
-        }
-        Commands::Delete {
-            target,
-            recursive,
-            no_confirm,
-        } => {
-            println!(
-                "执行删除操作: {} (recursive: {}, no_confirm: {})",
-                target.display(),
-                recursive,
-                no_confirm
-            );
-        }
-        Commands::Info { file, format } => {
-            println!("查看文件信息: {} (格式: {:?})", file.display(), format);
         }
 
         Commands::Test {} => {
