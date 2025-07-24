@@ -1,0 +1,12 @@
+[package]
+name = "fastcdn-node"
+version = "0.0.1"
+edition = "2024"
+
+[dependencies]
+argh = "0.1.13"
+clap = { version = "4.5.41", features = ["derive"] }
+hyper = "1.6.0"
+mime_guess = "2.0.5"
+tokio = "1.46.1"
+
