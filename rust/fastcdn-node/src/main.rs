@@ -1,17 +1,17 @@
 use clap::{Parser, Subcommand, ValueEnum};
 use std::path::PathBuf;
 
-/// 一个强大的文件处理工具
+/// 命令行信息
 #[derive(Parser, Debug)]
 #[command(
     author = "midoks <midoks@163.com>",
     version = "0.0.1",
     about = "fastcdn-node",
-    long_about = "这个工具提供了多种文件操作功能，包括复制、移动、删除和查看文件信息"
+    long_about = "fastcdn node service"
 )]
 
 struct Cli {
-    /// 启用详细输出
+    /// display version information
     #[arg(short, long, global = true)]
     verbose: bool,
 
@@ -51,6 +51,9 @@ struct SearchOptions {
 /// 支持的操作命令
 #[derive(Subcommand, Debug)]
 enum Commands {
+    /// start the fastcdn node server
+    Start {},
+
     /// 复制文件或目录
     Copy {
         /// 源文件路径
@@ -122,11 +125,17 @@ enum Commands {
 fn main() {
     let args = Cli::parse();
 
-    println!("命令行参数解析结果:");
-    println!("{:#?}", args);
+    // println!("命令行参数解析结果:");
+    // println!("s:{:#?}:e", args);
+    // for _ in 0..args.count {
+    //     println!("Hello {}!", args.command);
+    // }
 
     // 在实际应用中，这里会根据解析的参数执行相应的操作
     match &args.command {
+        Commands::Start {} => {
+            println!("start server!!!");
+        }
         Commands::Copy {
             source,
             destination,
@@ -190,7 +199,7 @@ fn main() {
         }
     }
 
-    if args.verbose {
-        println!("详细模式已启用");
-    }
+    // if args.verbose {
+    //     println!("详细模式已启用");
+    // }
 }
