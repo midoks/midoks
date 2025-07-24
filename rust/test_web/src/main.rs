@@ -57,6 +57,7 @@ async fn manual_hello() -> impl Responder {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+    println!("Server running at http://127.0.0.1:8980");
     HttpServer::new(|| {
         App::new()
             .service(web::resource("/static/{_:.*}").route(web::get().to(handle_static)))
