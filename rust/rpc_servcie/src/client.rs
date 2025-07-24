@@ -6,6 +6,7 @@ use tarpc::tokio_serde::formats::Json;
 
 pub async fn run_client(addr: &str) -> Result<()> {
     let transport = tcp::connect(addr, Json::default).await?;
+    // 使用生成的客户端类型
     let client = MathServiceClient::new(tarpc::client::Config::default(), transport).spawn();
 
     // 创建上下文
@@ -18,7 +19,7 @@ pub async fn run_client(addr: &str) -> Result<()> {
     // 调用阶乘服务
     for n in [5, 10, 25] {
         match client.factorial(ctx.clone(), n).await {
-            Ok(val) => println!("{}! = {}", n, val),
+            Ok(val) => println!("{}! = {:?}", n, val),
             Err(e) => println!("Error calculating {}!: {}", n, e),
         }
     }

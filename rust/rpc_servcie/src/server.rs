@@ -1,4 +1,5 @@
-use crate::service::{MathService, MathServiceServer};
+use crate::service::MathService;
+use tarpc::server::Channel;
 use tarpc::context;
 use tarpc::tokio_serde::formats::Json;
 use tokio::net::TcpListener;
@@ -8,11 +9,11 @@ struct MathServer;
 
 #[tarpc::server]
 impl MathService for MathServer {
-    async fn add(self, _: context::Context, a: i32, b: i32) -> i32 {
+    async fn add(self, _context: context::Context, a: i32, b: i32) -> i32 {
         a + b
     }
 
-    async fn factorial(self, _: context::Context, n: u64) -> Result<u64, String> {
+    async fn factorial(self, _context: context::Context, n: u64) -> Result<u64, String> {
         if n > 20 {
             return Err("Number too large!".to_string());
         }
@@ -33,12 +34,9 @@ pub async fn run_server(listener: TcpListener) -> anyhow::Result<()> {
             Json::default(),
         );
 
-        let server = MathServiceServer::new(MathServer);
+        let server = tarpc::server::BaseChannel::with_defaults(transport);
 
-        tokio::spawn(async move {
-            if let Err(e) = server.serve(transport).await {
-                eprintln!("Server error: {}", e);
-            }
-        });
+        // 直接执行服务，不使用for_each
+        tokio::spawn(server.execute(MathServer.serve()));
     }
 }
