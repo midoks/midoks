@@ -1,14 +1,9 @@
-use std::sync::Arc;
-use std::time::Duration;
-
 use clap::{Parser, Subcommand};
 use pingora_core::server::Server;
 use pingora_core::upstreams::peer::HttpPeer;
-use pingora_core::server::configuration::ServerConf;
 use pingora_core::Result;
 use pingora_proxy::{ProxyHttp, Session};
 use pingora_proxy::http_proxy_service;
-use pingora_core::services::listening::Service;
 use async_trait::async_trait;
 
 // 导入自定义模块
