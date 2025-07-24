@@ -4,5 +4,9 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-pingora = { version = "0.5" }
+pingora-core = { version = "0.5" }
+pingora-proxy = { version = "0.5" }
+pingora-http = { version = "0.5" }  # 添加 pingora-http 依赖
 async-trait = "0.1"  # 添加 async-trait 依赖
+env_logger = "0.10"  # 添加日志依赖
+clap = { version = "4.4", features = ["derive"] }  # 添加命令行参数解析依赖
