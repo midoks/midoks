@@ -15,7 +15,7 @@ struct Cli {
     #[arg(short, long, global = true)]
     verbose: bool,
 
-    /// 操作模式
+    /// subcommand operation mode
     #[command(subcommand)]
     command: Commands,
 }
