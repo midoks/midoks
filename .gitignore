@@ -45,3 +45,4 @@ node_modules
 /rust/test_pingora/target
 */*/target
 main
+*.lock

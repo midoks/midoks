@@ -6,7 +6,7 @@ use tarpc::tokio_serde::formats::Json;
 
 pub async fn run_client(addr: &str) -> Result<()> {
     let transport = tcp::connect(addr, Json::default).await?;
-    let client = MathServiceClient::new(tarpc::client::Config::default(), transport).spawn()?;
+    let client = MathServiceClient::new(tarpc::client::Config::default(), transport).spawn();
 
     // 创建上下文
     let ctx = context::current();
