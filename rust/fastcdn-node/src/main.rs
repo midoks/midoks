@@ -53,6 +53,13 @@ struct SearchOptions {
 enum Commands {
     /// start the fastcdn node server
     Start {},
+    /// stop the fastcdn node server
+    Stop {},
+    /// reload the fastcdn node server
+    Reload {},
+
+    /// fastcdn node server Status
+    Status {},
 
     /// 复制文件或目录
     Copy {
@@ -108,33 +115,29 @@ enum Commands {
         format: InfoFormat,
     },
 
-    /// 搜索文件内容
-    Search {
-        /// 搜索模式 (正则表达式)
-        pattern: String,
-
-        /// 搜索路径 (默认为当前目录)
-        path: Option<PathBuf>,
-
-        /// 搜索选项
-        #[command(flatten)]
-        options: SearchOptions,
-    },
+    /// test function
+    Test {},
 }
 
 fn main() {
     let args = Cli::parse();
 
-    // println!("命令行参数解析结果:");
-    // println!("s:{:#?}:e", args);
-    // for _ in 0..args.count {
-    //     println!("Hello {}!", args.command);
-    // }
+    println!("命令行参数解析结果:");
+    println!("s:{:#?}:e", args);
 
     // 在实际应用中，这里会根据解析的参数执行相应的操作
     match &args.command {
         Commands::Start {} => {
             println!("start server!!!");
+        }
+        Commands::Stop {} => {
+            println!("stop server!!!");
+        }
+        Commands::Reload {} => {
+            println!("reload server!!!");
+        }
+        Commands::Status {} => {
+            println!("reload server!!!");
         }
         Commands::Copy {
             source,
@@ -177,25 +180,9 @@ fn main() {
         Commands::Info { file, format } => {
             println!("查看文件信息: {} (格式: {:?})", file.display(), format);
         }
-        Commands::Search {
-            pattern,
-            path,
-            options,
-        } => {
-            let search_path = path
-                .as_ref()
-                .map(|p| p.display().to_string())
-                .unwrap_or_else(|| "当前目录".to_string());
 
-            println!("执行搜索操作: '{}' 在 {}", pattern, search_path);
-
-            if options.case_sensitive {
-                println!(" - 区分大小写");
-            } else if options.whole_word {
-                println!(" - 全词匹配");
-            } else if options.regex {
-                println!(" - 使用正则表达式");
-            }
+        Commands::Test {} => {
+            println!("test...");
         }
     }
 
