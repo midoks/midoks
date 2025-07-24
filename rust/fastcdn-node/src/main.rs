@@ -31,22 +31,6 @@ enum InfoFormat {
     Yaml,
 }
 
-/// 搜索选项
-#[derive(Parser, Debug)]
-#[group(required = false, multiple = false)]
-struct SearchOptions {
-    /// 区分大小写搜索
-    #[arg(short = 'c', long)]
-    case_sensitive: bool,
-
-    /// 全词匹配
-    #[arg(short = 'w', long)]
-    whole_word: bool,
-
-    /// 使用正则表达式
-    #[arg(short = 'r', long)]
-    regex: bool,
-}
 
 /// 支持的操作命令
 #[derive(Subcommand, Debug)]
@@ -186,7 +170,4 @@ fn main() {
         }
     }
 
-    // if args.verbose {
-    //     println!("详细模式已启用");
-    // }
 }
