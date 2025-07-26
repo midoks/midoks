@@ -46,3 +46,4 @@ node_modules
 */*/target
 main
 *.lock
+/rust/rpc/server/target
