@@ -22,4 +22,6 @@ action:
   - ./target/release/fastcdn-node start
   exit:
   - ./target/release/fastcdn stop
+  # 生成工作空间文档
+  # cargo doc --workspace --open
 link: https://github.com/midoks/zzz
