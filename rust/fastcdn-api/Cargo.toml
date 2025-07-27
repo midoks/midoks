@@ -1,8 +1,14 @@
 [package]
-name = "cdn_node"
-version = "0.1.0"
+name = "fastcdn-api"
+version = "0.0.1"
 edition = "2024"
 
 [dependencies]
+clap = { version = "4.5.41", features = ["derive"] }
 mini-redis = "0.4.1"
 tokio = "1.46.1"
+tonic = "0.12"
+prost = "0.13"
+
+[build-dependencies]
+tonic-build = "0.12"
