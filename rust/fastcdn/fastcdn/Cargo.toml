@@ -1,0 +1,13 @@
+[package]
+name = "fastcdn"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+mini-redis = "0.4.1"
+tokio = "1.46.1"
+actix-web = "4.9"
+mime_guess = "2.0"
+rust-embed = "8.7"
+serde = { version = "1.0", features = ["derive"] }
+env_logger = "0.10"
