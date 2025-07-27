@@ -44,16 +44,16 @@ fn main() {
     // 在实际应用中，这里会根据解析的参数执行相应的操作
     match &args.command {
         Commands::Start {} => {
-            println!("start server!!!");
+            println!("start node server!");
         }
         Commands::Stop {} => {
-            println!("stop server!!!");
+            println!("stop node server!");
         }
         Commands::Reload {} => {
-            println!("reload server!!!");
+            println!("reload node server!!!");
         }
         Commands::Status {} => {
-            println!("reload server!!!");
+            println!("reload node server!!!");
         }
 
         Commands::Test {} => {

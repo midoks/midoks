@@ -48,7 +48,7 @@ fn main() {
     // 执行相应的操作并返回适当的退出状态码
     let result: Result<&str, &str> = match &args.command {
         Some(Commands::Start {}) => {
-            println!("正在启动 fastcdn api 服务器...");
+            println!("正在启动 fastcdn api server...");
             // 这里应该包含实际的服务器启动逻辑
             Ok("服务器启动成功")
         }

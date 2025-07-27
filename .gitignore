@@ -44,3 +44,4 @@ node_modules
 main
 *.lock
 target
+*.pid

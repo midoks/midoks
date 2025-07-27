@@ -1,0 +1,25 @@
+dev: true
+title: zzz
+frequency: 3
+dirfilter:
+- tmp
+- .git
+- public
+- scripts
+- target
+- logs
+- templates
+ext:
+- rs
+lang: rust
+enablerun: true
+action:
+  before:
+  - echo "before"
+  after:
+  - ./target/release/fastcdn start
+  - ./target/release/fastcdn-api start
+  - ./target/release/fastcdn-node start
+  exit:
+  - echo "exit"
+link: https://github.com/midoks/zzz
