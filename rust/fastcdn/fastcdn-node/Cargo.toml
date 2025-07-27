@@ -8,5 +8,8 @@ argh = "0.1.13"
 clap = { version = "4.5.41", features = ["derive"] }
 hyper = "1.6.0"
 mime_guess = "2.0.5"
-tokio = "1.46.1"
+tokio = { version = "1.46.1", features = ["full"] }
+tonic = "0.12"
+prost = "0.13"
+tokio-stream = "0.1"
 

@@ -17,11 +17,16 @@ action:
   before:
   - echo "before"
   after:
-  - ./target/release/fastcdn start --daemon
-  - ./target/release/fastcdn-api start
-  - ./target/release/fastcdn-node start
+  - ./target/release/fastcdn start -d
+  - ./target/release/fastcdn-api start -d
+  - ./target/release/fastcdn-node start -d
   exit:
   - ./target/release/fastcdn stop
+  - ./target/release/fastcdn-api stop
+  - ./target/release/fastcdn-node stop
+  - rm -rf ./target/release/fastcdn
+  - rm -rf ./target/release/fastcdn-api
+  - rm -rf ./target/release/fastcdn-node
   # 生成工作空间文档
   # cargo doc --workspace --open
 link: https://github.com/midoks/zzz
