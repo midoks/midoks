@@ -1,4 +1,4 @@
-dev: true
+dev: false
 title: zzz
 frequency: 3
 dirfilter:
@@ -17,9 +17,9 @@ action:
   before:
   - echo "before"
   after:
-  - ./target/release/fastcdn start
+  - ./target/release/fastcdn start --daemon
   - ./target/release/fastcdn-api start
   - ./target/release/fastcdn-node start
   exit:
-  - echo "exit"
+  - ./target/release/fastcdn stop
 link: https://github.com/midoks/zzz
