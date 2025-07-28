@@ -14,7 +14,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let cert_der = cert.serialize_der()?;
     let priv_key = cert.serialize_private_key_der();
 
-    // 配置TLS
+    // 配置TLS支持0-RTT
     let mut server_crypto = rustls::ServerConfig::builder()
         .with_safe_defaults()
         .with_no_client_auth()
@@ -23,9 +23,21 @@ async fn main() -> Result<(), Box<dyn Error>> {
             rustls::PrivateKey(priv_key),
         )?;
     server_crypto.alpn_protocols = vec![b"hq-29".to_vec()];
+    
+    // 启用0-RTT支持
+    server_crypto.max_early_data_size = 0xffff_ffff;
+    server_crypto.send_half_rtt_data = true;
 
-    // 创建QUIC服务器配置
-    let server_config = ServerConfig::with_crypto(Arc::new(server_crypto));
+    // 创建QUIC服务器配置并启用0-RTT
+    let mut server_config = ServerConfig::with_crypto(Arc::new(server_crypto));
+    
+    // 配置传输参数以优化0-RTT性能
+    let mut transport_config = quinn::TransportConfig::default();
+    transport_config.max_concurrent_bidi_streams(100u32.into());
+    transport_config.max_concurrent_uni_streams(100u32.into());
+    transport_config.max_idle_timeout(Some(std::time::Duration::from_secs(30).try_into()?));
+    
+    server_config.transport = Arc::new(transport_config);
 
     // 绑定地址
     let addr: SocketAddr = "127.0.0.1:4433".parse()?;

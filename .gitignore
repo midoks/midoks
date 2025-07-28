@@ -45,3 +45,4 @@ main
 *.lock
 target
 *.pid
+*.txt

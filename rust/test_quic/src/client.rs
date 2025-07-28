@@ -10,15 +10,25 @@ async fn main() -> Result<(), Box<dyn Error>> {
     // 初始化日志
     tracing_subscriber::fmt::init();
 
-    // 配置客户端TLS（接受自签名证书）
+    // 配置客户端TLS支持0-RTT（接受自签名证书）
     let mut crypto = rustls::ClientConfig::builder()
         .with_safe_defaults()
         .with_custom_certificate_verifier(Arc::new(SkipServerVerification))
         .with_no_client_auth();
     crypto.alpn_protocols = vec![b"hq-29".to_vec()];
+    
+    // 启用0-RTT支持
+    crypto.enable_early_data = true;
 
-    // 创建QUIC客户端配置
-    let client_config = ClientConfig::new(Arc::new(crypto));
+    // 配置传输参数以优化0-RTT性能
+    let mut transport_config = quinn::TransportConfig::default();
+    transport_config.max_concurrent_bidi_streams(100u32.into());
+    transport_config.max_concurrent_uni_streams(100u32.into());
+    transport_config.max_idle_timeout(Some(std::time::Duration::from_secs(30).try_into()?));
+    
+    // 创建QUIC客户端配置并启用0-RTT
+    let mut client_config = ClientConfig::new(Arc::new(crypto));
+    client_config.transport_config(Arc::new(transport_config));
 
     // 创建端点
     let mut endpoint = Endpoint::client("0.0.0.0:0".parse()?)?;

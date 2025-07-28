@@ -26,14 +26,16 @@
 test_quic/
 ├── Cargo.toml          # 项目配置和依赖
 ├── src/
-│   ├── server.rs       # QUIC服务器
+│   ├── server.rs       # QUIC服务器（支持0-RTT）
 │   ├── client.rs       # QUIC客户端
+│   ├── client_0rtt.rs  # QUIC 0-RTT优化客户端
 │   ├── tcp_server.rs   # TCP服务器（对比用）
 │   ├── tcp_client.rs   # TCP客户端（对比用）
 │   ├── udp_server.rs   # UDP服务器（对比用）
 │   └── udp_client.rs   # UDP客户端（对比用）
 ├── benchmark.sh        # 性能对比测试脚本
 ├── full_benchmark.sh   # 完整的自动化测试脚本
+├── test_0rtt.sh        # QUIC 0-RTT专项测试脚本
 └── README.md           # 说明文档
 ```
 
@@ -56,6 +58,13 @@ cargo run --bin client
 ```
 
 客户端将连接到服务器并发送5条测试消息。
+
+**测试QUIC 0-RTT优化：**
+```bash
+cargo run --bin client_0rtt
+```
+
+0-RTT客户端会先建立会话，然后演示0-RTT连接的性能优势。
 
 ### 3. 运行TCP对比测试
 
@@ -98,6 +107,13 @@ cargo run --bin udp_client
 ```
 
 完整测试脚本会自动运行所有三种协议的测试，生成详细的对比报告，并保存测试结果到文件中。
+
+**QUIC 0-RTT专项测试：**
+```bash
+./test_0rtt.sh
+```
+
+专门测试QUIC 0-RTT功能的性能优势，对比标准QUIC和0-RTT优化的差异。
 
 ## 性能对比
 

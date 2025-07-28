@@ -22,6 +22,10 @@ name = "client"
 path = "src/client.rs"
 
 [[bin]]
+name = "client_0rtt"
+path = "src/client_0rtt.rs"
+
+[[bin]]
 name = "tcp_server"
 path = "src/tcp_server.rs"
 
