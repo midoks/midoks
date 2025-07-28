@@ -6,9 +6,9 @@ use tonic::Request;
 
 // 引入自动生成的proto代码
 use fastcdn_node::hello::hello_service_client::HelloServiceClient;
-use fastcdn_node::hello::{HelloRequest, HelloResponse};
+use fastcdn_node::hello::HelloRequest;
 use fastcdn_node::ping::ping_service_client::PingServiceClient;
-use fastcdn_node::ping::{PingRequest, PingResponse};
+use fastcdn_node::ping::PingRequest;
 
 /// 命令行信息
 #[derive(Parser, Debug)]

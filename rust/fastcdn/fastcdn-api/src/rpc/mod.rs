@@ -14,10 +14,8 @@ pub mod ping {
 }
 
 // 重新导出常用类型
-pub use hello::hello_service_server::{HelloService, HelloServiceServer};
-pub use hello::{HelloRequest, HelloResponse};
-pub use ping::ping_service_server::{PingService, PingServiceServer};
-pub use ping::{PingRequest, PingResponse};
+pub use hello::hello_service_server::HelloServiceServer;
+pub use ping::ping_service_server::PingServiceServer;
 
 // 重新导出服务实现
 pub use server::{MyHelloService, MyPingService};

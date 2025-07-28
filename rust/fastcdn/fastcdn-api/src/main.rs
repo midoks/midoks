@@ -49,7 +49,7 @@ enum Commands {
     Test {},
 }
 
-use std::process;
+
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -70,7 +70,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 // 获取当前可执行文件路径
                 let current_exe = match std::env::current_exe() {
                     Ok(exe) => exe,
-                    Err(e) => {
+                    Err(_e) => {
                         return Err(Box::new(std::io::Error::new(
                             std::io::ErrorKind::Other,
                             "无法获取当前执行文件路径",

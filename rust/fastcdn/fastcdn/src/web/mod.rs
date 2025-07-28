@@ -5,4 +5,4 @@
 pub mod server;
 
 // 重新导出常用组件
-pub use server::{HttpServerManager, StaticHandler, DaemonManager};
+pub use server::{HttpServerManager, DaemonManager};

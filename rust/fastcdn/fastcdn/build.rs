@@ -1,28 +1,27 @@
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let proto_dir = "../fastcdn-api/src/rpc/protos";
-    let hello_proto = format!("{}/hello.proto", proto_dir);
-    let ping_proto = format!("{}/ping.proto", proto_dir);
     
-    println!("cargo:rerun-if-changed={}", hello_proto);
-    println!("cargo:rerun-if-changed={}", ping_proto);
+    // 自动扫描protos目录下的所有.proto文件
+    let mut proto_files = Vec::new();
     
-    // 检查文件是否存在
-    if !std::path::Path::new(&hello_proto).exists() {
-        panic!("hello.proto not found at: {}", hello_proto);
+    for entry in std::fs::read_dir(proto_dir)? {
+        let entry = entry?;
+        let path = entry.path();
+        
+        if path.is_file() && path.extension().and_then(|s| s.to_str()) == Some("proto") {
+            proto_files.push(path.to_string_lossy().to_string());
+            println!("cargo:rerun-if-changed={}", path.display());
+        }
     }
-    if !std::path::Path::new(&ping_proto).exists() {
-        panic!("ping.proto not found at: {}", ping_proto);
+    
+    if !proto_files.is_empty() {
+        let out_dir = std::env::var("OUT_DIR")?;
+        
+        tonic_build::configure()
+            .build_server(false) // 只生成客户端代码
+            .out_dir(&out_dir)
+            .compile_protos(&proto_files, &[proto_dir])?;
     }
-    
-    let out_dir = std::env::var("OUT_DIR")?;
-    
-    tonic_build::configure()
-        .build_server(false) // 只生成客户端代码
-        .out_dir(&out_dir)
-        .compile(
-            &[hello_proto, ping_proto],
-            &[proto_dir],
-        )?;
     
     Ok(())
 }

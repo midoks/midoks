@@ -10,9 +10,9 @@ use web::{DaemonManager, HttpServerManager};
 
 
 use fastcdn::hello::hello_service_client::HelloServiceClient;
-use fastcdn::hello::{HelloRequest, HelloResponse};
+use fastcdn::hello::HelloRequest;
 use fastcdn::ping::ping_service_client::PingServiceClient;
-use fastcdn::ping::{PingRequest, PingResponse};
+use fastcdn::ping::PingRequest;
 
 /// 命令行信息
 #[derive(Parser, Debug)]

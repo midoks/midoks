@@ -8,5 +8,5 @@ pub mod daemon_manager;
 
 // 重新导出主要组件
 pub use http_server::HttpServerManager;
-pub use static_handler::StaticHandler;
+
 pub use daemon_manager::DaemonManager;
