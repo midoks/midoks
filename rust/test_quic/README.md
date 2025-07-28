@@ -32,7 +32,9 @@ test_quic/
 │   ├── tcp_server.rs   # TCP服务器（对比用）
 │   ├── tcp_client.rs   # TCP客户端（对比用）
 │   ├── udp_server.rs   # UDP服务器（对比用）
-│   └── udp_client.rs   # UDP客户端（对比用）
+│   ├── udp_client.rs   # UDP客户端（对比用）
+│   ├── https_server.rs # HTTPS服务器（对比用）
+│   └── https_client.rs # HTTPS客户端（对比用）
 ├── benchmark.sh        # 性能对比测试脚本
 ├── full_benchmark.sh   # 完整的自动化测试脚本
 ├── test_0rtt.sh        # QUIC 0-RTT专项测试脚本
@@ -94,7 +96,21 @@ cargo run --bin udp_server
 cargo run --bin udp_client
 ```
 
-### 6. 自动化性能对比
+### 6. 运行HTTPS对比测试
+
+HTTPS作为现代Web应用的标准，提供了安全的HTTP传输：
+
+**启动HTTPS服务器：**
+```bash
+cargo run --bin https_server
+```
+
+**运行HTTPS客户端：**
+```bash
+cargo run --bin https_client
+```
+
+### 7. 自动化性能对比
 
 **基础对比脚本：**
 ```bash
