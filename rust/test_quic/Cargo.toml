@@ -1,0 +1,30 @@
+[package]
+name = "test_quic"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+quinn = "0.10"
+tokio = { version = "1.0", features = ["full"] }
+rcgen = "0.12"
+rustls = { version = "0.21", features = ["dangerous_configuration"] }
+rustls-pemfile = "1.0"
+anyhow = "1.0"
+tracing = "0.1"
+tracing-subscriber = "0.3"
+
+[[bin]]
+name = "server"
+path = "src/server.rs"
+
+[[bin]]
+name = "client"
+path = "src/client.rs"
+
+[[bin]]
+name = "tcp_server"
+path = "src/tcp_server.rs"
+
+[[bin]]
+name = "tcp_client"
+path = "src/tcp_client.rs"
