@@ -1,6 +1,5 @@
 use std::sync::Arc;
 use std::net::SocketAddr;
-use std::time::Instant;
 use tokio::net::{TcpListener, TcpStream};
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio_rustls::{TlsAcceptor, rustls};

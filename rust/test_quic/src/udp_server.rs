@@ -1,5 +1,4 @@
 use std::net::UdpSocket;
-use std::time::Instant;
 
 fn main() -> std::io::Result<()> {
     let socket = UdpSocket::bind("127.0.0.1:9090")?;

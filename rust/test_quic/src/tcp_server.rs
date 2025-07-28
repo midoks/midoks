@@ -1,7 +1,6 @@
 use std::io::{Read, Write};
 use std::net::{TcpListener, TcpStream};
 use std::thread;
-use std::time::Instant;
 
 fn handle_client(mut stream: TcpStream) {
     println!("新的TCP连接: {}", stream.peer_addr().unwrap());
