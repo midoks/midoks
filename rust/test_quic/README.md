@@ -29,8 +29,11 @@ test_quic/
 │   ├── server.rs       # QUIC服务器
 │   ├── client.rs       # QUIC客户端
 │   ├── tcp_server.rs   # TCP服务器（对比用）
-│   └── tcp_client.rs   # TCP客户端（对比用）
+│   ├── tcp_client.rs   # TCP客户端（对比用）
+│   ├── udp_server.rs   # UDP服务器（对比用）
+│   └── udp_client.rs   # UDP客户端（对比用）
 ├── benchmark.sh        # 性能对比测试脚本
+├── full_benchmark.sh   # 完整的自动化测试脚本
 └── README.md           # 说明文档
 ```
 
@@ -68,14 +71,33 @@ cargo run --bin tcp_server
 cargo run --bin tcp_client
 ```
 
-### 4. 自动化性能对比
+### 5. 运行UDP对比测试
 
-运行性能对比脚本：
+UDP作为无连接协议，提供最基础的网络传输性能基准：
+
+**启动UDP服务器：**
+```bash
+cargo run --bin udp_server
+```
+
+**运行UDP客户端：**
+```bash
+cargo run --bin udp_client
+```
+
+### 6. 自动化性能对比
+
+**基础对比脚本：**
 ```bash
 ./benchmark.sh
 ```
 
-这个脚本会自动运行QUIC和TCP测试，方便对比两者的性能差异。
+**完整测试脚本（推荐）：**
+```bash
+./full_benchmark.sh
+```
+
+完整测试脚本会自动运行所有三种协议的测试，生成详细的对比报告，并保存测试结果到文件中。
 
 ## 性能对比
 

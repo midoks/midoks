@@ -42,11 +42,26 @@ echo "运行TCP客户端..."
 
 echo "关闭TCP服务器..."
 kill $TCP_SERVER_PID
+sleep 1
+
+echo
+echo "=== UDP 性能测试 ==="
+echo "启动UDP服务器..."
+./target/release/udp_server &
+UDP_SERVER_PID=$!
+sleep 2  # 等待服务器启动
+
+echo "运行UDP客户端..."
+./target/release/udp_client
+
+echo "关闭UDP服务器..."
+kill $UDP_SERVER_PID
 
 echo
 echo "=== 测试完成 ==="
-echo "请查看上面的输出来对比QUIC和TCP的性能差异。"
+echo "请查看上面的输出来对比QUIC、TCP和UDP的性能差异。"
 echo "主要关注点："
-echo "1. 连接建立时间"
+echo "1. 连接建立时间（UDP无连接）"
 echo "2. 消息往返时间"
-echo "3. 整体性能表现"
+echo "3. 协议开销对比"
+echo "4. 可靠性 vs 性能权衡"

@@ -28,3 +28,11 @@ path = "src/tcp_server.rs"
 [[bin]]
 name = "tcp_client"
 path = "src/tcp_client.rs"
+
+[[bin]]
+name = "udp_server"
+path = "src/udp_server.rs"
+
+[[bin]]
+name = "udp_client"
+path = "src/udp_client.rs"
