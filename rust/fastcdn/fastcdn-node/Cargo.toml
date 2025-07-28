@@ -3,6 +3,9 @@ name = "fastcdn-node"
 version = "0.0.1"
 edition = "2024"
 
+[build-dependencies]
+tonic-build = "0.12"
+
 [dependencies]
 argh = "0.1.13"
 clap = { version = "4.5.41", features = ["derive"] }

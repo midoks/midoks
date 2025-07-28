@@ -1,71 +1,26 @@
-use actix_web::{App, HttpRequest, HttpResponse, HttpServer, Responder, get, post, web};
 use clap::{Parser, Subcommand};
-use mime_guess::from_path;
-use rust_embed::RustEmbed;
-use std::borrow::Cow;
-use std::fs::{File, remove_file};
-use std::io::{Write, Read};
-use std::process::{Command, Stdio};
 
+// 引入模块化的Web服务器和RPC客户端
 mod app;
-use app::api;
+mod web;
 
-// 嵌入静态文件
-#[derive(RustEmbed)]
-#[folder = "public/"]
-struct Asset;
+use web::{DaemonManager, HttpServerManager};
 
-// 处理静态文件请求
-async fn handle_static(req: HttpRequest) -> impl Responder {
-    let path = req.path().trim_start_matches('/');
-    // println!("{}", path);
-    match Asset::get(path) {
-        Some(content) => {
-            let mime = from_path(path).first_or_octet_stream();
-            let body: Cow<[u8]> = content.data.into();
-            HttpResponse::Ok().content_type(mime.as_ref()).body(body)
-        }
-        None => HttpResponse::NotFound().body("404 Not Found"),
-    }
-}
+// 引入自动生成的proto代码
 
-// 首页重定向
-async fn index() -> impl Responder {
-    HttpResponse::Found()
-        .append_header(("Location", "/static/index.html"))
-        .finish()
-}
 
-#[get("/")]
-async fn hello() -> impl Responder {
-    HttpResponse::Ok().body("Hello world!")
-}
-
-#[get("/ec")]
-async fn ec(req_body: String) -> impl Responder {
-    HttpResponse::Ok().body(req_body)
-}
-
-#[post("/echos")]
-async fn echo(req_body: String) -> impl Responder {
-    HttpResponse::Ok().body(req_body)
-}
-
-async fn echh() -> impl Responder {
-    HttpResponse::Ok().body("ffdd")
-}
-
-async fn manual_hello() -> impl Responder {
-    HttpResponse::Ok().body("Hey there2!")
-}
+use fastcdn::hello::hello_service_client::HelloServiceClient;
+use fastcdn::hello::{HelloRequest, HelloResponse};
+use fastcdn::ping::ping_service_client::PingServiceClient;
+use fastcdn::ping::{PingRequest, PingResponse};
 
 /// 命令行信息
 #[derive(Parser, Debug)]
 #[command(
     author = "midoks <midoks@163.com>",
     version = "0.0.1",
-    about = "fastcdn-api",
-    long_about = "fastcdn api service"
+    about = "fastcdn",
+    long_about = "fastcdn service"
 )]
 
 struct Cli {
@@ -98,8 +53,6 @@ enum Commands {
     Test {},
 }
 
-use std::process;
-
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     let args = Cli::parse();
@@ -109,184 +62,67 @@ async fn main() -> std::io::Result<()> {
         println!("{:#?}", args);
     }
 
+    let daemon_manager = DaemonManager::new("fastcdn.pid");
+
     // 执行相应的操作并返回适当的退出状态码
     let result: Result<&str, std::io::Error> = match &args.command {
         Some(Commands::Start { daemon }) => {
             if *daemon {
                 // 后台模式运行
-                println!("正在启动后台服务...");
-
-                // 获取当前可执行文件路径
-                let current_exe = match std::env::current_exe() {
-                    Ok(exe) => exe,
-                    Err(e) => {
-                        return Err(std::io::Error::new(
-                            std::io::ErrorKind::Other,
-                            "无法获取当前执行文件路径",
-                        ));
-                    }
-                };
-
-                // 启动后台进程
-                let child = match Command::new(current_exe)
-                    .arg("start")
-                    .stdin(Stdio::null())
-                    .stdout(Stdio::null())
-                    .stderr(Stdio::null())
-                    .spawn()
-                {
-                    Ok(child) => child,
-                    Err(e) => return Err(e),
-                };
-
-                // 保存PID到文件
-                let pid_file = "fastcdn.pid";
-                let mut file = match File::create(pid_file) {
-                    Ok(file) => file,
-                    Err(e) => return Err(e),
-                };
-
-                if let Err(e) = writeln!(file, "{}", child.id()) {
-                    return Err(e);
-                }
-
-                println!("✓ 服务已在后台启动，PID: {}", child.id());
-                println!("✓ PID已保存到文件: {}", pid_file);
-                println!("✓ 服务地址: http://127.0.0.1:8980");
-
+                daemon_manager.start_daemon()?;
                 Ok("后台服务启动成功")
             } else {
                 // 前台模式运行
-                println!("Server running at http://127.0.0.1:8980");
-                let server_result = HttpServer::new(|| {
-                    App::new()
-                        .service(
-                            web::resource("/static/{_:.*}").route(web::get().to(handle_static)),
-                        )
-                        .service(web::scope("/api").service(api::hello))
-                        // .service(hello)
-                        // .service(echo)
-                        // .route("/echh", web::get().to(echh))
-                        // .route("/hey", web::get().to(manual_hello))
-                        .route("/", web::get().to(index))
-                })
-                .bind(("127.0.0.1", 8980));
-
-                match server_result {
-                    Ok(server) => {
-                        if let Err(e) = server.run().await {
-                            eprintln!("服务器运行失败: {}", e);
-                            std::process::exit(1);
-                        }
-                        Ok("服务器启动成功")
-                    }
-                    Err(e) => {
-                        eprintln!("服务器绑定失败: {}", e);
-                        std::process::exit(1);
-                    }
-                }
+                HttpServerManager::start().await?;
+                Ok("服务器启动成功")
             }
         }
         Some(Commands::Stop {}) => {
-            println!("正在停止 fastcdn api 服务器...");
-            
-            let pid_file = "fastcdn.pid";
-            
-            // 检查PID文件是否存在
-            if !std::path::Path::new(pid_file).exists() {
-                println!("⚠️  PID文件不存在，服务可能未在后台运行");
-                return Ok(());
-            }
-            
-            // 读取PID文件
-            let mut file = match File::open(pid_file) {
-                Ok(file) => file,
-                Err(e) => {
-                    eprintln!("无法打开PID文件: {}", e);
-                    return Err(e);
-                }
-            };
-            
-            let mut pid_str = String::new();
-            if let Err(e) = file.read_to_string(&mut pid_str) {
-                eprintln!("无法读取PID文件: {}", e);
-                return Err(e);
-            }
-            
-            let pid = match pid_str.trim().parse::<u32>() {
-                Ok(pid) => pid,
-                Err(_) => {
-                    eprintln!("PID文件格式错误");
-                    return Err(std::io::Error::new(std::io::ErrorKind::InvalidData, "PID文件格式错误"));
-                }
-            };
-            
-            println!("找到后台进程 PID: {}", pid);
-             
-             // 先检查进程是否存在
-             let check_result = Command::new("kill")
-                 .arg("-0")
-                 .arg(pid.to_string())
-                 .output();
-                 
-             match check_result {
-                 Ok(output) => {
-                     if output.status.success() {
-                         // 进程存在，尝试终止
-                         let kill_result = Command::new("kill")
-                             .arg(pid.to_string())
-                             .output();
-                             
-                         match kill_result {
-                             Ok(kill_output) => {
-                                 if kill_output.status.success() {
-                                     println!("✓ 成功终止进程 PID: {}", pid);
-                                 } else {
-                                     let error_msg = String::from_utf8_lossy(&kill_output.stderr);
-                                     eprintln!("⚠️  终止进程时出现警告: {}", error_msg);
-                                 }
-                             }
-                             Err(e) => {
-                                 eprintln!("⚠️  执行kill命令失败: {}", e);
-                             }
-                         }
-                     } else {
-                         // 进程不存在
-                         println!("⚠️  进程 PID: {} 不存在，可能已经退出", pid);
-                     }
-                     
-                     // 无论如何都删除PID文件
-                     if let Err(e) = remove_file(pid_file) {
-                         eprintln!("⚠️  删除PID文件失败: {}", e);
-                     } else {
-                         println!("✓ 已删除PID文件");
-                     }
-                     
-                     Ok("服务器停止成功")
-                 }
-                 Err(e) => {
-                     eprintln!("检查进程状态失败: {}", e);
-                     Err(e)
-                 }
-             }
+            daemon_manager.stop_daemon()?;
+            Ok("服务器停止成功")
         }
         Some(Commands::Reload {}) => {
-            println!("正在重新加载 fastcdn api 服务器...");
-            // 这里应该包含实际的服务器重载逻辑
+            daemon_manager.reload_service()?;
             Ok("服务器重载成功")
         }
         Some(Commands::Status {}) => {
-            println!("正在检查 fastcdn api 服务器状态...");
-            // 这里应该包含实际的状态检查逻辑
-            Ok("服务器状态正常")
+            daemon_manager.check_status()?;
+            Ok("状态检查完成")
         }
         Some(Commands::Test {}) => {
-            println!("正在执行测试...");
-            // 这里应该包含实际的测试逻辑
+            println!("正在测试gRPC连接...");
+
+            // 测试Ping服务
+            match PingServiceClient::connect("http://127.0.0.1:50051").await {
+                Ok(mut client) => {
+                    let request = tonic::Request::new(PingRequest {});
+                    match client.ping(request).await {
+                        Ok(response) => println!("✓ Ping服务连接成功: {:?}", response.into_inner()),
+                        Err(e) => println!("✗ Ping服务调用失败: {}", e),
+                    }
+                }
+                Err(e) => println!("✗ Ping服务连接失败: {}", e),
+            }
+
+            // 测试Hello服务
+            match HelloServiceClient::connect("http://127.0.0.1:50051").await {
+                Ok(mut client) => {
+                    let request = tonic::Request::new(HelloRequest {
+                        name: "FastCDN Web".to_string(),
+                    });
+                    match client.say_hello(request).await {
+                        Ok(response) => println!("✓ Hello服务响应: {}", response.get_ref().message),
+                        Err(e) => println!("✗ Hello服务调用失败: {}", e),
+                    }
+                }
+                Err(e) => println!("✗ Hello服务连接失败: {}", e),
+            }
+
+            println!("✓ 所有gRPC连接测试完成");
             Ok("测试执行完成")
         }
         None => {
-            println!("欢迎使用 fastcdn-api 服务！");
+            println!("欢迎使用 fastcdn 服务！");
             println!("使用 --help 查看可用命令");
             Ok("程序执行完成")
         }

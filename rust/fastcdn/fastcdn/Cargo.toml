@@ -3,6 +3,9 @@ name = "fastcdn"
 version = "0.1.0"
 edition = "2024"
 
+[build-dependencies]
+tonic-build = "0.12"
+
 [dependencies]
 mini-redis = "0.4.1"
 tokio = "1.46.1"
@@ -12,3 +15,7 @@ rust-embed = "8.7"
 serde = { version = "1.0", features = ["derive"] }
 env_logger = "0.10"
 clap = { version = "4.0", features = ["derive"] }
+# gRPC dependencies
+tonic = "0.12"
+prost = "0.13"
+http = "1.0"

@@ -4,11 +4,11 @@ use std::io::{Read, Write};
 use std::process::{Command, Stdio};
 use tonic::Request;
 
-// 引入手动创建的proto代码
-mod proto_gen;
-
-use proto_gen::hello::{HelloRequest, hello_service_client::HelloServiceClient};
-use proto_gen::service_ping::{PingRequest, ping_service_client::PingServiceClient};
+// 引入自动生成的proto代码
+use fastcdn_node::hello::hello_service_client::HelloServiceClient;
+use fastcdn_node::hello::{HelloRequest, HelloResponse};
+use fastcdn_node::ping::ping_service_client::PingServiceClient;
+use fastcdn_node::ping::{PingRequest, PingResponse};
 
 /// 命令行信息
 #[derive(Parser, Debug)]
@@ -93,6 +93,7 @@ async fn start_node_server() -> Result<(), Box<dyn std::error::Error>> {
     // 为了演示，我们让它保持运行
     loop {
         tokio::time::sleep(tokio::time::Duration::from_secs(10)).await;
+        println!("time...");
         // 定期ping API服务器
         if let Err(e) = ping_api_server().await {
             println!("警告: 无法连接到API服务器: {}", e);

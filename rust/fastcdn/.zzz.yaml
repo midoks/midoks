@@ -24,9 +24,9 @@ action:
   - ./target/release/fastcdn stop
   - ./target/release/fastcdn-api stop
   - ./target/release/fastcdn-node stop
-  - rm -rf ./target/release/fastcdn
-  - rm -rf ./target/release/fastcdn-api
-  - rm -rf ./target/release/fastcdn-node
+  # - rm -rf ./target/release/fastcdn
+  # - rm -rf ./target/release/fastcdn-api
+  # - rm -rf ./target/release/fastcdn-node
   # 生成工作空间文档
   # cargo doc --workspace --open
 link: https://github.com/midoks/zzz
