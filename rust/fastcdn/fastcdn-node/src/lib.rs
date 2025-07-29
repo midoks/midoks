@@ -1,8 +1,6 @@
-// 包含生成的proto代码
-pub mod hello {
-    tonic::include_proto!("hello");
-}
+//! FastCDN Node库模块
 
-pub mod ping {
-    tonic::include_proto!("ping");
-}
+pub mod rpc;
+
+// 重新导出proto定义
+pub use rpc::{hello, ping};

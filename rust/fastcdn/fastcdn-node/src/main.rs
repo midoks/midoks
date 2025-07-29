@@ -2,13 +2,10 @@ use clap::{Parser, Subcommand};
 use std::fs::{File, remove_file};
 use std::io::{Read, Write};
 use std::process::{Command, Stdio};
-use tonic::Request;
 
-// 引入自动生成的proto代码
-use fastcdn_node::hello::hello_service_client::HelloServiceClient;
-use fastcdn_node::hello::HelloRequest;
-use fastcdn_node::ping::ping_service_client::PingServiceClient;
-use fastcdn_node::ping::PingRequest;
+
+// 引入共享的RPC客户端
+use fastcdn_api::{HelloClient, PingClient};
 
 /// 命令行信息
 #[derive(Parser, Debug)]
@@ -235,26 +232,21 @@ async fn test_grpc_connection() -> Result<(), Box<dyn std::error::Error>> {
 // 测试API连接
 async fn test_api_connection() -> Result<(), Box<dyn std::error::Error>> {
     // 测试Ping服务
-    let mut ping_client = PingServiceClient::connect("http://127.0.0.1:50051").await?;
-    let ping_request = Request::new(PingRequest {});
-    let _ping_response = ping_client.ping(ping_request).await?;
+    let mut ping_client = PingClient::connect("http://127.0.0.1:50051").await?;
+    let _ping_response = ping_client.ping().await?;
     println!("✓ Ping服务连接成功");
 
     // 测试Hello服务
-    let mut hello_client = HelloServiceClient::connect("http://127.0.0.1:50051").await?;
-    let hello_request = Request::new(HelloRequest {
-        name: "fastcdn-node".to_string(),
-    });
-    let hello_response = hello_client.say_hello(hello_request).await?;
-    println!("✓ Hello服务响应: {}", hello_response.get_ref().message);
+    let mut hello_client = HelloClient::connect("http://127.0.0.1:50051").await?;
+    let hello_response = hello_client.say_hello("fastcdn-node").await?;
+    println!("✓ Hello服务响应: {}", hello_response);
 
     Ok(())
 }
 
 // 定期ping API服务器
 async fn ping_api_server() -> Result<(), Box<dyn std::error::Error>> {
-    let mut ping_client = PingServiceClient::connect("http://127.0.0.1:50051").await?;
-    let ping_request = Request::new(PingRequest {});
-    let _ping_response = ping_client.ping(ping_request).await?;
+    let mut ping_client = PingClient::connect("http://127.0.0.1:50051").await?;
+    let _ping_response = ping_client.ping().await?;
     Ok(())
 }

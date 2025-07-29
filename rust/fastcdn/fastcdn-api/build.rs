@@ -17,7 +17,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     if !proto_files.is_empty() {
         tonic_build::configure()
             .build_server(true)
-            .build_client(false)
+            .build_client(true)
             .compile_protos(&proto_files, &[proto_dir])?;
     }
     

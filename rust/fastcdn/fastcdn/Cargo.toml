@@ -19,3 +19,5 @@ clap = { version = "4.0", features = ["derive"] }
 tonic = "0.12"
 prost = "0.13"
 http = "1.0"
+# 共享RPC客户端
+fastcdn-api = { path = "../fastcdn-api" }

@@ -6,13 +6,8 @@ mod web;
 
 use web::{DaemonManager, HttpServerManager};
 
-// 引入自动生成的proto代码
-
-
-use fastcdn::hello::hello_service_client::HelloServiceClient;
-use fastcdn::hello::HelloRequest;
-use fastcdn::ping::ping_service_client::PingServiceClient;
-use fastcdn::ping::PingRequest;
+// 引入共享的RPC客户端
+use fastcdn_api::{HelloClient, PingClient};
 
 /// 命令行信息
 #[derive(Parser, Debug)]
@@ -93,11 +88,10 @@ async fn main() -> std::io::Result<()> {
             println!("正在测试gRPC连接...");
 
             // 测试Ping服务
-            match PingServiceClient::connect("http://127.0.0.1:50051").await {
+            match PingClient::connect("http://127.0.0.1:50051").await {
                 Ok(mut client) => {
-                    let request = tonic::Request::new(PingRequest {});
-                    match client.ping(request).await {
-                        Ok(response) => println!("✓ Ping服务连接成功: {:?}", response.into_inner()),
+                    match client.ping().await {
+                        Ok(response) => println!("✓ Ping服务连接成功: {}", response),
                         Err(e) => println!("✗ Ping服务调用失败: {}", e),
                     }
                 }
@@ -105,13 +99,10 @@ async fn main() -> std::io::Result<()> {
             }
 
             // 测试Hello服务
-            match HelloServiceClient::connect("http://127.0.0.1:50051").await {
+            match HelloClient::connect("http://127.0.0.1:50051").await {
                 Ok(mut client) => {
-                    let request = tonic::Request::new(HelloRequest {
-                        name: "FastCDN Web".to_string(),
-                    });
-                    match client.say_hello(request).await {
-                        Ok(response) => println!("✓ Hello服务响应: {}", response.get_ref().message),
+                    match client.say_hello("FastCDN Web").await {
+                        Ok(response) => println!("✓ Hello服务响应: {}", response),
                         Err(e) => println!("✗ Hello服务调用失败: {}", e),
                     }
                 }
