@@ -1,0 +1,4 @@
+rpc.endpoints: ['http://127.0.0.1:8001']
+rpc.disableUpdate: false
+nodeId: xxx
+secret: xxx
