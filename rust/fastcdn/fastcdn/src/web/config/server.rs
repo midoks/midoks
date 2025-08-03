@@ -125,18 +125,12 @@ impl Manager {
     }
 
     /// 重新加载服务器配置
-    pub fn reload_server(&mut self) -> Result<(), Box<dyn std::error::Error>> {
+    pub fn reload(&mut self) -> Result<(), Box<dyn std::error::Error>> {
         let new_server = Server::load_default()?;
         new_server
             .validate()
             .map_err(|e| Box::new(std::io::Error::new(std::io::ErrorKind::InvalidData, e)))?;
         self.server = new_server;
-        Ok(())
-    }
-
-    /// 重新加载所有配置
-    pub fn reload_all(&mut self) -> Result<(), Box<dyn std::error::Error>> {
-        self.reload_server()?;
         Ok(())
     }
 }

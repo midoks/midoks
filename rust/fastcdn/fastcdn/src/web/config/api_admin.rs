@@ -121,19 +121,13 @@ impl Manager {
     }
 
     /// 重新加载API管理员配置
-    pub fn reload_api_admin(&mut self) -> Result<(), Box<dyn std::error::Error>> {
+    pub fn reload(&mut self) -> Result<(), Box<dyn std::error::Error>> {
         let new_api_admin = ApiAdmin::load_default()?;
         new_api_admin
             .validate()
             .map_err(|e| Box::new(std::io::Error::new(std::io::ErrorKind::InvalidData, e)))?;
         self.api_admin = new_api_admin;
 
-        Ok(())
-    }
-
-    /// 重新加载所有配置
-    pub fn reload_all(&mut self) -> Result<(), Box<dyn std::error::Error>> {
-        self.reload_api_admin()?;
         Ok(())
     }
 }
