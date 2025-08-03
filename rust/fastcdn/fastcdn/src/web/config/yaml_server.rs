@@ -2,6 +2,9 @@ use serde::{Deserialize, Serialize};
 use std::fs;
 use std::path::Path;
 
+/// 默认服务器配置文件路径
+const DEFAULT_SERVER_CONFIG_PATH: &str = "configs/server.yaml";
+
 /// HTTP配置
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Http {
@@ -38,7 +41,7 @@ impl Server {
 
     /// 从默认路径加载配置
     pub fn load_default() -> Result<Self, Box<dyn std::error::Error>> {
-        Self::load_from_file("configs/server.yaml")
+        Self::load_from_file(DEFAULT_SERVER_CONFIG_PATH)
     }
 
     /// 验证配置是否有效
