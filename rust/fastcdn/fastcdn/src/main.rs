@@ -1,11 +1,11 @@
 use clap::{Parser, Subcommand};
+use std::env;
 
 // 引入模块化的Web服务器和RPC客户端
 mod app;
 mod web;
 
-use web::{DaemonManager, HttpServerManager};
-
+use web::{DaemonManager, HttpServerManager, ConfigManager};
 // 引入共享的RPC客户端
 use fastcdn_api::{HelloClient, PingClient};
 
@@ -27,6 +27,7 @@ struct Cli {
     #[command(subcommand)]
     command: Option<Commands>,
 }
+
 /// subcommand operation mode
 #[derive(Subcommand, Debug)]
 enum Commands {
@@ -40,10 +41,8 @@ enum Commands {
     Stop {},
     /// reload the fastcdn api server
     Reload {},
-
     /// fastcdn api server Status
     Status {},
-
     /// test function
     Test {},
 }
@@ -110,6 +109,39 @@ async fn main() -> std::io::Result<()> {
             }
 
             println!("✓ 所有gRPC连接测试完成");
+            
+            // 测试配置加载功能
+            match env::current_dir() {
+                Ok(path) => {
+                    println!("当前运行目录: {}", path.display());
+
+                    // 使用web/config模块的配置管理器
+                    match ConfigManager::new() {
+                        Ok(config_manager) => {
+                            let server_config = config_manager.server();
+                            println!("✓ 配置文件加载成功: {:#?}", server_config);
+                            
+                            // 显示配置信息
+                            println!("环境: {}", server_config.env);
+                            println!("HTTP服务: {}", if server_config.http.on { "启用" } else { "禁用" });
+                            if server_config.http.on {
+                                println!("HTTP监听地址: {:?}", server_config.get_http_addresses());
+                            }
+                            println!("HTTPS服务: {}", if server_config.https.on { "启用" } else { "禁用" });
+                            if server_config.https.on {
+                                println!("HTTPS监听地址: {:?}", server_config.get_https_addresses());
+                            }
+                        }
+                        Err(e) => {
+                            println!("✗ 配置文件加载失败: {}", e);
+                        }
+                    }
+                }
+                Err(e) => {
+                    eprintln!("获取目录失败: {}", e);
+                }
+            }
+
             Ok("测试执行完成")
         }
         None => {
