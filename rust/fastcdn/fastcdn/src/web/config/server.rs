@@ -93,3 +93,50 @@ impl Server {
         self.env == "dev" || self.env == "development"
     }
 }
+
+/// 配置管理器
+pub struct Manager {
+    server: Server,
+}
+
+impl Manager {
+    /// 创建新的配置管理器
+    pub fn new() -> Result<Self, Box<dyn std::error::Error>> {
+        let server = Server::load_default()?;
+        server
+            .validate()
+            .map_err(|e| Box::new(std::io::Error::new(std::io::ErrorKind::InvalidData, e)))?;
+
+        Ok(Manager { server })
+    }
+
+    /// 创建包含API管理员配置的配置管理器
+    pub fn new_with_api_admin() -> Result<Self, Box<dyn std::error::Error>> {
+        let server = Server::load_default()?;
+        server
+            .validate()
+            .map_err(|e| Box::new(std::io::Error::new(std::io::ErrorKind::InvalidData, e)))?;
+        Ok(Manager { server })
+    }
+
+    /// 获取服务器配置
+    pub fn server(&self) -> &Server {
+        &self.server
+    }
+
+    /// 重新加载服务器配置
+    pub fn reload_server(&mut self) -> Result<(), Box<dyn std::error::Error>> {
+        let new_server = Server::load_default()?;
+        new_server
+            .validate()
+            .map_err(|e| Box::new(std::io::Error::new(std::io::ErrorKind::InvalidData, e)))?;
+        self.server = new_server;
+        Ok(())
+    }
+
+    /// 重新加载所有配置
+    pub fn reload_all(&mut self) -> Result<(), Box<dyn std::error::Error>> {
+        self.reload_server()?;
+        Ok(())
+    }
+}

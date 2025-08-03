@@ -78,3 +78,62 @@ impl ApiAdmin {
         }
     }
 }
+
+/// 配置管理器
+pub struct Manager {
+    api_admin: ApiAdmin,
+}
+
+impl Manager {
+    /// 创建新的配置管理器
+    pub fn new() -> Result<Self, Box<dyn std::error::Error>> {
+        let api_admin = ApiAdmin::load_default()?;
+        api_admin
+            .validate()
+            .map_err(|e| Box::new(std::io::Error::new(std::io::ErrorKind::InvalidData, e)))?;
+
+        Ok(Manager { api_admin })
+    }
+
+    /// 创建包含API管理员配置的配置管理器
+    pub fn new_with_api_admin() -> Result<Self, Box<dyn std::error::Error>> {
+        let api_admin = ApiAdmin::load_default()?;
+        api_admin
+            .validate()
+            .map_err(|e| Box::new(std::io::Error::new(std::io::ErrorKind::InvalidData, e)))?;
+
+        Ok(Manager { api_admin })
+    }
+
+    /// 加载API管理员配置
+    pub fn load_api_admin(&mut self) -> Result<(), Box<dyn std::error::Error>> {
+        let api_admin = ApiAdmin::load_default()?;
+        api_admin
+            .validate()
+            .map_err(|e| Box::new(std::io::Error::new(std::io::ErrorKind::InvalidData, e)))?;
+        self.api_admin = api_admin;
+        Ok(())
+    }
+
+    /// 获取API管理员配置
+    pub fn api_admin(&self) -> &ApiAdmin {
+        &self.api_admin
+    }
+
+    /// 重新加载API管理员配置
+    pub fn reload_api_admin(&mut self) -> Result<(), Box<dyn std::error::Error>> {
+        let new_api_admin = ApiAdmin::load_default()?;
+        new_api_admin
+            .validate()
+            .map_err(|e| Box::new(std::io::Error::new(std::io::ErrorKind::InvalidData, e)))?;
+        self.api_admin = new_api_admin;
+
+        Ok(())
+    }
+
+    /// 重新加载所有配置
+    pub fn reload_all(&mut self) -> Result<(), Box<dyn std::error::Error>> {
+        self.reload_api_admin()?;
+        Ok(())
+    }
+}
