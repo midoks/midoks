@@ -4,4 +4,7 @@ members = [
     "fastcdn-api",
     "fastcdn-node",
 ]
-resolver = "2"  # 推荐使用版本2解析器
+resolver = "2"
+
+[profile.dev]
+debug = true
