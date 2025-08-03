@@ -6,5 +6,5 @@ pub mod config;
 pub mod server;
 
 // 重新导出常用组件
-pub use config::{api_admin, server};
+pub use config::server as config_server;
 pub use server::{DaemonManager, HttpServerManager};

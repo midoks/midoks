@@ -5,7 +5,7 @@ use std::env;
 mod app;
 mod web;
 
-use web::{DaemonManager, HttpServerManager, server};
+use web::{DaemonManager, HttpServerManager, config_server};
 // 引入共享的RPC客户端
 use fastcdn_api::{HelloClient, PingClient};
 
@@ -112,9 +112,9 @@ async fn main() -> std::io::Result<()> {
                     println!("当前运行目录: {}", path.display());
 
                     // 使用web/config模块的配置管理器
-                    match server::Manager::new() {
+                    match config_server::Manager::new() {
                         Ok(config_manager) => {
-                            let server_config = server::Manager.server();
+                            let server_config = config_manager.server();
                             println!("✓ 配置文件加载成功: {:#?}", server_config);
 
                             // 显示配置信息
