@@ -50,12 +50,6 @@ enum Commands {
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     let args = Cli::parse();
-
-    if args.verbose {
-        println!("命令行参数解析结果:");
-        println!("{:#?}", args);
-    }
-
     let daemon_manager = DaemonManager::new("fastcdn.pid");
 
     // 执行相应的操作并返回适当的退出状态码
