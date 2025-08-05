@@ -3,7 +3,7 @@ use std::fs;
 use std::path::Path;
 
 /// 默认服务器配置文件路径
-const DEFAULT_SERVER_CONFIG_PATH: &str = "configs/server.yaml";
+const CONF_YAML: &str = "configs/server.yaml";
 
 /// HTTP配置
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -41,7 +41,7 @@ impl Server {
 
     /// 从默认路径加载配置
     pub fn load_default() -> Result<Self, Box<dyn std::error::Error>> {
-        Self::load_from_file(DEFAULT_SERVER_CONFIG_PATH)
+        Self::load_from_file(CONF_YAML)
     }
 
     /// 验证配置是否有效

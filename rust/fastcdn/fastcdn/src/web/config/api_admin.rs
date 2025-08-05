@@ -3,7 +3,7 @@ use std::fs;
 use std::path::Path;
 
 /// 默认服务器配置文件路径
-const DEFAULT_API_ADMIN_CONFIG_PATH: &str = "configs/api_admin.yaml";
+const CONF_YAML: &str = "configs/api_admin.yaml";
 
 /// API管理员配置结构体
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -27,7 +27,7 @@ impl ApiAdmin {
 
     /// 从默认路径加载API管理员配置
     pub fn load_default() -> Result<Self, Box<dyn std::error::Error>> {
-        Self::load_from_file(DEFAULT_API_ADMIN_CONFIG_PATH)
+        Self::load_from_file(CONF_YAML)
     }
 
     /// 验证API管理员配置是否有效
