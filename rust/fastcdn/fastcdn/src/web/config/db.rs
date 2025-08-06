@@ -96,6 +96,13 @@ impl Manager {
         Ok(Manager {})
     }
 
+    /// 创建包含API管理员配置的配置管理器
+    pub fn new_db() -> Result<Self, Box<dyn std::error::Error>> {
+        // 确保单例已初始化
+        Db::instance()?;
+        Ok(Manager {})
+    }
+
     /// 获取服务器配置
     pub fn db(&self) -> Result<Arc<Mutex<Db>>, Box<dyn std::error::Error>> {
         Db::instance()

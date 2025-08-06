@@ -5,7 +5,7 @@ use std::env;
 mod app;
 mod web;
 
-use web::{DaemonManager, HttpServerManager, config_server};
+use web::{ConfigServer, DaemonManager, DatabaseManager, HttpServerManager};
 // 引入共享的RPC客户端
 use fastcdn_api::{HelloClient, PingClient};
 
@@ -106,7 +106,7 @@ async fn main() -> std::io::Result<()> {
                     println!("当前运行目录: {}", path.display());
 
                     // 使用web/config模块的配置管理器
-                    match config_server::Manager::new() {
+                    match ConfigServer::Manager::new() {
                         Ok(config_manager) => {
                             let server_config = config_manager.server();
                             println!("✓ 配置文件加载成功: {:#?}", server_config);
@@ -141,6 +141,29 @@ async fn main() -> std::io::Result<()> {
                         }
                         Err(e) => {
                             println!("✗ 配置文件加载失败: {}", e);
+                        }
+                    }
+
+                    // 测试数据库连接
+                    println!("\n正在测试数据库连接...");
+                    match DatabaseManager::new().await {
+                        Ok(db_manager) => {
+                            println!("✓ 数据库管理器创建成功");
+
+                            // 测试数据库连接
+                            match db_manager.test_connection().await {
+                                Ok(_) => println!("✓ 数据库连接测试通过"),
+                                Err(e) => println!("✗ 数据库连接测试失败: {}", e),
+                            }
+
+                            // 执行数据库迁移
+                            match db_manager.migrate().await {
+                                Ok(_) => println!("✓ 数据库迁移完成"),
+                                Err(e) => println!("✗ 数据库迁移失败: {}", e),
+                            }
+                        }
+                        Err(e) => {
+                            println!("✗ 数据库管理器创建失败: {}", e);
                         }
                     }
                 }
