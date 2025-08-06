@@ -38,11 +38,11 @@ enum Commands {
         daemon: bool,
     },
     /// stop the fastcdn api server
-    Stop {},
+    Stop,
     /// reload the fastcdn api server
-    Reload {},
+    Reload,
     /// fastcdn api server Status
-    Status {},
+    Status,
     /// test function
     Test {},
 }
