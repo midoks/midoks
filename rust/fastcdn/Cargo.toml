@@ -2,6 +2,7 @@
 members = [
     "fastcdn",
     "fastcdn-api",
+    "fastcdn-common",
     "fastcdn-node",
 ]
 resolver = "2"

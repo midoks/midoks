@@ -15,9 +15,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     if !proto_files.is_empty() {
+        let out_dir = std::env::var("OUT_DIR")?;
+
         tonic_build::configure()
             .build_server(true)
             .build_client(true)
+            .out_dir(&out_dir)
             .compile_protos(&proto_files, &[proto_dir])?;
     }
 
