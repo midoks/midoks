@@ -7,6 +7,7 @@ pub mod database;
 pub mod server;
 
 // 重新导出常用组件
-pub use config::{ConfigApiAdmin, ConfigServer};
+pub use config::ConfigServer;
+// 移除: pub use config::{ConfigApiAdmin, ConfigServer};
 pub use database::DatabaseManager;
 pub use server::{DaemonManager, HttpServerManager};

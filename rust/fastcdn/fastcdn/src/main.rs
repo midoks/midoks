@@ -7,7 +7,7 @@ mod web;
 
 use web::{ConfigServer, DaemonManager, DatabaseManager, HttpServerManager};
 // 引入共享的RPC客户端
-use fastcdn_api::{HelloClient, PingClient};
+use fastcdn_common::{HelloClient, PingClient};
 
 /// 命令行信息
 #[derive(Parser, Debug)]

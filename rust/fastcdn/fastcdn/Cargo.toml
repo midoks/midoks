@@ -20,7 +20,7 @@ tonic = "0.12"
 prost = "0.13"
 http = "1.0"
 # 共享RPC客户端
-fastcdn-api = { path = "../fastcdn-api" }
+fastcdn-common = { path = "../fastcdn-common" }
 serde_yaml = "0.9.34"
 lazy_static = "1.4"
 # 数据库相关依赖

@@ -1,5 +1,5 @@
 use crate::web::config::ConfigDb;
-use sqlx::{MySql, MySqlPool, Pool};
+use sqlx::MySqlPool;
 use std::sync::Arc;
 
 /// 数据库连接管理器

@@ -1,8 +1,8 @@
 [workspace]
 members = [
+    "fastcdn-common",
     "fastcdn",
     "fastcdn-api",
-    "fastcdn-common",
     "fastcdn-node",
 ]
 resolver = "2"

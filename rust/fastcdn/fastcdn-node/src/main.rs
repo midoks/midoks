@@ -3,9 +3,8 @@ use std::fs::{File, remove_file};
 use std::io::{Read, Write};
 use std::process::{Command, Stdio};
 
-
 // 引入共享的RPC客户端
-use fastcdn_api::{HelloClient, PingClient};
+use fastcdn_common::{HelloClient, PingClient};
 
 /// 命令行信息
 #[derive(Parser, Debug)]

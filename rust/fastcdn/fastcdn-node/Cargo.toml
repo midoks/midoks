@@ -16,5 +16,5 @@ tonic = "0.12"
 prost = "0.13"
 tokio-stream = "0.1"
 # 共享RPC客户端
-fastcdn-api = { path = "../fastcdn-api" }
+fastcdn-common = { path = "../fastcdn-common" }
 
