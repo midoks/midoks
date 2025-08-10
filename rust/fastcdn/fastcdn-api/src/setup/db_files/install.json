@@ -4,15 +4,11 @@
             "name": "fastcdn_admin",
             "engine": "InnoDB",
             "charset": "utf8mb4_general_ci",
-            "definition": "CREATE TABLE `fastcdn_admin` (\n  `id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID',\n  `isOn` tinyint(1) unsigned DEFAULT '1' COMMENT '是否启用',\n  `username` varchar(64) DEFAULT NULL COMMENT '用户名',\n  `password` varchar(32) DEFAULT NULL COMMENT '密码',\n  `fullname` varchar(64) DEFAULT NULL COMMENT '全名',\n  `isSuper` tinyint(1) unsigned DEFAULT '0' COMMENT '是否为超级管理员',\n  `createdAt` bigint(11) unsigned DEFAULT '0' COMMENT '创建时间',\n  `updatedAt` bigint(11) unsigned DEFAULT '0' COMMENT '修改时间',\n  `state` tinyint(1) unsigned DEFAULT '1' COMMENT '状态',\n  `modules` json DEFAULT NULL COMMENT '允许的模块',\n  `canLogin` tinyint(1) unsigned DEFAULT '1' COMMENT '是否可以登录',\n  `theme` varchar(64) DEFAULT NULL COMMENT '模板设置',\n  `lang` varchar(64) DEFAULT NULL COMMENT '语言代号',\n  PRIMARY KEY (`id`),\n  KEY `username` (`username`) USING BTREE,\n  KEY `password` (`password`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='管理员'",
+            "definition": "CREATE TABLE `fastcdn_admin` (\n  `id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID',\n  `is_on` tinyint(1) unsigned DEFAULT '1' COMMENT '是否启用',\n  `username` varchar(64) DEFAULT NULL COMMENT '用户名',\n  `password` varchar(32) DEFAULT NULL COMMENT '密码',\n  `fullname` varchar(64) DEFAULT NULL COMMENT '全名',\n  `is_super` tinyint(1) unsigned DEFAULT '0' COMMENT '是否为超级管理员',\n  `created_at` bigint(11) unsigned DEFAULT '0' COMMENT '创建时间',\n  `updated_at` bigint(11) unsigned DEFAULT '0' COMMENT '修改时间',\n  `state` tinyint(1) unsigned DEFAULT '1' COMMENT '状态',\n  `modules` json DEFAULT NULL COMMENT '允许的模块',\n  `can_login` tinyint(1) unsigned DEFAULT '1' COMMENT '是否可以登录',\n  `theme` varchar(64) DEFAULT NULL COMMENT '模板设置',\n  `lang` varchar(64) DEFAULT NULL COMMENT '语言代号',\n  PRIMARY KEY (`id`),\n  KEY `username` (`username`) USING BTREE,\n  KEY `password` (`password`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='管理员'",
             "fields": [
                 {
                     "name": "id",
                     "definition": "int(11) unsigned auto_increment COMMENT 'ID'"
-                },
-                {
-                    "name": "isOn",
-                    "definition": "tinyint(1) unsigned DEFAULT '1' COMMENT '是否启用'"
                 },
                 {
                     "name": "username",
@@ -27,15 +23,23 @@
                     "definition": "varchar(64) COMMENT '全名'"
                 },
                 {
-                    "name": "isSuper",
+                    "name": "is_on",
+                    "definition": "tinyint(1) unsigned DEFAULT '1' COMMENT '是否启用'"
+                },
+                {
+                    "name": "is_super",
                     "definition": "tinyint(1) unsigned DEFAULT '0' COMMENT '是否为超级管理员'"
                 },
                 {
-                    "name": "createdAt",
+                    "name": "can_login",
+                    "definition": "tinyint(1) unsigned DEFAULT '1' COMMENT '是否可以登录'"
+                },
+                {
+                    "name": "created_at",
                     "definition": "bigint(11) unsigned DEFAULT '0' COMMENT '创建时间'"
                 },
                 {
-                    "name": "updatedAt",
+                    "name": "updated_at",
                     "definition": "bigint(11) unsigned DEFAULT '0' COMMENT '修改时间'"
                 },
                 {
@@ -45,10 +49,6 @@
                 {
                     "name": "modules",
                     "definition": "json COMMENT '允许的模块'"
-                },
-                {
-                    "name": "canLogin",
-                    "definition": "tinyint(1) unsigned DEFAULT '1' COMMENT '是否可以登录'"
                 },
                 {
                     "name": "theme",
