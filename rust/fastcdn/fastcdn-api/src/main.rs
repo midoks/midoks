@@ -4,6 +4,7 @@ use std::io::{Read, Write};
 use std::process::{Command, Stdio};
 use tonic::transport::Server;
 
+mod setup;
 use fastcdn_common::{HelloServiceServer, MyHelloService, MyPingService, PingServiceServer};
 
 /// 命令行信息
@@ -41,6 +42,9 @@ enum Commands {
     /// fastcdn api server Status
     Status {},
 
+    /// fastcdn api server setup cmd
+    Setup {},
+
     /// test function
     Test {},
 }
@@ -56,6 +60,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // 执行相应的操作并返回适当的退出状态码
     let result: Result<&str, Box<dyn std::error::Error>> = match &args.command {
+        Some(Commands::Setup {}) => {
+            setup::setup::install_db();
+            Ok("Setup completed")
+        }
         Some(Commands::Start { daemon }) => {
             if *daemon {
                 // 后台模式运行

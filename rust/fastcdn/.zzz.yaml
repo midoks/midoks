@@ -17,13 +17,13 @@ action:
   before:
   - echo "before"
   after:
-  - ./target/release/fastcdn-api start -d
-  - ./target/release/fastcdn test
+  - ./target/release/fastcdn-api setup
+  # - ./target/release/fastcdn test
   # - ./target/release/fastcdn-node start -d
   exit:
-  - ./target/release/fastcdn stop
+  # - ./target/release/fastcdn stop
   - ./target/release/fastcdn-api stop
-  - ./target/release/fastcdn-node stop
+  # - ./target/release/fastcdn-node stop
   - rm -rf ./target/release/fastcdn
   - rm -rf ./target/release/fastcdn-api
   - rm -rf ./target/release/fastcdn-node

@@ -11,6 +11,7 @@ tonic = "0.12"
 prost = "0.13"
 tokio-stream = "0.1"
 fastcdn-common = { path = "../fastcdn-common" }
+rust-embed = "6.6"
 
 [build-dependencies]
 tonic-build = "0.12"

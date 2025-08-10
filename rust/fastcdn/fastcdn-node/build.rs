@@ -1,5 +1,5 @@
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let proto_dir = "../fastcdn-api/src/rpc/protos";
+    let proto_dir = "../fastcdn-common/src/rpc/protos";
     
     // 自动扫描protos目录下的所有.proto文件
     let mut proto_files = Vec::new();
