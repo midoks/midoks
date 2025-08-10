@@ -108,15 +108,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
                 println!("✓ RPC服务已在后台启动，PID: {}", child.id());
                 println!("✓ PID已保存到文件: {}", pid_file);
-                println!("✓ gRPC服务地址: http://127.0.0.1:50051");
+                println!("✓ gRPC服务地址: http://127.0.0.1:9001");
 
                 Ok("后台RPC服务启动成功")
             } else {
                 // 前台模式运行
                 println!("正在启动 fastcdn api RPC server...");
-                println!("gRPC服务监听地址: 127.0.0.1:50051");
+                println!("gRPC服务监听地址: 127.0.0.1:9001");
 
-                let addr = match "127.0.0.1:50051".parse() {
+                let addr = match "127.0.0.1:9001".parse() {
                     Ok(addr) => addr,
                     Err(e) => {
                         eprintln!("地址解析失败: {}", e);
@@ -131,7 +131,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
                 println!("✓ HelloService 已注册");
                 println!("✓ PingService 已注册");
-                println!("✓ gRPC服务器启动成功，监听端口: 50051");
+                println!("✓ gRPC服务器启动成功，监听端口: 9001");
 
                 if let Err(e) = Server::builder()
                     .add_service(HelloServiceServer::new(hello_service))
