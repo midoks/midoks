@@ -1,3 +1,4 @@
+type: mysql
 user: root
 password: root
 database: fastcdn
