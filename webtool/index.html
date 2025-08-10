@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>在线工具箱 - WebTool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .categories {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .category {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .category:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+
+        .category-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .category-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .code-processing .category-icon {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+        }
+
+        .data-conversion .category-icon {
+            background: linear-gradient(45deg, #4834d4, #686de0);
+            color: white;
+        }
+
+        .debug-analysis .category-icon {
+            background: linear-gradient(45deg, #00d2d3, #54a0ff);
+            color: white;
+        }
+
+        .extension-tools .category-icon {
+            background: linear-gradient(45deg, #5f27cd, #a55eea);
+            color: white;
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+        }
+
+        .tool-item {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: #333;
+        }
+
+        .tool-item:hover {
+            background: #e9ecef;
+            border-color: #6c757d;
+            transform: scale(1.05);
+        }
+
+        .tool-icon {
+            font-size: 2rem;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .tool-name {
+            font-size: 0.9rem;
+            font-weight: 500;
+            line-height: 1.3;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 50px;
+            color: white;
+            opacity: 0.8;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .categories {
+                grid-template-columns: 1fr;
+            }
+            
+            .tools-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🛠️ 在线工具箱</h1>
+            <p>高效便捷的开发者工具集合</p>
+        </div>
+
+        <div class="categories">
+            <!-- 代码处理 -->
+            <div class="category code-processing">
+                <div class="category-title">
+                    <div class="category-icon">💻</div>
+                    代码处理
+                </div>
+                <div class="tools-grid">
+                    <a href="#" class="tool-item" onclick="openTool('json-formatter')">
+                        <span class="tool-icon">📋</span>
+                        <div class="tool-name">JSON格式化</div>
+                    </a>
+                    <a href="#" class="tool-item" onclick="openTool('code-minify')">
+                        <span class="tool-icon">🗜️</span>
+                        <div class="tool-name">代码压缩</div>
+                    </a>
+                    <a href="#" class="tool-item" onclick="openTool('code-beautify')">
+                        <span class="tool-icon">✨</span>
+                        <div class="tool-name">代码美化</div>
+                    </a>
+                    <a href="#" class="tool-item" onclick="openTool('string-encode')">
+                        <span class="tool-icon">🔤</span>
+                        <div class="tool-name">字符串编码</div>
+                    </a>
+                    <a href="#" class="tool-item" onclick="openTool('string-decode')">
+                        <span class="tool-icon">🔓</span>
+                        <div class="tool-name">字符串解码</div>
+                    </a>
+                </div>
+            </div>
+
+            <!-- 数据转换 -->
+            <div class="category data-conversion">
+                <div class="category-title">
+                    <div class="category-icon">🔄</div>
+                    数据转换
+                </div>
+                <div class="tools-grid">
+                    <a href="#" class="tool-item" onclick="openTool('qr-generator')">
+                        <span class="tool-icon">📱</span>
+                        <div class="tool-name">二维码生成</div>
+                    </a>
+                    <a href="#" class="tool-item" onclick="openTool('qr-decoder')">
+                        <span class="tool-icon">🔍</span>
+                        <div class="tool-name">二维码解码</div>
+                    </a>
+                    <a href="#" class="tool-item" onclick="openTool('image-base64')">
+                        <span class="tool-icon">🖼️</span>
+                        <div class="tool-name">图片Base64</div>
+                    </a>
+                    <a href="#" class="tool-item" onclick="openTool('timestamp-converter')">
+                        <span class="tool-icon">⏰</span>
+                        <div class="tool-name">时间戳转换</div>
+                    </a>
+                </div>
+            </div>
+
+            <!-- 调试分析 -->
+            <div class="category debug-analysis">
+                <div class="category-title">
+                    <div class="category-icon">🔧</div>
+                    调试分析
+                </div>
+                <div class="tools-grid">
+                    <a href="#" class="tool-item" onclick="openTool('color-picker')">
+                        <span class="tool-icon">🎨</span>
+                        <div class="tool-name">页面取色器</div>
+                    </a>
+                    <a href="#" class="tool-item" onclick="openTool('performance-test')">
+                        <span class="tool-icon">⚡</span>
+                        <div class="tool-name">性能检测</div>
+                    </a>
+                    <a href="#" class="tool-item" onclick="openTool('grid-ruler')">
+                        <span class="tool-icon">📏</span>
+                        <div class="tool-name">栅格标尺</div>
+                    </a>
+                </div>
+            </div>
+
+            <!-- 扩展工具 -->
+            <div class="category extension-tools">
+                <div class="category-title">
+                    <div class="category-icon">🚀</div>
+                    扩展工具
+                </div>
+                <div class="tools-grid">
+                    <a href="#" class="tool-item" onclick="openTool('regex-tester')">
+                        <span class="tool-icon">🔤</span>
+                        <div class="tool-name">正则测试器</div>
+                    </a>
+                    <a href="#" class="tool-item" onclick="openTool('api-tester')">
+                        <span class="tool-icon">📡</span>
+                        <div class="tool-name">简易Postman</div>
+                    </a>
+                    <a href="#" class="tool-item" onclick="openTool('password-generator')">
+                        <span class="tool-icon">🔐</span>
+                        <div class="tool-name">随机密码生成</div>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>&copy; 2024 WebTool - 让开发更简单</p>
+        </div>
+    </div>
+
+    <script>
+        function openTool(toolName) {
+            // 跳转到对应的工具页面
+            window.location.href = `tools/${toolName}.html`;
+        }
+
+        // 添加一些交互效果
+        document.addEventListener('DOMContentLoaded', function() {
+            // 为工具项添加点击动画
+            const toolItems = document.querySelectorAll('.tool-item');
+            toolItems.forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // 添加点击动画
+                    this.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        this.style.transform = 'scale(1.05)';
+                        setTimeout(() => {
+                            this.style.transform = '';
+                        }, 150);
+                    }, 100);
+                    
+                    // 延迟执行工具打开函数
+                    setTimeout(() => {
+                        const toolName = this.getAttribute('onclick').match(/'([^']+)'/)[1];
+                        openTool(toolName);
+                    }, 250);
+                });
+            });
+
+            // 添加页面加载动画
+            const categories = document.querySelectorAll('.category');
+            categories.forEach((category, index) => {
+                category.style.opacity = '0';
+                category.style.transform = 'translateY(30px)';
+                
+                setTimeout(() => {
+                    category.style.transition = 'all 0.6s ease';
+                    category.style.opacity = '1';
+                    category.style.transform = 'translateY(0)';
+                }, index * 200);
+            });
+        });
+    </script>
+</body>
+</html>

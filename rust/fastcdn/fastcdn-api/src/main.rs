@@ -4,11 +4,7 @@ use std::io::{Read, Write};
 use std::process::{Command, Stdio};
 use tonic::transport::Server;
 
-// 引入RPC模块
-mod rpc;
-use rpc::{HelloServiceServer, PingServiceServer, MyHelloService, MyPingService};
-
-
+use fastcdn_common::{HelloServiceServer, MyHelloService, MyPingService, PingServiceServer};
 
 /// 命令行信息
 #[derive(Parser, Debug)]
@@ -48,8 +44,6 @@ enum Commands {
     /// test function
     Test {},
 }
-
-
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {

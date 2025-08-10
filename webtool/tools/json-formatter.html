@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON格式化 - WebTool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .tool-container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .input-section, .output-section {
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        textarea {
+            width: 100%;
+            height: 200px;
+            padding: 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            resize: vertical;
+        }
+
+        .btn-group {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            margin: 0 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .error {
+            color: #dc3545;
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <a href="../index.html" class="back-btn">← 返回主页</a>
+    
+    <div class="container">
+        <div class="header">
+            <h1>📋 JSON格式化工具</h1>
+            <p>美化和验证JSON数据</p>
+        </div>
+
+        <div class="tool-container">
+            <div class="input-section">
+                <div class="section-title">输入JSON数据：</div>
+                <textarea id="jsonInput" placeholder="请输入需要格式化的JSON数据..."></textarea>
+                <div id="inputError" class="error" style="display: none;"></div>
+            </div>
+
+            <div class="btn-group">
+                <button class="btn" onclick="formatJSON()">格式化</button>
+                <button class="btn" onclick="minifyJSON()">压缩</button>
+                <button class="btn" onclick="clearAll()">清空</button>
+                <button class="btn" onclick="copyResult()">复制结果</button>
+            </div>
+
+            <div class="output-section">
+                <div class="section-title">格式化结果：</div>
+                <textarea id="jsonOutput" readonly></textarea>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function formatJSON() {
+            const input = document.getElementById('jsonInput').value.trim();
+            const output = document.getElementById('jsonOutput');
+            const errorDiv = document.getElementById('inputError');
+            
+            if (!input) {
+                showError('请输入JSON数据');
+                return;
+            }
+            
+            try {
+                const parsed = JSON.parse(input);
+                output.value = JSON.stringify(parsed, null, 2);
+                hideError();
+            } catch (error) {
+                showError('JSON格式错误: ' + error.message);
+                output.value = '';
+            }
+        }
+        
+        function minifyJSON() {
+            const input = document.getElementById('jsonInput').value.trim();
+            const output = document.getElementById('jsonOutput');
+            const errorDiv = document.getElementById('inputError');
+            
+            if (!input) {
+                showError('请输入JSON数据');
+                return;
+            }
+            
+            try {
+                const parsed = JSON.parse(input);
+                output.value = JSON.stringify(parsed);
+                hideError();
+            } catch (error) {
+                showError('JSON格式错误: ' + error.message);
+                output.value = '';
+            }
+        }
+        
+        function clearAll() {
+            document.getElementById('jsonInput').value = '';
+            document.getElementById('jsonOutput').value = '';
+            hideError();
+        }
+        
+        function copyResult() {
+            const output = document.getElementById('jsonOutput');
+            if (output.value) {
+                output.select();
+                document.execCommand('copy');
+                alert('结果已复制到剪贴板');
+            } else {
+                alert('没有可复制的内容');
+            }
+        }
+        
+        function showError(message) {
+            const errorDiv = document.getElementById('inputError');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+        }
+        
+        function hideError() {
+            const errorDiv = document.getElementById('inputError');
+            errorDiv.style.display = 'none';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>二维码生成 - WebTool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .tool-container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        textarea {
+            height: 100px;
+            resize: vertical;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            margin: 10px 5px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .qr-result {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        #qrcode {
+            margin: 20px auto;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+</head>
+<body>
+    <a href="../index.html" class="back-btn">← 返回主页</a>
+    
+    <div class="container">
+        <div class="header">
+            <h1>📱 二维码生成工具</h1>
+            <p>将文本或链接转换为二维码</p>
+        </div>
+
+        <div class="tool-container">
+            <div class="input-group">
+                <label class="label" for="textInput">输入文本或链接：</label>
+                <textarea id="textInput" placeholder="请输入要生成二维码的文本或链接..."></textarea>
+            </div>
+
+            <div class="input-group">
+                <label class="label" for="sizeSelect">二维码大小：</label>
+                <select id="sizeSelect" style="width: 200px; padding: 8px; border: 2px solid #e9ecef; border-radius: 5px;">
+                    <option value="200">小 (200x200)</option>
+                    <option value="300" selected>中 (300x300)</option>
+                    <option value="400">大 (400x400)</option>
+                </select>
+            </div>
+
+            <div style="text-align: center;">
+                <button class="btn" onclick="generateQR()">生成二维码</button>
+                <button class="btn" onclick="downloadQR()">下载二维码</button>
+                <button class="btn" onclick="clearQR()">清空</button>
+            </div>
+
+            <div class="qr-result" id="qrResult" style="display: none;">
+                <div id="qrcode"></div>
+                <p>扫描上方二维码或右键保存图片</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentQRDataURL = null;
+        
+        function generateQR() {
+            const text = document.getElementById('textInput').value.trim();
+            const size = parseInt(document.getElementById('sizeSelect').value);
+            const qrContainer = document.getElementById('qrcode');
+            const resultDiv = document.getElementById('qrResult');
+            
+            if (!text) {
+                alert('请输入要生成二维码的内容');
+                return;
+            }
+            
+            // 清空之前的二维码
+            qrContainer.innerHTML = '';
+            
+            // 生成二维码
+            QRCode.toCanvas(text, {
+                width: size,
+                height: size,
+                margin: 2,
+                color: {
+                    dark: '#000000',
+                    light: '#FFFFFF'
+                }
+            }, function (error, canvas) {
+                if (error) {
+                    alert('生成二维码失败: ' + error.message);
+                    return;
+                }
+                
+                qrContainer.appendChild(canvas);
+                currentQRDataURL = canvas.toDataURL();
+                resultDiv.style.display = 'block';
+            });
+        }
+        
+        function downloadQR() {
+            if (!currentQRDataURL) {
+                alert('请先生成二维码');
+                return;
+            }
+            
+            const link = document.createElement('a');
+            link.download = 'qrcode.png';
+            link.href = currentQRDataURL;
+            link.click();
+        }
+        
+        function clearQR() {
+            document.getElementById('textInput').value = '';
+            document.getElementById('qrcode').innerHTML = '';
+            document.getElementById('qrResult').style.display = 'none';
+            currentQRDataURL = null;
+        }
+    </script>
+</body>
+</html>
