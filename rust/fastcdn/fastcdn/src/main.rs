@@ -33,6 +33,8 @@ enum Commands {
         #[arg(short, long)]
         daemon: bool,
     },
+    /// daemon the fastcdn server
+    Daemon,
     /// stop the fastcdn api server
     Stop,
     /// reload the fastcdn api server
@@ -40,7 +42,7 @@ enum Commands {
     /// fastcdn api server Status
     Status,
     /// test function
-    Test {},
+    Test,
 }
 
 #[actix_web::main]
@@ -59,9 +61,13 @@ async fn main() -> std::io::Result<()> {
                 Ok("exit successful!")
             }
         }
+        Some(Commands::Daemon {}) => {
+            daemon_manager.start_daemon()?;
+            Ok("start daemon successful")
+        }
         Some(Commands::Stop {}) => {
             daemon_manager.stop_daemon()?;
-            Ok("服务器停止成功")
+            Ok("stop server successful")
         }
         Some(Commands::Reload {}) => {
             daemon_manager.reload_service()?;
