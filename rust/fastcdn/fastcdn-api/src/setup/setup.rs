@@ -75,7 +75,7 @@ pub async fn install_db() -> Result<(), Box<dyn std::error::Error>> {
 // 可选：添加创建表的函数
 async fn create_table(table: &Table) -> Result<(), Box<dyn std::error::Error>> {
     // println!("创建表: {}", table.name);
-    // println!("SQL: {}", table.definition);
+    println!("SQL: {}", table.definition);
 
     let db = fastcdn_common::db::pool::Manager::new().await?;
     db.create_sql(&table.definition).await?;
