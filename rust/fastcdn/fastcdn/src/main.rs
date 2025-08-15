@@ -52,13 +52,11 @@ async fn main() -> std::io::Result<()> {
     let result: Result<&str, std::io::Error> = match &args.command {
         Some(Commands::Start { daemon }) => {
             if *daemon {
-                // 后台模式运行
                 daemon_manager.start_daemon()?;
-                Ok("后台服务启动成功")
+                Ok("start successful")
             } else {
-                // 前台模式运行
                 HttpServerManager::start().await?;
-                Ok(())
+                Ok("exit successful!")
             }
         }
         Some(Commands::Stop {}) => {
@@ -80,13 +78,13 @@ async fn main() -> std::io::Result<()> {
         None => {
             println!("欢迎使用 fastcdn 服务！");
             println!("使用 --help 查看可用命令");
-            Ok("程序执行完成")
+            Ok("")
         }
     };
 
     match result {
         Ok(message) => {
-            println!("✓ {}", message);
+            println!("{}", message);
             Ok(())
         }
         Err(error) => {
