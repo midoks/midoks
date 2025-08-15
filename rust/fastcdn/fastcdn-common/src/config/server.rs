@@ -93,6 +93,7 @@ impl Server {
 }
 
 /// 配置管理器
+#[derive(Debug)]
 pub struct Manager {
     server: Server,
 }

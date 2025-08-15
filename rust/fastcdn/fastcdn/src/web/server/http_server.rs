@@ -1,6 +1,6 @@
-use actix_web::{App, HttpServer, web};
-use crate::app::api;
 use super::static_handler::StaticHandler;
+use crate::app::api;
+use actix_web::{App, HttpServer, web};
 
 /// HTTP服务器配置和启动
 pub struct HttpServerManager;
@@ -8,8 +8,11 @@ pub struct HttpServerManager;
 impl HttpServerManager {
     /// 创建并启动HTTP服务器
     pub async fn start() -> std::io::Result<()> {
+        let config = fastcdn_common::config::ConfigServer::Manager::new();
+        println!("{:?}", config);
+
         println!("Server running at http://127.0.0.1:8980");
-        
+
         let server_result = HttpServer::new(|| {
             App::new()
                 .service(
@@ -19,7 +22,7 @@ impl HttpServerManager {
                 .service(web::scope("/api").service(api::hello))
                 .route("/", web::get().to(StaticHandler::index))
         })
-        .bind(("127.0.0.1", 8980));
+        .bind("127.0.0.1:8990");
 
         match server_result {
             Ok(server) => {

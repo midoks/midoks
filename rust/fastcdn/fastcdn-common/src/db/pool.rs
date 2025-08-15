@@ -21,15 +21,15 @@ impl Manager {
             config.user, config.password, config.host, config.database
         );
 
-        println!(
-            "正在连接数据库: {}",
-            database_url.replace(&config.password, "***")
-        );
+        // println!(
+        //     "正在连接数据库: {}",
+        //     database_url.replace(&config.password, "***")
+        // );
 
         // 创建连接池
         let pool = MySqlPool::connect(&database_url).await?;
 
-        println!("✓ 数据库连接成功");
+        // println!("✓ 数据库连接成功");
 
         Ok(Manager {
             pool: Arc::new(pool),
@@ -207,7 +207,7 @@ impl Manager {
     pub async fn find_by_id(
         &self,
         table: &str,
-        id: u64,
+        _id: u64,
     ) -> Result<Option<Value>, Box<dyn std::error::Error>> {
         let results = self
             .select(

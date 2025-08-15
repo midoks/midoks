@@ -33,6 +33,16 @@ struct Index {
     definition: String,
 }
 
+pub async fn is_exists(tables: &[String], name: &str) -> bool {
+    let name_lower = name.to_lowercase();
+    tables.iter().any(|s| s.to_lowercase() == name_lower)
+}
+
+/// 守护进程管理器
+pub struct SetupOp {
+    log: String,
+}
+
 pub async fn install_db() -> Result<(), Box<dyn std::error::Error>> {
     // 从嵌入的文件中获取 install.json
     let install_json_file = DbFiles::get("install.json").ok_or("install.json file not found")?;
@@ -47,16 +57,10 @@ pub async fn install_db() -> Result<(), Box<dyn std::error::Error>> {
 
     let db = fastcdn_common::db::pool::Manager::new().await?;
     let tables = db.table_names().await?;
-    println!("table: {:?}", tables);
-
-    for table in tables {
-        let table_info = db.find_full_table(&table).await?;
-        println!("table2: {:?}", table_info);
-    }
 
     // 遍历所有表
     for table in &install_config.tables {
-        println!("\n表名: {}", table.name);
+        // println!("\n表名: {}", table.name);
         // println!("引擎: {}", table.engine);
         // println!("字符集: {}", table.charset);
         // println!("字段数量: {}", table.fields.len());
@@ -74,19 +78,10 @@ pub async fn install_db() -> Result<(), Box<dyn std::error::Error>> {
         //     println!("  - {}: {}", index.name, index.definition);
         // }
 
-        // 这里可以添加创建表的逻辑
-        create_table(&table).await?;
+        if !is_exists(&tables, &table.name).await {
+            db.create_sql(&table.definition).await?;
+        }
     }
 
-    Ok(())
-}
-
-// 可选：添加创建表的函数
-async fn create_table(table: &Table) -> Result<(), Box<dyn std::error::Error>> {
-    // println!("创建表: {}", table.name);
-    println!("SQL: {}", table.definition);
-
-    let db = fastcdn_common::db::pool::Manager::new().await?;
-    db.create_sql(&table.definition).await?;
     Ok(())
 }
