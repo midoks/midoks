@@ -45,6 +45,15 @@ pub async fn install_db() -> Result<(), Box<dyn std::error::Error>> {
 
     println!("解析成功！找到 {} 个表定义", install_config.tables.len());
 
+    let db = fastcdn_common::db::pool::Manager::new().await?;
+    let tables = db.table_names().await?;
+    println!("table: {:?}", tables);
+
+    for table in tables {
+        let table_info = db.find_full_table(&table).await?;
+        println!("table2: {:?}", table_info);
+    }
+
     // 遍历所有表
     for table in &install_config.tables {
         println!("\n表名: {}", table.name);
