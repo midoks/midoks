@@ -49,16 +49,22 @@ impl Manager {
         Ok(())
     }
 
-    /// 执行数据库迁移（如果需要）
+    /// 执行数据库迁移
     pub async fn migrate(&self) -> Result<(), Box<dyn std::error::Error>> {
         // 这里可以添加数据库表创建或迁移逻辑
         println!("✓ 数据库迁移完成");
         Ok(())
     }
 
-    pub async fn create_sql(&self, sql: &str) -> Result<(), sqlx::Error> {
+    /// 执行SQL
+    pub async fn execute_sql(&self, sql: &str) -> Result<(), sqlx::Error> {
         sqlx::query(sql).execute(self.pool.as_ref()).await?;
-        println!("✅ SQL执行成功");
+        Ok(())
+    }
+
+    /// 创建数据表
+    pub async fn create_sql(&self, sql: &str) -> Result<(), sqlx::Error> {
+        self.execute_sql(sql);
         Ok(())
     }
 }
