@@ -603,192 +603,6 @@ impl Manager {
         Ok(Value::Array(tables_info))
     }
 
-    /// 导出单个表的结构信息
-    ///
-    /// # 参数
-    /// * `table_name` - 表名
-    ///
-    /// # 返回
-    /// 返回指定表的详细信息
-    pub async fn dump_table(&self, table_name: &str) -> Result<Value, Box<dyn std::error::Error>> {
-        // 检查表是否存在
-        let exists_query = "SELECT COUNT(*) FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ?";
-        let (count,): (i64,) = sqlx::query_as(exists_query)
-            .bind(table_name)
-            .fetch_one(self.pool.as_ref())
-            .await?;
-
-        if count == 0 {
-            return Err(format!("表 '{}' 不存在", table_name).into());
-        }
-
-        // 临时修改 dump 方法的查询条件来只获取指定表
-        let tables_query = "SELECT TABLE_NAME, ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? AND TABLE_TYPE = 'BASE TABLE'";
-        let table_rows = sqlx::query(tables_query)
-            .bind(table_name)
-            .fetch_all(self.pool.as_ref())
-            .await?;
-
-        if table_rows.is_empty() {
-            return Err(format!("表 '{}' 不存在或不是基础表", table_name).into());
-        }
-
-        // 复用 dump 方法的逻辑，但只处理一个表
-        let full_dump = self.dump().await?;
-        if let Value::Array(tables) = full_dump {
-            for table in tables {
-                if let Value::Object(table_obj) = &table {
-                    if let Some(Value::String(name)) = table_obj.get("table_name") {
-                        if name == table_name {
-                            return Ok(table);
-                        }
-                    }
-                }
-            }
-        }
-
-        Err(format!("无法获取表 '{}' 的信息", table_name).into())
-    }
-
-    /// 将数据库结构导出为 SQL 文件格式
-    ///
-    /// # 参数
-    /// * `include_data` - 是否包含数据
-    ///
-    /// # 返回
-    /// 返回 SQL 格式的字符串
-    pub async fn dump_to_sql(
-        &self,
-        include_data: bool,
-    ) -> Result<String, Box<dyn std::error::Error>> {
-        let mut sql_output = String::new();
-
-        // 添加文件头注释
-        sql_output.push_str("-- FastCDN Database Dump\n");
-        sql_output.push_str(&format!(
-            "-- Generated on: {}\n",
-            chrono::Utc::now().format("%Y-%m-%d %H:%M:%S UTC")
-        ));
-        sql_output.push_str("-- \n\n");
-
-        sql_output.push_str("SET FOREIGN_KEY_CHECKS = 0;\n\n");
-
-        let dump_data = self.dump().await?;
-
-        if let Value::Array(tables) = dump_data {
-            for table in tables {
-                if let Value::Object(table_obj) = table {
-                    if let Some(Value::String(table_name)) = table_obj.get("table_name") {
-                        sql_output.push_str(&format!(
-                            "-- \n-- Table structure for table `{}`\n-- \n\n",
-                            table_name
-                        ));
-
-                        // 添加 DROP TABLE 语句
-                        sql_output.push_str(&format!("DROP TABLE IF EXISTS `{}`;\n", table_name));
-
-                        // 添加 CREATE TABLE 语句
-                        if let Some(Value::String(create_statement)) =
-                            table_obj.get("create_statement")
-                        {
-                            sql_output.push_str(&format!("{};\n\n", create_statement));
-                        }
-
-                        // 如果需要包含数据
-                        if include_data {
-                            sql_output.push_str(&format!(
-                                "-- \n-- Dumping data for table `{}`\n-- \n\n",
-                                table_name
-                            ));
-
-                            // 获取表数据
-                            let data = self.select(table_name, None, None, None).await?;
-
-                            if !data.is_empty() {
-                                // 获取列名
-                                if let Some(Value::Array(columns)) = table_obj.get("columns") {
-                                    let column_names: Vec<String> = columns
-                                        .iter()
-                                        .filter_map(|col| {
-                                            if let Value::Object(col_obj) = col {
-                                                if let Some(Value::String(name)) =
-                                                    col_obj.get("name")
-                                                {
-                                                    Some(format!("`{}`", name))
-                                                } else {
-                                                    None
-                                                }
-                                            } else {
-                                                None
-                                            }
-                                        })
-                                        .collect();
-
-                                    if !column_names.is_empty() {
-                                        sql_output.push_str(&format!(
-                                            "INSERT INTO `{}` ({}) VALUES\n",
-                                            table_name,
-                                            column_names.join(", ")
-                                        ));
-
-                                        for (i, row) in data.iter().enumerate() {
-                                            if let Value::Object(row_obj) = row {
-                                                let values: Vec<String> = column_names
-                                                    .iter()
-                                                    .map(|col_name| {
-                                                        let clean_name = col_name.trim_matches('`');
-                                                        match row_obj.get(clean_name) {
-                                                            Some(Value::String(s)) => format!(
-                                                                "'{}'",
-                                                                s.replace("'", "''")
-                                                            ), // 移除多余的右括号
-                                                            Some(Value::Number(n)) => n.to_string(),
-                                                            Some(Value::Bool(b)) => {
-                                                                if *b {
-                                                                    "1".to_string()
-                                                                } else {
-                                                                    "0".to_string()
-                                                                }
-                                                            }
-                                                            Some(Value::Null) | None => {
-                                                                "NULL".to_string()
-                                                            }
-                                                            _ => "NULL".to_string(),
-                                                        }
-                                                    })
-                                                    .collect();
-
-                                                let separator =
-                                                    if i == data.len() - 1 { ";" } else { "," };
-                                                sql_output.push_str(&format!(
-                                                    "({}){}",
-                                                    values.join(", "),
-                                                    separator
-                                                ));
-
-                                                if i < data.len() - 1 {
-                                                    sql_output.push('\n');
-                                                }
-                                            }
-                                        }
-
-                                        sql_output.push_str("\n\n");
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        sql_output.push_str("SET FOREIGN_KEY_CHECKS = 1;\n");
-
-        Ok(sql_output)
-    }
-
-    
-
     /// 获取数据库中所有表名
     ///
     /// # 返回
@@ -796,25 +610,28 @@ impl Manager {
     pub async fn table_names(&self) -> Result<Vec<String>, Box<dyn std::error::Error>> {
         let query = "SHOW TABLES";
         let rows = sqlx::query(query).fetch_all(self.pool.as_ref()).await?;
-    
+
         let mut table_names = Vec::new();
         for row in rows {
             let table_name: String = row.try_get(0)?;
             table_names.push(table_name);
         }
-    
+
         Ok(table_names)
     }
-    
+
     /// 获取表的完整信息，包括表结构、分区和索引信息
-    pub async fn find_full_table(&self, table_name: &str) -> Result<Value, Box<dyn std::error::Error>> {
+    pub async fn find_full_table(
+        &self,
+        table_name: &str,
+    ) -> Result<Value, Box<dyn std::error::Error>> {
         let mut result = serde_json::json!({
             "table_name": table_name,
             "columns": [],
             "indexes": [],
             "partitions": []
         });
-    
+
         // 获取表结构信息
         let columns_query = "SELECT 
             COLUMN_NAME,
@@ -826,12 +643,12 @@ impl Manager {
             COLUMN_COMMENT
         FROM INFORMATION_SCHEMA.COLUMNS 
         WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ?";
-        
+
         let column_rows = sqlx::query(columns_query)
             .bind(table_name)
             .fetch_all(self.pool.as_ref())
             .await?;
-    
+
         let mut columns = Vec::new();
         for row in column_rows {
             let column_info = serde_json::json!({
@@ -846,7 +663,7 @@ impl Manager {
             columns.push(column_info);
         }
         result["columns"] = Value::Array(columns);
-    
+
         // 获取索引信息
         let indexes_query = "SELECT 
             INDEX_NAME,
@@ -857,38 +674,41 @@ impl Manager {
         FROM INFORMATION_SCHEMA.STATISTICS 
         WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ?
         ORDER BY INDEX_NAME, SEQ_IN_INDEX";
-        
+
         let index_rows = sqlx::query(indexes_query)
             .bind(table_name)
             .fetch_all(self.pool.as_ref())
             .await?;
-    
+
         let mut indexes_map: HashMap<String, Value> = HashMap::new();
         for row in index_rows {
             let index_name: String = row.try_get("INDEX_NAME")?;
             let column_name: String = row.try_get("COLUMN_NAME")?;
             let non_unique: i32 = row.try_get("NON_UNIQUE")?;
             let index_type: String = row.try_get("INDEX_TYPE")?;
-            
+
             if !indexes_map.contains_key(&index_name) {
-                indexes_map.insert(index_name.clone(), serde_json::json!({
-                    "name": index_name,
-                    "unique": non_unique == 0,
-                    "type": index_type,
-                    "columns": []
-                }));
+                indexes_map.insert(
+                    index_name.clone(),
+                    serde_json::json!({
+                        "name": index_name,
+                        "unique": non_unique == 0,
+                        "type": index_type,
+                        "columns": []
+                    }),
+                );
             }
-            
+
             if let Some(index_info) = indexes_map.get_mut(&index_name) {
                 if let Some(columns_array) = index_info["columns"].as_array_mut() {
                     columns_array.push(Value::String(column_name));
                 }
             }
         }
-        
+
         let indexes: Vec<Value> = indexes_map.into_values().collect();
         result["indexes"] = Value::Array(indexes);
-    
+
         // 获取分区信息
         let partitions_query = "SELECT 
             PARTITION_NAME,
@@ -900,12 +720,12 @@ impl Manager {
             INDEX_LENGTH
         FROM INFORMATION_SCHEMA.PARTITIONS 
         WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? AND PARTITION_NAME IS NOT NULL";
-        
+
         let partition_rows = sqlx::query(partitions_query)
             .bind(table_name)
             .fetch_all(self.pool.as_ref())
             .await?;
-    
+
         let mut partitions = Vec::new();
         for row in partition_rows {
             let partition_info = serde_json::json!({
@@ -920,7 +740,7 @@ impl Manager {
             partitions.push(partition_info);
         }
         result["partitions"] = Value::Array(partitions);
-    
+
         Ok(result)
     }
 }
