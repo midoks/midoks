@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
-use std::fs;
 use std::path::Path;
+use super::{load_from_file, load_default};
 
 /// 默认服务器配置文件路径
 const CONF_YAML: &str = "configs/api_admin.yaml";
@@ -20,14 +20,12 @@ pub struct ApiAdmin {
 impl ApiAdmin {
     /// 从YAML文件加载API管理员配置
     pub fn load_from_file<P: AsRef<Path>>(path: P) -> Result<Self, Box<dyn std::error::Error>> {
-        let yaml_content = fs::read_to_string(path)?;
-        let config: ApiAdmin = serde_yaml::from_str(&yaml_content)?;
-        Ok(config)
+        load_from_file(path)
     }
 
     /// 从默认路径加载API管理员配置
     pub fn load_default() -> Result<Self, Box<dyn std::error::Error>> {
-        Self::load_from_file(CONF_YAML)
+        load_default(CONF_YAML)
     }
 
     /// 验证API管理员配置是否有效

@@ -3,6 +3,7 @@ use std::fs;
 use std::path::Path;
 use std::sync::{Arc, Mutex};
 use lazy_static::lazy_static;
+use super::{load_from_file, load_default};
 
 /// 默认服务器配置文件路径
 const CONF_YAML: &str = "configs/db.yaml";
@@ -51,14 +52,12 @@ impl Db {
 
     /// 从YAML文件加载配置
     pub fn load_from_file<P: AsRef<Path>>(path: P) -> Result<Self, Box<dyn std::error::Error>> {
-        let yaml_content = fs::read_to_string(path)?;
-        let db: Db = serde_yaml::from_str(&yaml_content)?;
-        Ok(db)
+        load_from_file(path)
     }
 
     /// 从默认路径加载配置
     pub fn load_default() -> Result<Self, Box<dyn std::error::Error>> {
-        Self::load_from_file(CONF_YAML)
+        load_default(CONF_YAML)
     }
 
     /// 验证配置是否有效
