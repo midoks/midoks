@@ -1,6 +1,8 @@
+use super::{load_default, load_from_file};
+use lazy_static::lazy_static;
 use serde::{Deserialize, Serialize};
 use std::path::Path;
-use super::{load_from_file, load_default};
+use std::sync::{Arc, Mutex};
 
 /// 默认服务器配置文件路径
 const CONF_YAML: &str = "configs/server.yaml";
@@ -31,7 +33,29 @@ pub struct Server {
     pub https: Https,
 }
 
+// 使用 lazy_static 实现线程安全的单例
+lazy_static! {
+    static ref INSTANCE: Arc<Mutex<Option<Server>>> = Arc::new(Mutex::new(None));
+}
+
 impl Server {
+    /// 获取单例实例
+    pub fn instance() -> Result<Arc<Mutex<Server>>, Box<dyn std::error::Error>> {
+        let mut instance_guard = INSTANCE.lock().unwrap();
+
+        if instance_guard.is_none() {
+            let server = Self::load_default()?;
+            server
+                .validate()
+                .map_err(|e| Box::new(std::io::Error::new(std::io::ErrorKind::InvalidData, e)))?;
+            *instance_guard = Some(server);
+        }
+
+        // 创建一个新的 Arc<Mutex<Db>> 包装实际的 Db 实例
+        let server = instance_guard.as_ref().unwrap().clone();
+        Ok(Arc::new(Mutex::new(server)))
+    }
+
     /// 从YAML文件加载配置
     pub fn load_from_file<P: AsRef<Path>>(path: P) -> Result<Self, Box<dyn std::error::Error>> {
         load_from_file(path)
@@ -45,7 +69,7 @@ impl Server {
     /// 验证配置是否有效
     pub fn validate(&self) -> Result<(), String> {
         if self.env.is_empty() {
-            return Err("环境配置不能为空".to_string());
+            return Err("env is not empty".to_string());
         }
 
         if self.http.on && self.http.listen.is_empty() {

@@ -8,6 +8,7 @@ use std::env;
 use fastcdn_common::{HelloClient, PingClient};
 
 pub async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    println!("开始测试...");
     println!("正在测试gRPC连接...");
 
     // 测试Ping服务

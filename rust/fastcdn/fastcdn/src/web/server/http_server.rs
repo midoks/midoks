@@ -8,12 +8,7 @@ pub struct HttpServerManager;
 impl HttpServerManager {
     /// 创建并启动HTTP服务器
     pub async fn start() -> std::io::Result<()> {
-        let config = fastcdn_common::config::ConfigServer::Manager::new();
-        println!("{:?}", config);
-
-        println!("Server running at http://127.0.0.1:8980");
-
-        let server_result = HttpServer::new(|| {
+        let server = HttpServer::new(|| {
             App::new()
                 .service(
                     web::resource("/static/{_:.*}")
@@ -21,20 +16,27 @@ impl HttpServerManager {
                 )
                 .service(web::scope("/api").service(api::hello))
                 .route("/", web::get().to(StaticHandler::index))
-        })
-        .bind("127.0.0.1:8990");
+        });
 
-        match server_result {
-            Ok(server) => {
-                if let Err(e) = server.run().await {
-                    eprintln!("服务器运行失败: {}", e);
-                    std::process::exit(1);
-                }
-                Ok(())
+        let config_intance = fastcdn_common::config::ConfigServer::Server::instance()
+            .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e.to_string()))?;
+
+        match config_intance.lock() {
+            Ok(config) => {
+                let http_bind = config.get_http_addresses()[0];
+                // println!("{:?}", http_bind);
+                server
+                    .bind(http_bind)
+                    .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e.to_string()))?
+                    .run()
+                    .await
             }
             Err(e) => {
-                eprintln!("服务器绑定失败: {}", e);
-                std::process::exit(1);
+                // 修复返回类型 - 直接返回错误而不是在 match 分支中
+                return Err(std::io::Error::new(
+                    std::io::ErrorKind::Other,
+                    "Failed to acquire config lock",
+                ));
             }
         }
     }
