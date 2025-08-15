@@ -60,7 +60,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // 执行相应的操作并返回适当的退出状态码
     let result: Result<&str, Box<dyn std::error::Error>> = match &args.command {
-        Some(Commands::Setup {}) => match setup::install_db() {
+        Some(Commands::Setup {}) => match setup::install_db().await {
             Ok(_) => Ok("Setup completed successfully"),
             Err(e) => {
                 eprintln!("Setup failed: {}", e);

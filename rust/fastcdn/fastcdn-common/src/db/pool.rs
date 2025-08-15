@@ -1,4 +1,4 @@
-use crate::web::config::ConfigDb;
+use crate::config::ConfigDb;
 use sqlx::MySqlPool;
 use std::sync::Arc;
 
@@ -21,7 +21,7 @@ impl Manager {
 
         println!(
             "正在连接数据库: {}",
-            database_url.replace(&db_config.password, "***")
+            database_url.replace(&config.password, "***")
         );
 
         // 创建连接池
@@ -53,6 +53,12 @@ impl Manager {
     pub async fn migrate(&self) -> Result<(), Box<dyn std::error::Error>> {
         // 这里可以添加数据库表创建或迁移逻辑
         println!("✓ 数据库迁移完成");
+        Ok(())
+    }
+
+    pub async fn create_sql(&self, sql: &str) -> Result<(), sqlx::Error> {
+        sqlx::query(sql).execute(self.pool.as_ref()).await?;
+        println!("✅ SQL执行成功");
         Ok(())
     }
 }

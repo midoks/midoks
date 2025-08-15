@@ -23,5 +23,4 @@ http = "1.0"
 fastcdn-common = { path = "../fastcdn-common" }
 serde_yaml = "0.9.34"
 lazy_static = "1.4"
-# 数据库相关依赖
 sqlx = { version = "0.7", features = ["runtime-tokio-rustls", "mysql", "chrono"] }

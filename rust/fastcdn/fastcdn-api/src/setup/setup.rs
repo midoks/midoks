@@ -33,7 +33,7 @@ struct Index {
     definition: String,
 }
 
-pub fn install_db() -> Result<(), Box<dyn std::error::Error>> {
+pub async fn install_db() -> Result<(), Box<dyn std::error::Error>> {
     // 从嵌入的文件中获取 install.json
     let install_json_file = DbFiles::get("install.json").ok_or("install.json file not found")?;
 
@@ -48,37 +48,36 @@ pub fn install_db() -> Result<(), Box<dyn std::error::Error>> {
     // 遍历所有表
     for table in &install_config.tables {
         println!("\n表名: {}", table.name);
-        println!("引擎: {}", table.engine);
-        println!("字符集: {}", table.charset);
-        println!("字段数量: {}", table.fields.len());
-        println!("索引数量: {}", table.indexes.len());
+        // println!("引擎: {}", table.engine);
+        // println!("字符集: {}", table.charset);
+        // println!("字段数量: {}", table.fields.len());
+        // println!("索引数量: {}", table.indexes.len());
 
-        // 打印字段信息
-        println!("字段列表:");
-        for field in &table.fields {
-            println!("  - {}: {}", field.name, field.definition);
-        }
+        // // 打印字段信息
+        // println!("字段列表:");
+        // for field in &table.fields {
+        //     println!("  - {}: {}", field.name, field.definition);
+        // }
 
-        // 打印索引信息
-        println!("索引列表:");
-        for index in &table.indexes {
-            println!("  - {}: {}", index.name, index.definition);
-        }
+        // // 打印索引信息
+        // println!("索引列表:");
+        // for index in &table.indexes {
+        //     println!("  - {}: {}", index.name, index.definition);
+        // }
 
         // 这里可以添加创建表的逻辑
-        // create_table(&table)?;
+        create_table(&table).await?;
     }
 
     Ok(())
 }
 
 // 可选：添加创建表的函数
-fn create_table(table: &Table) -> Result<(), Box<dyn std::error::Error>> {
-    println!("创建表: {}", table.name);
-    println!("SQL: {}", table.definition);
+async fn create_table(table: &Table) -> Result<(), Box<dyn std::error::Error>> {
+    // println!("创建表: {}", table.name);
+    // println!("SQL: {}", table.definition);
 
-    // 这里可以添加实际的数据库操作逻辑
-    // 例如使用 sqlx 或其他数据库库执行 SQL
-
+    let db = fastcdn_common::db::pool::Manager::new().await?;
+    db.create_sql(&table.definition).await?;
     Ok(())
 }

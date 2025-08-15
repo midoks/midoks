@@ -13,6 +13,7 @@ serde = { version = "1.0.219", features = ["derive"] }
 tokio-stream = "0.1"
 lazy_static = "1.5.0"
 serde_yaml = "0.9.34"
+sqlx = { version = "0.7", features = ["runtime-tokio-rustls", "mysql"] }
 
 [build-dependencies]
 tonic-build = "0.12"

@@ -5,6 +5,8 @@
 pub mod config;
 pub mod rpc;
 
+pub mod db;
+
 // 导出常用的客户端
 pub use rpc::client::{HelloClient, PingClient};
 

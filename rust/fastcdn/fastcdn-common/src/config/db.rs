@@ -1,7 +1,6 @@
 use serde::{Deserialize, Serialize};
-use std::fs;
-use std::path::Path;
 use std::sync::{Arc, Mutex};
+use std::path::Path;
 use lazy_static::lazy_static;
 use super::{load_from_file, load_default};
 
