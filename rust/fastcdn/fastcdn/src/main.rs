@@ -58,7 +58,7 @@ async fn main() -> std::io::Result<()> {
             } else {
                 // 前台模式运行
                 HttpServerManager::start().await?;
-                Ok("服务器启动成功")
+                Ok(())
             }
         }
         Some(Commands::Stop {}) => {
