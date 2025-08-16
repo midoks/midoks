@@ -83,7 +83,7 @@ pub async fn install_db() -> Result<(), Box<dyn std::error::Error>> {
 
         let info = db.find_full_table(&table.name).await?;
         if let Some(create_statement) = info.get("create_statement") {
-            println!("local_sql:{:?}", create_statement);
+            println!("local_sql:{}", create_statement);
             println!("create_sql:{:?}", table.definition);
         } else {
             println!("create_statement not found in info");
@@ -94,7 +94,7 @@ pub async fn install_db() -> Result<(), Box<dyn std::error::Error>> {
 
             let info = db.find_full_table(&table.name).await?;
             if let Some(create_statement) = info.get("create_statement") {
-                println!("local_sql:{:?}", create_statement);
+                println!("local_sql:{}", create_statement);
                 println!("create_sql:{:?}", table.definition);
             } else {
                 println!("create_statement not found in info");
