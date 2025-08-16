@@ -39,8 +39,8 @@ pub async fn is_exists(tables: &[String], name: &str) -> bool {
 }
 
 /// 守护进程管理器
-pub struct SetupOp {
-    log: String,
+pub struct Setup {
+    log_path: String,
 }
 
 pub async fn install_db() -> Result<(), Box<dyn std::error::Error>> {
@@ -60,11 +60,11 @@ pub async fn install_db() -> Result<(), Box<dyn std::error::Error>> {
 
     // 遍历所有表
     for table in &install_config.tables {
-        // println!("\n表名: {}", table.name);
-        // println!("引擎: {}", table.engine);
-        // println!("字符集: {}", table.charset);
-        // println!("字段数量: {}", table.fields.len());
-        // println!("索引数量: {}", table.indexes.len());
+        println!("\n表名: {}", table.name);
+        println!("引擎: {}", table.engine);
+        println!("字符集: {}", table.charset);
+        println!("字段数量: {}", table.fields.len());
+        println!("索引数量: {}", table.indexes.len());
 
         // // 打印字段信息
         // println!("字段列表:");
@@ -78,8 +78,24 @@ pub async fn install_db() -> Result<(), Box<dyn std::error::Error>> {
         //     println!("  - {}: {}", index.name, index.definition);
         // }
 
+        let info = db.find_full_table(&table.name).await?;
+        if let Some(create_statement) = info.get("create_statement") {
+            println!("local_sql:{:?}", create_statement);
+            println!("create_sql:{:?}", table.definition);
+        } else {
+            println!("create_statement not found in info");
+        }
+
         if !is_exists(&tables, &table.name).await {
             db.create_sql(&table.definition).await?;
+
+            let info = db.find_full_table(&table.name).await?;
+            if let Some(create_statement) = info.get("create_statement") {
+                println!("local_sql:{:?}", create_statement);
+                println!("create_sql:{:?}", table.definition);
+            } else {
+                println!("create_statement not found in info");
+            }
         }
     }
 

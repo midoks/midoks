@@ -498,100 +498,76 @@ impl Manager {
                 .await?;
 
             // 按索引名分组
-            let mut indexes_map: std::collections::HashMap<
-                String,
-                Vec<serde_json::Map<String, Value>>,
-            > = std::collections::HashMap::new();
+            let mut indexes_map: std::collections::HashMap<String, Value> = std::collections::HashMap::new();
 
             for index_row in index_rows {
                 let index_name: String = index_row.try_get("INDEX_NAME")?;
                 let column_name: String = index_row.try_get("COLUMN_NAME")?;
                 let non_unique: i32 = index_row.try_get("NON_UNIQUE")?;
                 let index_type: String = index_row.try_get("INDEX_TYPE")?;
-                let seq_in_index: i64 = index_row.try_get("SEQ_IN_INDEX")?;
-
-                let mut index_column = serde_json::Map::new();
-                index_column.insert("column_name".to_string(), Value::String(column_name));
-                index_column.insert(
-                    "seq_in_index".to_string(),
-                    Value::Number(serde_json::Number::from(seq_in_index)),
-                );
-
+                let seq_in_index: u32 = index_row.try_get("SEQ_IN_INDEX")?;
                 let collation: Option<String> = index_row.try_get("COLLATION").unwrap_or(None);
-                index_column.insert(
-                    "collation".to_string(),
-                    collation.map(Value::String).unwrap_or(Value::Null),
-                );
 
-                let cardinality: Option<i64> = index_row.try_get("CARDINALITY").unwrap_or(None);
-                index_column.insert(
-                    "cardinality".to_string(),
-                    cardinality
-                        .map(|c| Value::Number(serde_json::Number::from(c)))
-                        .unwrap_or(Value::Null),
-                );
-
-                let sub_part: Option<i64> = index_row.try_get("SUB_PART").unwrap_or(None);
-                index_column.insert(
-                    "sub_part".to_string(),
-                    sub_part
-                        .map(|s| Value::Number(serde_json::Number::from(s)))
-                        .unwrap_or(Value::Null),
-                );
-
-                let entry = indexes_map
-                    .entry(index_name.clone())
-                    .or_insert_with(Vec::new);
-                entry.push(index_column);
-
-                // 为每个索引添加基本信息（只在第一次添加）
-                if entry.len() == 1 {
-                    let first_column = &mut entry[0]; // 移除 mut
-                    first_column.insert("index_name".to_string(), Value::String(index_name));
-                    first_column.insert("non_unique".to_string(), Value::Bool(non_unique != 0));
-                    first_column.insert("index_type".to_string(), Value::String(index_type));
-
-                    let index_comment: Option<String> =
-                        index_row.try_get("INDEX_COMMENT").unwrap_or(None);
-                    first_column.insert(
-                        "comment".to_string(),
-                        index_comment.map(Value::String).unwrap_or(Value::Null),
+                if !indexes_map.contains_key(&index_name) {
+                    indexes_map.insert(
+                        index_name.clone(),
+                        serde_json::json!({
+                            "name": index_name,
+                            "unique": non_unique == 0,
+                            "type": index_type,
+                            "columns": []
+                        }),
                     );
+                }
+
+                if let Some(index_info) = indexes_map.get_mut(&index_name) {
+                    if let Some(columns_array) = index_info["columns"].as_array_mut() {
+                        let column_info = serde_json::json!({
+                            "name": column_name,
+                            "seq_in_index": seq_in_index,
+                            "collation": collation
+                        });
+                        columns_array.push(column_info);
+                    }
                 }
             }
 
             // 转换索引信息为最终格式
             let mut indexes = Vec::new();
-            for (index_name, columns) in indexes_map {
+            for (index_name, index_value) in indexes_map {
                 let mut index_info = serde_json::Map::new();
                 index_info.insert("index_name".to_string(), Value::String(index_name));
 
-                if let Some(first_column) = columns.first() {
-                    if let Some(non_unique) = first_column.get("non_unique") {
-                        index_info.insert("non_unique".to_string(), non_unique.clone());
-                    }
-                    if let Some(index_type) = first_column.get("index_type") {
-                        index_info.insert("index_type".to_string(), index_type.clone());
-                    }
-                    if let Some(comment) = first_column.get("comment") {
-                        index_info.insert("comment".to_string(), comment.clone());
-                    }
+                // 从 index_value 中提取信息
+                if let Some(non_unique) = index_value.get("unique") {
+                    index_info.insert("non_unique".to_string(), Value::Bool(!non_unique.as_bool().unwrap_or(false)));
+                }
+                if let Some(index_type) = index_value.get("type") {
+                    index_info.insert("index_type".to_string(), index_type.clone());
                 }
 
                 // 提取列信息
-                let index_columns: Vec<Value> = columns
-                    .into_iter()
-                    .map(|mut col| {
-                        // 移除索引级别的信息，只保留列级别的信息
-                        col.remove("index_name");
-                        col.remove("non_unique");
-                        col.remove("index_type");
-                        col.remove("comment");
-                        Value::Object(col)
-                    })
-                    .collect();
+                if let Some(columns_array) = index_value.get("columns").and_then(|v| v.as_array()) {
+                    let index_columns: Vec<Value> = columns_array
+                        .iter()
+                        .map(|col| {
+                            let mut column_info = serde_json::Map::new();
+                            if let Some(name) = col.get("name") {
+                                column_info.insert("column_name".to_string(), name.clone());
+                            }
+                            if let Some(seq) = col.get("seq_in_index") {
+                                column_info.insert("seq_in_index".to_string(), seq.clone());
+                            }
+                            if let Some(collation) = col.get("collation") {
+                                column_info.insert("collation".to_string(), collation.clone());
+                            }
+                            Value::Object(column_info)
+                        })
+                        .collect();
 
-                index_info.insert("columns".to_string(), Value::Array(index_columns));
+                    index_info.insert("columns".to_string(), Value::Array(index_columns));
+                }
+
                 indexes.push(Value::Object(index_info));
             }
 
@@ -627,10 +603,20 @@ impl Manager {
     ) -> Result<Value, Box<dyn std::error::Error>> {
         let mut result = serde_json::json!({
             "table_name": table_name,
+            "create_statement": "",
             "columns": [],
             "indexes": [],
             "partitions": []
         });
+
+        // 获取表的创建语句
+        let create_query = format!("SHOW CREATE TABLE `{}`", table_name);
+        let create_row = sqlx::query(&create_query)
+            .fetch_one(self.pool.as_ref())
+            .await?;
+
+        let create_statement: String = create_row.try_get(1)?; // 第二列是 Create Table
+        result["create_statement"] = Value::String(create_statement);
 
         // 获取表结构信息
         let columns_query = "SELECT 
@@ -638,11 +624,13 @@ impl Manager {
             DATA_TYPE,
             IS_NULLABLE,
             COLUMN_DEFAULT,
+            COLUMN_TYPE,
             COLUMN_KEY,
             EXTRA,
             COLUMN_COMMENT
         FROM INFORMATION_SCHEMA.COLUMNS 
-        WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ?";
+        WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ?
+        ORDER BY ORDINAL_POSITION";
 
         let column_rows = sqlx::query(columns_query)
             .bind(table_name)
@@ -654,6 +642,7 @@ impl Manager {
             let column_info = serde_json::json!({
                 "name": row.try_get::<String, _>("COLUMN_NAME")?,
                 "data_type": row.try_get::<String, _>("DATA_TYPE")?,
+                "column_type": row.try_get::<String, _>("COLUMN_TYPE")?,
                 "nullable": row.try_get::<String, _>("IS_NULLABLE")? == "YES",
                 "default": row.try_get::<Option<String>, _>("COLUMN_DEFAULT")?,
                 "key": row.try_get::<String, _>("COLUMN_KEY")?,
@@ -670,7 +659,8 @@ impl Manager {
             COLUMN_NAME,
             NON_UNIQUE,
             INDEX_TYPE,
-            SEQ_IN_INDEX
+            SEQ_IN_INDEX,
+            COLLATION
         FROM INFORMATION_SCHEMA.STATISTICS 
         WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ?
         ORDER BY INDEX_NAME, SEQ_IN_INDEX";
@@ -686,6 +676,8 @@ impl Manager {
             let column_name: String = row.try_get("COLUMN_NAME")?;
             let non_unique: i32 = row.try_get("NON_UNIQUE")?;
             let index_type: String = row.try_get("INDEX_TYPE")?;
+            let seq_in_index: u32 = row.try_get("SEQ_IN_INDEX")?;
+            let collation: Option<String> = row.try_get("COLLATION").unwrap_or(None);
 
             if !indexes_map.contains_key(&index_name) {
                 indexes_map.insert(
@@ -701,7 +693,12 @@ impl Manager {
 
             if let Some(index_info) = indexes_map.get_mut(&index_name) {
                 if let Some(columns_array) = index_info["columns"].as_array_mut() {
-                    columns_array.push(Value::String(column_name));
+                    let column_info = serde_json::json!({
+                        "name": column_name,
+                        "seq_in_index": seq_in_index,
+                        "collation": collation
+                    });
+                    columns_array.push(column_info);
                 }
             }
         }
