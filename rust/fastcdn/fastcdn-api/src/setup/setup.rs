@@ -58,6 +58,9 @@ pub async fn install_db() -> Result<(), Box<dyn std::error::Error>> {
     let db = fastcdn_common::db::pool::Manager::new().await?;
     let tables = db.table_names().await?;
 
+    let dump_sql = db.dump().await?;
+    println!("dump_sql:{:?}", dump_sql);
+
     // 遍历所有表
     for table in &install_config.tables {
         println!("\n表名: {}", table.name);

@@ -18,7 +18,7 @@ action:
   - echo "before"
   after:
   - ./target/release/fastcdn-api start -d
-  - ./target/release/fastcdn start -d
+  # - ./target/release/fastcdn start -d
   - ./target/release/fastcdn test
   # - ./target/release/fastcdn-node start -d
   exit:
