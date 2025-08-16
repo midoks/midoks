@@ -1,7 +1,6 @@
 use rust_embed::RustEmbed;
 use serde::{Deserialize, Serialize};
-use serde_json::Value; // 添加这行导入
-use fastcdn_common::db::dump::DumpSql; // 添加这行导入
+use fastcdn_common::db::dump::{DumpSql, TableInfo};
 
 #[derive(RustEmbed, Debug)]
 #[folder = "src/setup/db_files/"]
@@ -41,15 +40,12 @@ pub async fn is_exists(tables: &[String], name: &str) -> bool {
     tables.iter().any(|s| s.to_lowercase() == name_lower)
 }
 
-pub async fn is_tables_exists(tables: &[Value], name: &str) -> bool {
+// 修改函数签名，使用 TableInfo 而不是 Value
+pub async fn is_tables_exists(tables: &[TableInfo], name: &str) -> bool {
     let name_lower = name.to_lowercase();
     for table_info in tables {
-        if let Some(table_name) = table_info.get("table_name") {
-            if let Some(table_name_str) = table_name.as_str() {
-                if table_name_str.to_lowercase() == name_lower {
-                    return true;
-                }
-            }
+        if table_info.table_name.to_lowercase() == name_lower {
+            return true;
         }
     }
     false
@@ -69,7 +65,7 @@ pub async fn install_db() -> Result<(), Box<dyn std::error::Error>> {
     let install_config: InstallConfig = serde_json::from_str(install_json_str)?;
 
     let db = fastcdn_common::db::pool::Manager::new().await?;
-    let dump_sql = db.dump().await?;
+    let dump_sql = db.dump().await?; // 现在返回 Vec<TableInfo>
     println!("dump_sql:{:?}", dump_sql);
 
     // 遍历所有表
@@ -80,28 +76,20 @@ pub async fn install_db() -> Result<(), Box<dyn std::error::Error>> {
         // println!("字段数量: {}", table.fields.len());
         // println!("索引数量: {}", table.indexes.len());
 
-        // 将 dump_sql 转换为数组切片
-        let tables_array = if let Some(array) = dump_sql.as_array() {
-            array.as_slice()
-        } else {
-            &[]
-        };
+        // dump_sql 现在是 Vec<TableInfo>，直接使用切片
+        let tables_array = dump_sql.as_slice();
 
         if !is_tables_exists(tables_array, &table.name).await {
             db.create_sql(&table.definition).await?;
         } else {
             for table_info in tables_array {
-                if let Some(create_statement) = table_info.get("create_statement") {
-                    println!("local_sql:{}", create_statement);
-                    println!("creat_sql:{:?}", table.definition);
+                // 直接访问 create_statement 字段
+                let create_statement = &table_info.create_statement;
+                println!("local_sql:{}", create_statement);
+                println!("creat_sql:{:?}", table.definition);
 
-                    if let Some(create_statement_str) = create_statement.as_str() {
-                        if table.definition != create_statement_str {
-                            println!("not ok!!!!");
-                        }
-                    } else {
-                        println!("create_statement is not a string");
-                    }
+                if table.definition != *create_statement {
+                    println!("not ok!!!!");
                 }
             }
         }

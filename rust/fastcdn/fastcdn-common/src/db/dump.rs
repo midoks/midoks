@@ -1,10 +1,9 @@
 use crate::db::pool;
 use serde::{Deserialize, Serialize};
-use serde_json::Value as JsonValue;
 use sqlx::Row;
 use std::collections::HashMap;
 
-/// 服务器配置结构体
+/// 数据库表-字段信息数据结构体
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct TableColumns {
     pub name: String,
@@ -17,14 +16,52 @@ pub struct TableColumns {
     pub comment: String,
 }
 
+/// 数据库表-索引信息数据结构体
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct TableIndexColumns {
+    pub collation: String,
+    pub name: String,
+    pub seq_in_index: u32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct TableIndexes {
+    pub name: String,
+    pub index_type: String,
+    pub unique: bool,
+    pub columns: Vec<TableIndexColumns>,
+}
+
+/// 数据库表-分区信息数据结构体
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct TablePartitions {
+    pub name: String,
+    pub method: String,
+    pub expression: String,
+    pub description: String,
+    pub rows: i64,
+    pub data_length: i64,
+    pub index_length: i64,
+}
+
+/// 数据库表信息数据结构体
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct TableInfo {
+    pub table_name: String,
+    pub create_statement: String,
+    pub columns: Vec<TableColumns>,
+    pub indexes: Vec<TableIndexes>,
+    pub partitions: Vec<TablePartitions>,
+}
+
 /// 数据库导出 trait
 pub trait DumpSql {
-    async fn dump(&self) -> Result<JsonValue, Box<dyn std::error::Error>>;
+    async fn dump(&self) -> Result<Vec<TableInfo>, Box<dyn std::error::Error>>;
     async fn table_names(&self) -> Result<Vec<String>, Box<dyn std::error::Error>>;
     async fn find_full_table(
         &self,
         table_name: &str,
-    ) -> Result<JsonValue, Box<dyn std::error::Error>>;
+    ) -> Result<TableInfo, Box<dyn std::error::Error>>;
 }
 
 impl DumpSql for pool::Manager {
@@ -37,7 +74,7 @@ impl DumpSql for pool::Manager {
     /// - create_statement: 创建表的 SQL 语句
     /// - columns: 字段信息数组
     /// - indexes: 索引信息数组
-    async fn dump(&self) -> Result<JsonValue, Box<dyn std::error::Error>> {
+    async fn dump(&self) -> Result<Vec<TableInfo>, Box<dyn std::error::Error>> {
         let mut tables_info = Vec::new();
 
         // 1. 获取所有表名
@@ -49,7 +86,7 @@ impl DumpSql for pool::Manager {
             tables_info.push(table_info);
         }
 
-        Ok(JsonValue::Array(tables_info))
+        Ok(tables_info)
     }
 
     /// 获取数据库中所有表名
@@ -73,16 +110,7 @@ impl DumpSql for pool::Manager {
     async fn find_full_table(
         &self,
         table_name: &str,
-    ) -> Result<JsonValue, Box<dyn std::error::Error>> {
-        let mut result = serde_json::json!({
-            "table_name": table_name,
-            "create_statement": "",
-            "columns": [],
-            "fields": [],
-            "indexes": [],
-            "partitions": []
-        });
-
+    ) -> Result<TableInfo, Box<dyn std::error::Error>> {
         // 获取表的创建语句
         let create_query = format!("SHOW CREATE TABLE `{}`", table_name);
         let create_row = sqlx::query(&create_query)
@@ -90,7 +118,6 @@ impl DumpSql for pool::Manager {
             .await?;
 
         let create_statement: String = create_row.try_get(1)?; // 第二列是 Create Table
-        result["create_statement"] = JsonValue::String(create_statement);
 
         // 获取表结构信息
         let columns_query = "SELECT 
@@ -112,9 +139,8 @@ impl DumpSql for pool::Manager {
             .await?;
 
         let mut columns = Vec::new();
-        let mut f = Vec::new(); // 添加这行来定义变量 f
         for row in &column_rows {
-            let column_infos = TableColumns {
+            let column_info = TableColumns {
                 name: row.try_get::<String, _>("COLUMN_NAME")?,
                 data_type: row.try_get::<String, _>("DATA_TYPE")?,
                 column_type: row.try_get::<String, _>("COLUMN_TYPE")?,
@@ -126,10 +152,8 @@ impl DumpSql for pool::Manager {
                 extra: row.try_get::<String, _>("EXTRA")?,
                 comment: row.try_get::<String, _>("COLUMN_COMMENT")?,
             };
-            columns.push(serde_json::to_value(column_infos.clone())?); // 转换为 JSON 值
-            f.push(serde_json::to_value(column_infos)?); // 修复：转换为 JSON 值
+            columns.push(column_info);
         }
-        result["columns"] = JsonValue::Array(columns);
 
         // 获取索引信息
         let indexes_query = "SELECT 
@@ -148,7 +172,7 @@ impl DumpSql for pool::Manager {
             .fetch_all(self.pool.as_ref())
             .await?;
 
-        let mut indexes_map: HashMap<String, JsonValue> = HashMap::new();
+        let mut indexes_map: HashMap<String, TableIndexes> = HashMap::new();
         for row in index_rows {
             let index_name: String = row.try_get("INDEX_NAME")?;
             let column_name: String = row.try_get("COLUMN_NAME")?;
@@ -160,29 +184,26 @@ impl DumpSql for pool::Manager {
             if !indexes_map.contains_key(&index_name) {
                 indexes_map.insert(
                     index_name.clone(),
-                    serde_json::json!({
-                        "name": index_name,
-                        "unique": non_unique == 0,
-                        "type": index_type,
-                        "columns": []
-                    }),
+                    TableIndexes {
+                        name: index_name.clone(),
+                        unique: non_unique == 0,
+                        index_type: index_type.clone(),
+                        columns: Vec::new(),
+                    },
                 );
             }
 
             if let Some(index_info) = indexes_map.get_mut(&index_name) {
-                if let Some(columns_array) = index_info["columns"].as_array_mut() {
-                    let column_info = serde_json::json!({
-                        "name": column_name,
-                        "seq_in_index": seq_in_index,
-                        "collation": collation
-                    });
-                    columns_array.push(column_info);
-                }
+                let column_info = TableIndexColumns {
+                    name: column_name,
+                    seq_in_index,
+                    collation: collation.unwrap_or_default(),
+                };
+                index_info.columns.push(column_info);
             }
         }
 
-        let indexes: Vec<JsonValue> = indexes_map.into_values().collect();
-        result["indexes"] = JsonValue::Array(indexes);
+        let indexes: Vec<TableIndexes> = indexes_map.into_values().collect();
 
         // 获取分区信息
         let partitions_query = "SELECT 
@@ -203,18 +224,25 @@ impl DumpSql for pool::Manager {
 
         let mut partitions = Vec::new();
         for row in partition_rows {
-            let partition_info = serde_json::json!({
-                "name": row.try_get::<Option<String>, _>("PARTITION_NAME")?,
-                "method": row.try_get::<Option<String>, _>("PARTITION_METHOD")?,
-                "expression": row.try_get::<Option<String>, _>("PARTITION_EXPRESSION")?,
-                "description": row.try_get::<Option<String>, _>("PARTITION_DESCRIPTION")?,
-                "rows": row.try_get::<Option<i64>, _>("TABLE_ROWS")?,
-                "data_length": row.try_get::<Option<i64>, _>("DATA_LENGTH")?,
-                "index_length": row.try_get::<Option<i64>, _>("INDEX_LENGTH")?
-            });
+            let partition_info = TablePartitions {
+                name: row.try_get::<Option<String>, _>("PARTITION_NAME")?.unwrap_or_default(),
+                method: row.try_get::<Option<String>, _>("PARTITION_METHOD")?.unwrap_or_default(),
+                expression: row.try_get::<Option<String>, _>("PARTITION_EXPRESSION")?.unwrap_or_default(),
+                description: row.try_get::<Option<String>, _>("PARTITION_DESCRIPTION")?.unwrap_or_default(),
+                rows: row.try_get::<Option<i64>, _>("TABLE_ROWS")?.unwrap_or(0),
+                data_length: row.try_get::<Option<i64>, _>("DATA_LENGTH")?.unwrap_or(0),
+                index_length: row.try_get::<Option<i64>, _>("INDEX_LENGTH")?.unwrap_or(0),
+            };
             partitions.push(partition_info);
         }
-        result["partitions"] = JsonValue::Array(partitions);
+
+        let result = TableInfo {
+            table_name: table_name.to_string(),
+            create_statement,
+            columns,
+            indexes,
+            partitions,
+        };
 
         Ok(result)
     }
