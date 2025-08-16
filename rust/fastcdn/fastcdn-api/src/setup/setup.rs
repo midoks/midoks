@@ -1,6 +1,6 @@
+use fastcdn_common::db::dump::{DumpSql, TableInfo};
 use rust_embed::RustEmbed;
 use serde::{Deserialize, Serialize};
-use fastcdn_common::db::dump::{DumpSql, TableInfo};
 
 #[derive(RustEmbed, Debug)]
 #[folder = "src/setup/db_files/"]
@@ -86,6 +86,11 @@ pub async fn install_db() -> Result<(), Box<dyn std::error::Error>> {
                 // 直接访问 create_statement 字段
                 let create_statement = &table_info.create_statement;
                 println!("local_sql:{}", create_statement);
+
+                // 将 create_statement 转换为 JSON 字符串
+                let create_statement_json = serde_json::to_string(create_statement)?;
+                println!("localjson:{}", create_statement_json);
+
                 println!("creat_sql:{:?}", table.definition);
 
                 if table.definition != *create_statement {
