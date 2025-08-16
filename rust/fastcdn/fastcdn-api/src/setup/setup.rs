@@ -1,5 +1,7 @@
 use rust_embed::RustEmbed;
 use serde::{Deserialize, Serialize};
+use serde_json::Value; // 添加这行导入
+use fastcdn_common::db::dump::DumpSql; // 添加这行导入
 
 #[derive(RustEmbed, Debug)]
 #[folder = "src/setup/db_files/"]
@@ -33,9 +35,24 @@ struct Index {
     definition: String,
 }
 
+#[warn(dead_code)]
 pub async fn is_exists(tables: &[String], name: &str) -> bool {
     let name_lower = name.to_lowercase();
     tables.iter().any(|s| s.to_lowercase() == name_lower)
+}
+
+pub async fn is_tables_exists(tables: &[Value], name: &str) -> bool {
+    let name_lower = name.to_lowercase();
+    for table_info in tables {
+        if let Some(table_name) = table_info.get("table_name") {
+            if let Some(table_name_str) = table_name.as_str() {
+                if table_name_str.to_lowercase() == name_lower {
+                    return true;
+                }
+            }
+        }
+    }
+    false
 }
 
 /// 守护进程管理器
@@ -49,55 +66,43 @@ pub async fn install_db() -> Result<(), Box<dyn std::error::Error>> {
 
     // 将字节数据转换为字符串
     let install_json_str = std::str::from_utf8(&install_json_file.data)?;
-
-    // 解析 JSON
     let install_config: InstallConfig = serde_json::from_str(install_json_str)?;
 
-    println!("解析成功！找到 {} 个表定义", install_config.tables.len());
-
     let db = fastcdn_common::db::pool::Manager::new().await?;
-    let tables = db.table_names().await?;
-
     let dump_sql = db.dump().await?;
     println!("dump_sql:{:?}", dump_sql);
 
     // 遍历所有表
     for table in &install_config.tables {
-        println!("\n表名: {}", table.name);
-        println!("引擎: {}", table.engine);
-        println!("字符集: {}", table.charset);
-        println!("字段数量: {}", table.fields.len());
-        println!("索引数量: {}", table.indexes.len());
+        // println!("表名: {}", table.name);
+        // println!("引擎: {}", table.engine);
+        // println!("字符集: {}", table.charset);
+        // println!("字段数量: {}", table.fields.len());
+        // println!("索引数量: {}", table.indexes.len());
 
-        // // 打印字段信息
-        // println!("字段列表:");
-        // for field in &table.fields {
-        //     println!("  - {}: {}", field.name, field.definition);
-        // }
-
-        // // 打印索引信息
-        // println!("索引列表:");
-        // for index in &table.indexes {
-        //     println!("  - {}: {}", index.name, index.definition);
-        // }
-
-        let info = db.find_full_table(&table.name).await?;
-        if let Some(create_statement) = info.get("create_statement") {
-            println!("local_sql:{}", create_statement);
-            println!("create_sql:{:?}", table.definition);
+        // 将 dump_sql 转换为数组切片
+        let tables_array = if let Some(array) = dump_sql.as_array() {
+            array.as_slice()
         } else {
-            println!("create_statement not found in info");
-        }
+            &[]
+        };
 
-        if !is_exists(&tables, &table.name).await {
+        if !is_tables_exists(tables_array, &table.name).await {
             db.create_sql(&table.definition).await?;
+        } else {
+            for table_info in tables_array {
+                if let Some(create_statement) = table_info.get("create_statement") {
+                    println!("local_sql:{}", create_statement);
+                    println!("creat_sql:{:?}", table.definition);
 
-            let info = db.find_full_table(&table.name).await?;
-            if let Some(create_statement) = info.get("create_statement") {
-                println!("local_sql:{}", create_statement);
-                println!("create_sql:{:?}", table.definition);
-            } else {
-                println!("create_statement not found in info");
+                    if let Some(create_statement_str) = create_statement.as_str() {
+                        if table.definition != create_statement_str {
+                            println!("not ok!!!!");
+                        }
+                    } else {
+                        println!("create_statement is not a string");
+                    }
+                }
             }
         }
     }
