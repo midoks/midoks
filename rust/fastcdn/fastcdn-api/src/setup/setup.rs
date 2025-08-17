@@ -1,4 +1,4 @@
-use fastcdn_common::db::dump::{Dump, Find, TableInfo};
+use fastcdn_common::db::dump::TableInfo;
 use rust_embed::RustEmbed;
 use serde::{Deserialize, Serialize};
 
@@ -67,54 +67,75 @@ pub async fn install_db() -> Result<(), Box<dyn std::error::Error>> {
     // println!("dump_sql:{:?}", dump_sql);
 
     // 遍历所有表
-    for table in &install_config.tables {
-        // println!("表名: {}", table.name);
-        // println!("引擎: {}", table.engine);
-        // println!("字符集: {}", table.charset);
-        // println!("字段数量: {}", table.fields.len());
-        // println!("索引数量: {}", table.indexes.len());
+    for embed_table in &install_config.tables {
+        let db_tables = dump_sql.as_slice();
 
-        // dump_sql 现在是 Vec<TableInfo>，直接使用切片
-        let tables_array = dump_sql.as_slice();
-
-        if !is_tables_exists(tables_array, &table.name).await {
-            db.create_sql(&table.definition).await?;
+        if !is_tables_exists(db_tables, &embed_table.name).await {
+            db.create_sql(&embed_table.definition).await?;
         } else {
-            for table_info in tables_array {
-                // 直接访问 create_statement 字段
+            for table_info in db_tables {
                 let create_statement = &table_info.create_statement;
-                // let create_statement_jstr = serde_json::to_string(create_statement)?;
-                // println!("local_sql:{}", create_statement);
-                // println!("localjstr:{}", create_statement_jstr);
-                // println!("creat_sql:{:?}", table.definition);
-
-                if table.definition != *create_statement {
-                    println!("not ok!!!!");
-
-                    // 对比字段
-                    let code_fields = &table.fields;
-                    for field in code_fields {
-                        // println!("{:?}", field);
-                        if let Some(column) = table_info.find_column(&field.name).await {
-                            println!("Found column: {:?}", column);
-
-                            let sql_cmd = format!(
-                                "ALTER TABLE {} MODIFY `{}` {}",
-                                table.name, field.name, field.definition
-                            );
-
-                            let _ = db.exec(&sql_cmd).await;
-                            println!("sql_cmd: {}", sql_cmd);
+                if embed_table.definition != *create_statement {
+                    // 对比字段 +
+                    let embed_fields = &embed_table.fields;
+                    for embed_field in embed_fields {
+                        if let Some(column) = table_info.find_column(&embed_field.name).await {
+                            if !column.eq_definition(&embed_field.definition).await {
+                                let cmd = format!(
+                                    "ALTER TABLE {} MODIFY `{}` {}",
+                                    embed_table.name, embed_field.name, embed_field.definition
+                                );
+                                let _ = db.exec(&cmd).await;
+                            }
                         } else {
-                            let sql_cmd = format!(
+                            let cmd = format!(
                                 "ALTER TABLE {} ADD `{}` {}",
-                                table.name, field.name, field.definition
+                                embed_table.name, embed_field.name, embed_field.definition
                             );
-
-                            let _ = db.exec(&sql_cmd).await;
+                            let _ = db.exec(&cmd).await;
                         }
                     }
-                    // println!("{:?}", newTable);
+
+                    // 对比索引 +
+                    let embed_indexes = &embed_table.indexes;
+                    for embed_index in embed_indexes {
+                        if let Some(index) = table_info.find_index(&embed_index.name).await {
+                            if index.definition().await != embed_index.definition {
+                                let drop_index = format!(
+                                    "ALTER TABLE {} DROP KEY {}",
+                                    embed_table.name, embed_index.definition
+                                );
+                                match db.exec(&drop_index).await {
+                                    Ok(_) => {
+                                        let add_index = format!(
+                                            "ALTER TABLE {} ADD {}",
+                                            embed_table.name, embed_index.definition
+                                        );
+                                        match db.exec(&add_index).await {
+                                            Ok(_) => {}
+                                            Err(e) => {
+                                                eprintln!("add table index command: {}", e);
+                                            }
+                                        }
+                                    }
+                                    Err(e) => {
+                                        eprintln!("drop table index command: {}", e);
+                                    }
+                                }
+                            }
+                        } else {
+                            let add_index = format!(
+                                "ALTER TABLE {} ADD {}",
+                                embed_table.name, embed_index.definition
+                            );
+                            match db.exec(&add_index).await {
+                                Ok(_) => {}
+                                Err(e) => {
+                                    eprintln!("add table index command: {}", e);
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }

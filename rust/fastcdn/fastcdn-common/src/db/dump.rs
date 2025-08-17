@@ -1,7 +1,17 @@
 use crate::db::pool;
+use regex::Regex;
 use serde::{Deserialize, Serialize};
 use sqlx::Row;
 use std::collections::HashMap;
+// 建议静态初始化避免重复编译
+use once_cell::sync::Lazy;
+
+static TYPE_REGEX: Lazy<Regex> =
+    Lazy::new(|| Regex::new(r"(?P<type>tinyint|smallint|mediumint|int|bigint)\(\d+\)").unwrap());
+
+fn sanitize_definition(def: &str) -> String {
+    TYPE_REGEX.replace_all(def, "$type").into_owned()
+}
 
 /// 数据库表-字段信息数据结构体
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -14,6 +24,56 @@ pub struct TableColumns {
     pub key: String,
     pub extra: String,
     pub comment: String,
+}
+
+impl TableColumns {
+    pub async fn definition(&self) -> String {
+        let mut definition = String::new();
+
+        if !self.column_type.is_empty() {
+            definition.push_str(&self.column_type);
+        }
+
+        if !self.extra.is_empty() {
+            if !definition.is_empty() {
+                definition.push(' ');
+            }
+            definition.push_str(&self.extra);
+        }
+
+        if !self.default.is_empty() {
+            if !definition.is_empty() {
+                definition.push(' ');
+            }
+            definition.push_str("DEFAULT '");
+            definition.push_str(&self.default);
+            definition.push_str("'");
+        }
+
+        if !self.comment.is_empty() {
+            if !definition.is_empty() {
+                definition.push(' ');
+            }
+            definition.push_str("COMMENT '");
+            definition.push_str(&self.comment);
+            definition.push_str("'");
+        }
+        definition.trim().to_string()
+    }
+
+    pub async fn eq_definition(&self, def: &str) -> bool {
+        let local_def = self.definition().await;
+        if local_def == def {
+            return true;
+        }
+
+        // 针对MySQL v8.0.17以后
+        let x = sanitize_definition(def);
+        if x == local_def {
+            return true;
+        }
+        false
+    }
 }
 
 /// 数据库表-索引信息数据结构体
@@ -30,6 +90,35 @@ pub struct TableIndexes {
     pub index_type: String,
     pub unique: bool,
     pub columns: Vec<TableIndexColumns>,
+}
+
+impl TableIndexes {
+    pub async fn definition(&self) -> String {
+        let mut definition = String::new();
+
+        if self.unique {
+            definition.push_str("UNIQUE ");
+        }
+
+        definition.push_str("KEY `");
+        definition.push_str(&self.name);
+        definition.push_str("` ");
+        definition.push_str("(");
+        for (k, idx_col) in self.columns.iter().enumerate() {
+            definition.push_str("`");
+            definition.push_str(&idx_col.name);
+            definition.push_str("`");
+            // println!("{},{:?}", k, idx_col);
+            if k < self.columns.len() - 1 {
+                definition.push_str(",");
+            }
+        }
+        definition.push_str(") ");
+        definition.push_str("USING ");
+        definition.push_str(&self.index_type);
+
+        definition.trim().to_string()
+    }
 }
 
 /// 数据库表-分区信息数据结构体
@@ -54,14 +143,15 @@ pub struct TableInfo {
     pub partitions: Vec<TablePartitions>,
 }
 
-pub trait Find {
-    async fn find_column(&self, name: &str) -> Option<&TableColumns>;
-    async fn find_index(&self, name: &str) -> Option<&TableIndexes>;
-    async fn find_partition(&self, name: &str) -> Option<&TablePartitions>;
-}
+// TableInfo 相关方法
+// pub trait Find {
+//     async fn find_column(&self, name: &str) -> Option<&TableColumns>;
+//     async fn find_index(&self, name: &str) -> Option<&TableIndexes>;
+//     async fn find_partition(&self, name: &str) -> Option<&TablePartitions>;
+// }
 
-impl Find for TableInfo {
-    async fn find_column(&self, name: &str) -> Option<&TableColumns> {
+impl TableInfo {
+    pub async fn find_column(&self, name: &str) -> Option<&TableColumns> {
         let columns = &self.columns;
         for col in columns {
             if col.name == name {
@@ -71,7 +161,7 @@ impl Find for TableInfo {
         None
     }
 
-    async fn find_index(&self, name: &str) -> Option<&TableIndexes> {
+    pub async fn find_index(&self, name: &str) -> Option<&TableIndexes> {
         let indexes = &self.indexes;
         for idx in indexes {
             if idx.name == name {
@@ -81,7 +171,7 @@ impl Find for TableInfo {
         None
     }
 
-    async fn find_partition(&self, name: &str) -> Option<&TablePartitions> {
+    pub async fn find_partition(&self, name: &str) -> Option<&TablePartitions> {
         let part = &self.partitions;
         for pt in part {
             if pt.name == name {
@@ -93,16 +183,16 @@ impl Find for TableInfo {
 }
 
 /// 导出数据库表结构 trait
-pub trait Dump {
-    async fn dump(&self) -> Result<Vec<TableInfo>, Box<dyn std::error::Error>>;
-    async fn table_names(&self) -> Result<Vec<String>, Box<dyn std::error::Error>>;
-    async fn find_full_table(
-        &self,
-        table_name: &str,
-    ) -> Result<TableInfo, Box<dyn std::error::Error>>;
-}
+// pub trait Dump {
+//     async fn dump(&self) -> Result<Vec<TableInfo>, Box<dyn std::error::Error>>;
+//     async fn table_names(&self) -> Result<Vec<String>, Box<dyn std::error::Error>>;
+//     async fn find_full_table(
+//         &self,
+//         table_name: &str,
+//     ) -> Result<TableInfo, Box<dyn std::error::Error>>;
+// }
 
-impl Dump for pool::Manager {
+impl pool::Manager {
     /// 导出数据库所有表的结构信息
     ///
     /// # 返回
@@ -112,7 +202,7 @@ impl Dump for pool::Manager {
     /// - create_statement: 创建表的 SQL 语句
     /// - columns: 字段信息数组
     /// - indexes: 索引信息数组
-    async fn dump(&self) -> Result<Vec<TableInfo>, Box<dyn std::error::Error>> {
+    pub async fn dump(&self) -> Result<Vec<TableInfo>, Box<dyn std::error::Error>> {
         let mut tables_info = Vec::new();
 
         // 1. 获取所有表名
@@ -131,7 +221,7 @@ impl Dump for pool::Manager {
     ///
     /// # 返回
     /// 返回包含所有表名的字符串向量
-    async fn table_names(&self) -> Result<Vec<String>, Box<dyn std::error::Error>> {
+    pub async fn table_names(&self) -> Result<Vec<String>, Box<dyn std::error::Error>> {
         let query = "SHOW TABLES";
         let rows = sqlx::query(query).fetch_all(self.pool.as_ref()).await?;
 
@@ -145,7 +235,7 @@ impl Dump for pool::Manager {
     }
 
     /// 获取表的完整信息，包括表结构、分区和索引信息
-    async fn find_full_table(
+    pub async fn find_full_table(
         &self,
         table_name: &str,
     ) -> Result<TableInfo, Box<dyn std::error::Error>> {

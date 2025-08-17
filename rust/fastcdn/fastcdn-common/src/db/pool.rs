@@ -1,5 +1,5 @@
 use crate::config::ConfigDb;
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Serialize}; // 如果确实不需要，可以删除这行
 use serde_json::Value;
 use sqlx::{Column, MySqlPool, Row, TypeInfo}; // 添加 TypeInfo trait
 use std::collections::HashMap; // 添加 HashMap 导入
