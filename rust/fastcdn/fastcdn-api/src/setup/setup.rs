@@ -83,7 +83,6 @@ pub async fn install_db() -> Result<(), Box<dyn std::error::Error>> {
 
     let db = fastcdn_common::db::pool::Manager::new().await?;
     let dump_sql = db.dump().await?;
-    // println!("dump_sql:{:?}", dump_sql);
 
     // 遍历所有表
     for embed_table in &install_config.tables {
