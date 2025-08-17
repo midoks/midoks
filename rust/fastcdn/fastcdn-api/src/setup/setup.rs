@@ -197,6 +197,7 @@ pub async fn install_db() -> Result<(), Box<dyn std::error::Error>> {
                             }
                         }
                     }
+                    //end
                 }
             }
         }
