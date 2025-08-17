@@ -103,14 +103,25 @@ pub async fn install_db() -> Result<(), Box<dyn std::error::Error>> {
                                     "ALTER TABLE {} MODIFY `{}` {}",
                                     embed_table.name, embed_field.name, embed_field.definition
                                 );
-                                let _ = db.exec(&cmd).await;
+
+                                match db.exec(&cmd).await {
+                                    Ok(_) => {}
+                                    Err(e) => {
+                                        eprintln!("modify table index command: {}", e);
+                                    }
+                                }
                             }
                         } else {
                             let cmd = format!(
                                 "ALTER TABLE {} ADD `{}` {}",
                                 embed_table.name, embed_field.name, embed_field.definition
                             );
-                            let _ = db.exec(&cmd).await;
+                            match db.exec(&cmd).await {
+                                Ok(_) => {}
+                                Err(e) => {
+                                    eprintln!("add table index command: {}", e);
+                                }
+                            }
                         }
                     }
 
@@ -155,8 +166,37 @@ pub async fn install_db() -> Result<(), Box<dyn std::error::Error>> {
                     }
 
                     // 字段对比 -
-                    for table_field in &table_info.columns {
-                        println!("{:?}", table_field);
+                    for table_col in &table_info.columns {
+                        if let Some(_col) = embed_table.find_column(&table_col.name).await {
+                        } else {
+                            let cmd = format!(
+                                "ALTER TABLE {} DROP COLUMN `{}`",
+                                embed_table.name, table_col.name
+                            );
+                            match db.exec(&cmd).await {
+                                Ok(_) => {}
+                                Err(e) => {
+                                    eprintln!("drop table column command: {}", e);
+                                }
+                            }
+                        }
+                    }
+
+                    // 索引对比 -
+                    for table_idx in &table_info.indexes {
+                        if let Some(_idx) = embed_table.find_index(&table_idx.name).await {
+                        } else {
+                            let cmd = format!(
+                                "ALTER TABLE {} DROP KEY `{}`",
+                                embed_table.name, table_idx.name
+                            );
+                            match db.exec(&cmd).await {
+                                Ok(_) => {}
+                                Err(e) => {
+                                    eprintln!("drop table index command: {}", e);
+                                }
+                            }
+                        }
                     }
                 }
             }
