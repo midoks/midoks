@@ -49,25 +49,25 @@ impl Manager {
             .await?;
 
         println!("✓ 数据库连接测试成功，返回值: {}", row.0);
-        Ok(()) // 修复：Ok() -> Ok(())
+        Ok(())
     }
 
     /// 数据库迁移
     pub async fn migrate(&self) -> Result<(), Box<dyn std::error::Error>> {
         // 这里可以添加数据库迁移逻辑
-        Ok(()) // 修复：Ok() -> Ok(())
+        Ok(())
     }
 
     /// 执行 SQL 语句
-    pub async fn execute_sql(&self, sql: &str) -> Result<(), sqlx::Error> {
+    pub async fn exec(&self, sql: &str) -> Result<(), sqlx::Error> {
         sqlx::query(sql).execute(self.pool.as_ref()).await?;
-        Ok(()) // 修复：Ok() -> Ok(())
+        Ok(())
     }
 
     /// 创建表的 SQL 语句
     pub async fn create_sql(&self, sql: &str) -> Result<(), sqlx::Error> {
         sqlx::query(sql).execute(self.pool.as_ref()).await?;
-        Ok(()) // 修复：Ok() -> Ok(())
+        Ok(())
     }
 
     // ==================== CRUD 基本操作方法 ====================

@@ -54,8 +54,46 @@ pub struct TableInfo {
     pub partitions: Vec<TablePartitions>,
 }
 
-/// 数据库导出 trait
-pub trait DumpSql {
+pub trait Find {
+    async fn find_column(&self, name: &str) -> Option<&TableColumns>;
+    async fn find_index(&self, name: &str) -> Option<&TableIndexes>;
+    async fn find_partition(&self, name: &str) -> Option<&TablePartitions>;
+}
+
+impl Find for TableInfo {
+    async fn find_column(&self, name: &str) -> Option<&TableColumns> {
+        let columns = &self.columns;
+        for col in columns {
+            if col.name == name {
+                return Some(col);
+            }
+        }
+        None
+    }
+
+    async fn find_index(&self, name: &str) -> Option<&TableIndexes> {
+        let indexes = &self.indexes;
+        for idx in indexes {
+            if idx.name == name {
+                return Some(idx);
+            }
+        }
+        None
+    }
+
+    async fn find_partition(&self, name: &str) -> Option<&TablePartitions> {
+        let part = &self.partitions;
+        for pt in part {
+            if pt.name == name {
+                return Some(pt);
+            }
+        }
+        None
+    }
+}
+
+/// 导出数据库表结构 trait
+pub trait Dump {
     async fn dump(&self) -> Result<Vec<TableInfo>, Box<dyn std::error::Error>>;
     async fn table_names(&self) -> Result<Vec<String>, Box<dyn std::error::Error>>;
     async fn find_full_table(
@@ -64,7 +102,7 @@ pub trait DumpSql {
     ) -> Result<TableInfo, Box<dyn std::error::Error>>;
 }
 
-impl DumpSql for pool::Manager {
+impl Dump for pool::Manager {
     /// 导出数据库所有表的结构信息
     ///
     /// # 返回
@@ -225,10 +263,18 @@ impl DumpSql for pool::Manager {
         let mut partitions = Vec::new();
         for row in partition_rows {
             let partition_info = TablePartitions {
-                name: row.try_get::<Option<String>, _>("PARTITION_NAME")?.unwrap_or_default(),
-                method: row.try_get::<Option<String>, _>("PARTITION_METHOD")?.unwrap_or_default(),
-                expression: row.try_get::<Option<String>, _>("PARTITION_EXPRESSION")?.unwrap_or_default(),
-                description: row.try_get::<Option<String>, _>("PARTITION_DESCRIPTION")?.unwrap_or_default(),
+                name: row
+                    .try_get::<Option<String>, _>("PARTITION_NAME")?
+                    .unwrap_or_default(),
+                method: row
+                    .try_get::<Option<String>, _>("PARTITION_METHOD")?
+                    .unwrap_or_default(),
+                expression: row
+                    .try_get::<Option<String>, _>("PARTITION_EXPRESSION")?
+                    .unwrap_or_default(),
+                description: row
+                    .try_get::<Option<String>, _>("PARTITION_DESCRIPTION")?
+                    .unwrap_or_default(),
                 rows: row.try_get::<Option<i64>, _>("TABLE_ROWS")?.unwrap_or(0),
                 data_length: row.try_get::<Option<i64>, _>("DATA_LENGTH")?.unwrap_or(0),
                 index_length: row.try_get::<Option<i64>, _>("INDEX_LENGTH")?.unwrap_or(0),

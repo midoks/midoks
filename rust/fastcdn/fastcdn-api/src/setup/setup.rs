@@ -1,4 +1,4 @@
-use fastcdn_common::db::dump::{DumpSql, TableInfo};
+use fastcdn_common::db::dump::{Dump, Find, TableInfo};
 use rust_embed::RustEmbed;
 use serde::{Deserialize, Serialize};
 
@@ -57,16 +57,14 @@ pub struct Setup {
 }
 
 pub async fn install_db() -> Result<(), Box<dyn std::error::Error>> {
-    // 从嵌入的文件中获取 install.json
-    let install_json_file = DbFiles::get("install.json").ok_or("install.json file not found")?;
-
+    let install_embed_file = DbFiles::get("install.json").ok_or("install.json file not found")?;
     // 将字节数据转换为字符串
-    let install_json_str = std::str::from_utf8(&install_json_file.data)?;
+    let install_json_str = std::str::from_utf8(&install_embed_file.data)?;
     let install_config: InstallConfig = serde_json::from_str(install_json_str)?;
 
     let db = fastcdn_common::db::pool::Manager::new().await?;
-    let dump_sql = db.dump().await?; // 现在返回 Vec<TableInfo>
-    println!("dump_sql:{:?}", dump_sql);
+    let dump_sql = db.dump().await?;
+    // println!("dump_sql:{:?}", dump_sql);
 
     // 遍历所有表
     for table in &install_config.tables {
@@ -85,16 +83,38 @@ pub async fn install_db() -> Result<(), Box<dyn std::error::Error>> {
             for table_info in tables_array {
                 // 直接访问 create_statement 字段
                 let create_statement = &table_info.create_statement;
-                println!("local_sql:{}", create_statement);
-
-                // 将 create_statement 转换为 JSON 字符串
-                let create_statement_json = serde_json::to_string(create_statement)?;
-                println!("localjson:{}", create_statement_json);
-
-                println!("creat_sql:{:?}", table.definition);
+                // let create_statement_jstr = serde_json::to_string(create_statement)?;
+                // println!("local_sql:{}", create_statement);
+                // println!("localjstr:{}", create_statement_jstr);
+                // println!("creat_sql:{:?}", table.definition);
 
                 if table.definition != *create_statement {
                     println!("not ok!!!!");
+
+                    // 对比字段
+                    let code_fields = &table.fields;
+                    for field in code_fields {
+                        // println!("{:?}", field);
+                        if let Some(column) = table_info.find_column(&field.name).await {
+                            println!("Found column: {:?}", column);
+
+                            let sql_cmd = format!(
+                                "ALTER TABLE {} MODIFY `{}` {}",
+                                table.name, field.name, field.definition
+                            );
+
+                            let _ = db.exec(&sql_cmd).await;
+                            println!("sql_cmd: {}", sql_cmd);
+                        } else {
+                            let sql_cmd = format!(
+                                "ALTER TABLE {} ADD `{}` {}",
+                                table.name, field.name, field.definition
+                            );
+
+                            let _ = db.exec(&sql_cmd).await;
+                        }
+                    }
+                    // println!("{:?}", newTable);
                 }
             }
         }
