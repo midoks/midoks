@@ -22,6 +22,26 @@ struct Table {
     records: Vec<serde_json::Value>, // 使用 Value 类型处理动态记录
 }
 
+impl Table {
+    pub async fn find_column(&self, name: &str) -> Option<&Field> {
+        for field in &self.fields {
+            if field.name == name {
+                return Some(field);
+            }
+        }
+        None
+    }
+
+    pub async fn find_index(&self, name: &str) -> Option<&Index> {
+        for idx in &self.indexes {
+            if idx.name == name {
+                return Some(idx);
+            }
+        }
+        None
+    }
+}
+
 #[derive(Debug, Deserialize, Serialize)]
 struct Field {
     name: String,
@@ -34,7 +54,6 @@ struct Index {
     definition: String,
 }
 
-#[warn(dead_code)]
 pub async fn is_exists(tables: &[String], name: &str) -> bool {
     let name_lower = name.to_lowercase();
     tables.iter().any(|s| s.to_lowercase() == name_lower)
