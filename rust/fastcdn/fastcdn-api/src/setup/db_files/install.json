@@ -57,10 +57,6 @@
                 {
                     "name": "lang",
                     "definition": "varchar(64) COMMENT '语言代号'"
-                },
-                {
-                    "name": "test",
-                    "definition": "varchar(64) COMMENT '语言代号'"
                 }
             ],
             "indexes": [

@@ -77,8 +77,7 @@ pub async fn install_db() -> Result<(), Box<dyn std::error::Error>> {
                 let create_statement = &table_info.create_statement;
                 if embed_table.definition != *create_statement {
                     // 对比字段 +
-                    let embed_fields = &embed_table.fields;
-                    for embed_field in embed_fields {
+                    for embed_field in &embed_table.fields {
                         if let Some(column) = table_info.find_column(&embed_field.name).await {
                             if !column.eq_definition(&embed_field.definition).await {
                                 let cmd = format!(
@@ -97,8 +96,7 @@ pub async fn install_db() -> Result<(), Box<dyn std::error::Error>> {
                     }
 
                     // 对比索引 +
-                    let embed_indexes = &embed_table.indexes;
-                    for embed_index in embed_indexes {
+                    for embed_index in &embed_table.indexes {
                         if let Some(index) = table_info.find_index(&embed_index.name).await {
                             if index.definition().await != embed_index.definition {
                                 let drop_index = format!(
@@ -135,6 +133,11 @@ pub async fn install_db() -> Result<(), Box<dyn std::error::Error>> {
                                 }
                             }
                         }
+                    }
+
+                    // 字段对比 -
+                    for table_field in &table_info.columns {
+                        println!("{:?}", table_field);
                     }
                 }
             }
