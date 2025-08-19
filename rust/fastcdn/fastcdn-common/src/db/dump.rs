@@ -188,16 +188,6 @@ impl TableInfo {
     }
 }
 
-/// 导出数据库表结构 trait
-// pub trait Dump {
-//     async fn dump(&self) -> Result<Vec<TableInfo>, Box<dyn std::error::Error>>;
-//     async fn table_names(&self) -> Result<Vec<String>, Box<dyn std::error::Error>>;
-//     async fn find_full_table(
-//         &self,
-//         table_name: &str,
-//     ) -> Result<TableInfo, Box<dyn std::error::Error>>;
-// }
-
 impl pool::Manager {
     /// 导出数据库所有表的结构信息
     ///
