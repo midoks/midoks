@@ -92,8 +92,7 @@ pub async fn install_db() -> Result<(), Box<dyn std::error::Error>> {
             db.create_sql(&embed_table.definition).await?;
         } else {
             for table_info in db_tables {
-                let create_statement = &table_info.create_statement;
-                if embed_table.definition != *create_statement {
+                if table_info.eq_definition(&embed_table.definition).await {
                     // 对比字段 +
                     for embed_field in &embed_table.fields {
                         if let Some(column) = table_info.find_column(&embed_field.name).await {

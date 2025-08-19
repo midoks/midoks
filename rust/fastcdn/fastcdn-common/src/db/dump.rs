@@ -143,14 +143,20 @@ pub struct TableInfo {
     pub partitions: Vec<TablePartitions>,
 }
 
-// TableInfo 相关方法
-// pub trait Find {
-//     async fn find_column(&self, name: &str) -> Option<&TableColumns>;
-//     async fn find_index(&self, name: &str) -> Option<&TableIndexes>;
-//     async fn find_partition(&self, name: &str) -> Option<&TablePartitions>;
-// }
-
 impl TableInfo {
+    pub async fn eq_definition(&self, def: &str) -> bool {
+        let db_sql = self
+            .create_statement
+            .replace("COLLATE utf8mb4_general_ci", "");
+
+        // print!("embed_sql: {:?}\n", def);
+        // print!("dbxxx_sql: {:?}\n", db_sql);
+        if db_sql == def {
+            return true;
+        }
+        false
+    }
+
     pub async fn find_column(&self, name: &str) -> Option<&TableColumns> {
         let columns = &self.columns;
         for col in columns {
