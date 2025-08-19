@@ -54,11 +54,6 @@ struct Index {
     definition: String,
 }
 
-pub async fn is_exists(tables: &[String], name: &str) -> bool {
-    let name_lower = name.to_lowercase();
-    tables.iter().any(|s| s.to_lowercase() == name_lower)
-}
-
 // 修改函数签名，使用 TableInfo 而不是 Value
 pub async fn is_tables_exists(tables: &[TableInfo], name: &str) -> bool {
     let name_lower = name.to_lowercase();
@@ -71,9 +66,9 @@ pub async fn is_tables_exists(tables: &[TableInfo], name: &str) -> bool {
 }
 
 /// 守护进程管理器
-pub struct Setup {
-    log_path: String,
-}
+// pub struct Setup {
+//     log_path: String,
+// }
 
 pub async fn install_db() -> Result<(), Box<dyn std::error::Error>> {
     let install_embed_file = DbFiles::get("install.json").ok_or("install.json file not found")?;

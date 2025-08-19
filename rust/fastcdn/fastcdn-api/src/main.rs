@@ -53,10 +53,10 @@ enum Commands {
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args = Cli::parse();
 
-    if args.verbose {
-        println!("命令行参数解析结果:");
-        println!("{:#?}", args);
-    }
+    // if args.verbose {
+    //     println!("命令行参数解析结果:");
+    //     println!("{:#?}", args);
+    // }
 
     // 执行相应的操作并返回适当的退出状态码
     let result: Result<&str, Box<dyn std::error::Error>> = match &args.command {
@@ -235,16 +235,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             // 这里应该包含实际的服务器重载逻辑
             Ok("服务器重载成功")
         }
-        Some(Commands::Status {}) => {
-            println!("正在检查 fastcdn api 服务器状态...");
-            // 这里应该包含实际的状态检查逻辑
-            Ok("服务器状态正常")
-        }
-        Some(Commands::Test {}) => {
-            println!("正在执行测试...");
-            // 这里应该包含实际的测试逻辑
-            Ok("测试执行完成")
-        }
+        Some(Commands::Status {}) => Ok("服务器状态正常"),
+        Some(Commands::Test {}) => Ok("测试执行完成"),
         None => {
             println!("欢迎使用 fastcdn-api 服务！");
             println!("使用 --help 查看可用命令");
