@@ -82,7 +82,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             app.status()?;
             Ok("服务器状态正常")
         }
-        Some(Commands::Test {}) => Ok("测试执行完成"),
+        Some(Commands::Test {}) => {
+            let _ = web::test::run().await;
+            Ok("测试执行完成")
+        }
         None => {
             println!("欢迎使用 fastcdn-api 服务！");
             println!("使用 --help 查看可用命令");
