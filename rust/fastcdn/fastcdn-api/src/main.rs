@@ -1,10 +1,10 @@
 use clap::{Parser, Subcommand};
 
+mod service;
 mod setup;
-mod web;
 
 use fastcdn_common::daemon::app::Daemon;
-use web::RpcServerManager;
+use service::RpcServerManager;
 
 /// 命令行信息
 #[derive(Parser, Debug)]
@@ -83,7 +83,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             Ok("服务器状态正常")
         }
         Some(Commands::Test {}) => {
-            let _ = web::test::run().await;
+            let _ = service::test::run().await;
             Ok("测试执行完成")
         }
         None => {

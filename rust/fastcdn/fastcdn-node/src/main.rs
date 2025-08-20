@@ -3,6 +3,7 @@ use std::fs::{File, remove_file};
 use std::io::{Read, Write};
 use std::process::{Command, Stdio};
 
+mod service;
 // 引入共享的RPC客户端
 use fastcdn_common::{HelloClient, PingClient};
 
@@ -63,13 +64,17 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             Ok(())
         }
         Commands::Status {} => check_status().await,
-        Commands::Test {} => test_grpc_connection().await,
+        Commands::Test {} => {
+            service::test::run().await?;
+            println!("测试结束");
+            Ok(())
+        }
     };
 
     match result {
         Ok(_) => Ok(()),
         Err(error) => {
-            eprintln!("错误: {}", error);
+            eprintln!("fastcdn-node error: {}", error);
             Err(error)
         }
     }
