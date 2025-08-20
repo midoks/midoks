@@ -4,6 +4,7 @@
 
 pub mod config;
 pub mod rpc;
+pub mod daemon;  // 添加这行
 
 pub mod db;
 

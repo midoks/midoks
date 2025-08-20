@@ -3,7 +3,9 @@ use clap::{Parser, Subcommand};
 // 引入模块化的Web服务器和RPC客户端
 mod app;
 mod web;
-use web::{DaemonManager, HttpServerManager};
+
+use fastcdn_common::daemon::app::Daemon;
+use web::HttpServerManager;
 
 /// 命令行信息
 #[derive(Parser, Debug)]
@@ -48,13 +50,13 @@ enum Commands {
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     let args = Cli::parse();
-    let daemon_manager = DaemonManager::new("fastcdn.pid");
+    let app = Daemon::new("fastcdn.pid");
 
     // 执行相应的操作并返回适当的退出状态码
     let result: Result<&str, std::io::Error> = match &args.command {
         Some(Commands::Start { daemon }) => {
             if *daemon {
-                daemon_manager.start_daemon()?;
+                app.start()?;
                 Ok("start successful")
             } else {
                 HttpServerManager::start().await?;
@@ -62,19 +64,19 @@ async fn main() -> std::io::Result<()> {
             }
         }
         Some(Commands::Daemon {}) => {
-            daemon_manager.start_daemon()?;
+            app.start()?;
             Ok("start daemon successful")
         }
         Some(Commands::Stop {}) => {
-            daemon_manager.stop_daemon()?;
+            app.stop()?;
             Ok("stop server successful")
         }
         Some(Commands::Reload {}) => {
-            daemon_manager.reload_service()?;
+            app.reload()?;
             Ok("服务器重载成功")
         }
         Some(Commands::Status {}) => {
-            daemon_manager.check_status()?;
+            app.status()?;
             Ok("状态检查完成")
         }
         Some(Commands::Test {}) => {

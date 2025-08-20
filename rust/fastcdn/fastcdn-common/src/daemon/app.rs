@@ -3,11 +3,11 @@ use std::io::{Read, Write};
 use std::process::{Command, Stdio};
 
 /// 守护进程管理器
-pub struct DaemonManager {
+pub struct Daemon {
     pid_file: String,
 }
 
-impl DaemonManager {
+impl Daemon {
     /// 创建新的守护进程管理器
     pub fn new(pid_file: &str) -> Self {
         Self {
@@ -16,7 +16,7 @@ impl DaemonManager {
     }
 
     /// 启动守护进程
-    pub fn start_daemon(&self) -> std::io::Result<()> {
+    pub fn start(&self) -> std::io::Result<()> {
         println!("正在启动后台服务...");
 
         // 获取当前可执行文件路径
@@ -44,7 +44,7 @@ impl DaemonManager {
     }
 
     /// 停止守护进程
-    pub fn stop_daemon(&self) -> std::io::Result<()> {
+    pub fn stop(&self) -> std::io::Result<()> {
         println!("正在停止 fastcdn 服务器...");
 
         // 检查PID文件是否存在
@@ -117,7 +117,7 @@ impl DaemonManager {
     }
 
     /// 检查服务状态
-    pub fn check_status(&self) -> std::io::Result<()> {
+    pub fn status(&self) -> std::io::Result<()> {
         println!("正在检查 fastcdn 服务器状态...");
 
         // 检查PID文件是否存在
@@ -153,7 +153,7 @@ impl DaemonManager {
     }
 
     /// 重载服务
-    pub fn reload_service(&self) -> std::io::Result<()> {
+    pub fn reload(&self) -> std::io::Result<()> {
         println!("正在重新加载 fastcdn 服务器...");
         // TODO: 实现实际的服务器重载逻辑
         println!("✓ 服务器重载成功");

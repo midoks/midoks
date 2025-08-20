@@ -5,4 +5,4 @@ pub mod server;
 pub mod test;
 
 // 重新导出常用组件
-pub use server::{DaemonManager, HttpServerManager};
+pub use server::HttpServerManager;

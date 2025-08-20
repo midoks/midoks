@@ -3,8 +3,8 @@ use clap::{Parser, Subcommand};
 mod setup;
 mod web;
 
-use fastcdn_common::{HelloServiceServer, MyHelloService, MyPingService, PingServiceServer};
-use web::ApiDaemonManager;
+use fastcdn_common::daemon::app::Daemon;
+use web::RpcServerManager;
 
 /// 命令行信息
 #[derive(Parser, Debug)]
@@ -49,7 +49,8 @@ enum Commands {
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args = Cli::parse();
-    let daemon_manager = ApiDaemonManager::new("fastcdn-api.pid");
+
+    let app = Daemon::new("fastcdn-api.pid");
 
     // 执行相应的操作并返回适当的退出状态码
     let result: Result<&str, Box<dyn std::error::Error>> = match &args.command {
@@ -62,23 +63,23 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         },
         Some(Commands::Start { daemon }) => {
             if *daemon {
-                daemon_manager.start_daemon().await?;
+                let _ = app.start();
                 Ok("后台RPC服务启动成功")
             } else {
-                daemon_manager.start_foreground().await?;
+                RpcServerManager::start().await?;
                 Ok("RPC服务器启动成功")
             }
         }
         Some(Commands::Stop {}) => {
-            daemon_manager.stop_daemon()?;
+            app.stop()?;
             Ok("RPC服务器停止成功")
         }
         Some(Commands::Reload {}) => {
-            daemon_manager.reload_service()?;
+            app.reload()?;
             Ok("服务器重载成功")
         }
         Some(Commands::Status {}) => {
-            daemon_manager.check_status()?;
+            app.status()?;
             Ok("服务器状态正常")
         }
         Some(Commands::Test {}) => Ok("测试执行完成"),
