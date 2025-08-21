@@ -3,7 +3,7 @@ syntax = "proto3";
 package ping;
 
 // Ping服务
-service PingService {
+service Ping {
 	rpc ping(PingRequest) returns (PingResponse);
 }
 

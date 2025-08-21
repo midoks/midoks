@@ -5,7 +5,7 @@ use std::env;
 
 // 引入共享的RPC客户端
 use fastcdn_common::rpc::client::hello::HelloClient;
-use fastcdn_common::rpc::client::ping::PingClient;
+use fastcdn_common::rpc::client::ping::Ping;
 
 pub async fn run() -> Result<(), Box<dyn std::error::Error>> {
     // println!("开始测试...");
@@ -22,7 +22,7 @@ pub async fn run() -> Result<(), Box<dyn std::error::Error>> {
 pub async fn test_rpc() {
     println!("正在测试gRPC连接...");
     // 测试Ping服务
-    match PingClient::connect("http://127.0.0.1:10001").await {
+    match Ping::connect("http://127.0.0.1:10001").await {
         Ok(mut client) => match client.ping().await {
             Ok(response) => println!("✓ Ping服务连接成功: {}", response),
             Err(e) => println!("✗ Ping服务调用失败: {}", e),
