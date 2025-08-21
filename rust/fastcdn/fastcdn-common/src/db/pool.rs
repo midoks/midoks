@@ -1,5 +1,4 @@
 use crate::config::ConfigDb;
-use serde::{Deserialize, Serialize}; // 如果确实不需要，可以删除这行
 use serde_json::Value;
 use sqlx::{Column, MySqlPool, Row, TypeInfo}; // 添加 TypeInfo trait
 use std::collections::HashMap; // 添加 HashMap 导入
@@ -363,3 +362,7 @@ impl Manager {
         Ok(result.is_some())
     }
 }
+
+
+// 移除或注释掉未使用的导入
+// use serde::{Deserialize, Serialize}; // 如果确实不需要，可以删除这行
