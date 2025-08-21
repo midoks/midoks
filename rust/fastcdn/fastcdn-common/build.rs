@@ -1,5 +1,5 @@
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let proto_dir = "../fastcdn-common/src/rpc/protos";
+    let proto_dir = "src/rpc/protos";
 
     // 自动扫描protos目录下的所有.proto文件
     let mut proto_files = Vec::new();
@@ -21,7 +21,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             .build_server(true)
             .build_client(true)
             .out_dir(&out_dir)
-            .compile_protos(&proto_files, &[proto_dir])?;
+            .compile_protos(&proto_files, &[proto_dir])?
     }
 
     Ok(())
