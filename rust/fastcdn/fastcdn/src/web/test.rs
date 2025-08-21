@@ -1,8 +1,7 @@
-// Remove these unused imports:
 // use sqlx::MySqlPool;
 // use std::sync::Arc;
 
-use std::env;
+// use std::env;
 
 // 引入共享的RPC客户端
 use fastcdn_common::{HelloClient, PingClient};
@@ -12,7 +11,7 @@ pub async fn run() -> Result<(), Box<dyn std::error::Error>> {
     println!("正在测试gRPC连接...");
 
     // 测试Ping服务
-    match PingClient::connect("http://127.0.0.1:50051").await {
+    match PingClient::connect("http://127.0.0.1:10001").await {
         Ok(mut client) => match client.ping().await {
             Ok(response) => println!("✓ Ping服务连接成功: {}", response),
             Err(e) => println!("✗ Ping服务调用失败: {}", e),
@@ -21,7 +20,7 @@ pub async fn run() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     // 测试Hello服务
-    match HelloClient::connect("http://127.0.0.1:50051").await {
+    match HelloClient::connect("http://127.0.0.1:10001").await {
         Ok(mut client) => match client.say_hello("FastCDN Web").await {
             Ok(response) => println!("✓ Hello服务响应: {}", response),
             Err(e) => println!("✗ Hello服务调用失败: {}", e),
@@ -32,31 +31,31 @@ pub async fn run() -> Result<(), Box<dyn std::error::Error>> {
     println!("✓ 所有gRPC连接测试完成");
 
     // 测试配置加载功能
-    match env::current_dir() {
-        Ok(path) => {
-            println!("当前运行目录: {}", path.display());
+    // match env::current_dir() {
+    //     Ok(path) => {
+    //         println!("当前运行目录: {}", path.display());
 
-            match fastcdn_common::config::server::Manager::new() {
-                Ok(config_manager) => {
-                    let server_config = config_manager.server();
-                    println!("✓ 配置文件加载成功: {:#?}", server_config);
+    //         match fastcdn_common::config::server::Manager::new() {
+    //             Ok(config_manager) => {
+    //                 let server_config = config_manager.server();
+    //                 println!("✓ 配置文件加载成功: {:#?}", server_config);
 
-                    // 显示配置信息
-                    println!("环境: {}", server_config.env);
-                    println!(
-                        "HTTP服务: {}",
-                        if server_config.http.on {
-                            "启用"
-                        } else {
-                            "禁用"
-                        }
-                    );
-                }
-                Err(e) => println!("✗ 配置文件加载失败: {}", e),
-            }
-        }
-        Err(e) => println!("✗ 获取当前目录失败: {}", e),
-    }
+    //                 // 显示配置信息
+    //                 println!("环境: {}", server_config.env);
+    //                 println!(
+    //                     "HTTP服务: {}",
+    //                     if server_config.http.on {
+    //                         "启用"
+    //                     } else {
+    //                         "禁用"
+    //                     }
+    //                 );
+    //             }
+    //             Err(e) => println!("✗ 配置文件加载失败: {}", e),
+    //         }
+    //     }
+    //     Err(e) => println!("✗ 获取当前目录失败: {}", e),
+    // }
 
     println!("\n正在测试数据库连接...");
 

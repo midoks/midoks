@@ -4,7 +4,6 @@ mod service;
 mod setup;
 
 use fastcdn_common::daemon::app::Daemon;
-use service::RpcServerManager;
 
 /// 命令行信息
 #[derive(Parser, Debug)]
@@ -56,9 +55,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // 执行相应的操作并返回适当的退出状态码
     let result: Result<&str, Box<dyn std::error::Error>> = match &args.command {
         Some(Commands::Setup {}) => match setup::install_db().await {
-            Ok(_) => Ok("Setup completed successfully"),
+            Ok(_) => Ok("setup completed successfully!"),
             Err(e) => {
-                eprintln!("Setup failed: {}", e);
+                eprintln!("setup failed: {}", e);
                 Err(e)
             }
         },
@@ -67,7 +66,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 let _ = app.start();
                 Ok("后台RPC服务启动成功")
             } else {
-                RpcServerManager::start().await?;
+                service::RpcServerManager::start().await?;
                 Ok("RPC服务器启动成功")
             }
         }
@@ -100,11 +99,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     match result {
         Ok(message) => {
-            println!("✓ {}", message);
+            println!("{}", message);
             Ok(())
         }
         Err(error) => {
-            eprintln!("✗ 错误: {}", error);
+            eprintln!("fastcdn-api error: {}", error);
             Err(error)
         }
     }

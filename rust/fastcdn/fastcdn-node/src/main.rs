@@ -84,7 +84,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     };
 
     match result {
-        Ok(_) => Ok(()),
+        Ok(message) => {
+            println!("{}", message);
+            Ok(())
+        }
         Err(error) => {
             eprintln!("fastcdn-node error: {}", error);
             Err(error)

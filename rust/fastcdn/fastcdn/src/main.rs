@@ -5,7 +5,6 @@ mod app;
 mod web;
 
 use fastcdn_common::daemon::app::Daemon;
-use web::HttpServerManager;
 
 /// 命令行信息
 #[derive(Parser, Debug)]
@@ -59,7 +58,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 app.start()?;
                 Ok("start successful")
             } else {
-                HttpServerManager::start().await?;
+                web::HttpServerManager::start().await?;
                 Ok("exit successful!")
             }
         }
@@ -96,7 +95,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             Ok(())
         }
         Err(error) => {
-            eprintln!("✗ 错误: {}", error);
+            eprintln!("fastcdn error: {}", error);
             Err(error)
         }
     }
