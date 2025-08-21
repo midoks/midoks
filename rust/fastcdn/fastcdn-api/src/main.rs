@@ -34,10 +34,12 @@ enum Commands {
         #[arg(short, long)]
         daemon: bool,
     },
+    Daemon,
     /// stop the fastcdn api server
     Stop {},
     /// reload the fastcdn api server
     Reload {},
+
     /// fastcdn api server Status
     Status {},
     /// fastcdn api server setup cmd
@@ -49,7 +51,6 @@ enum Commands {
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args = Cli::parse();
-
     let app = Daemon::new("fastcdn-api.pid");
 
     // 执行相应的操作并返回适当的退出状态码
@@ -69,6 +70,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 RpcServerManager::start().await?;
                 Ok("RPC服务器启动成功")
             }
+        }
+        Some(Commands::Daemon {}) => {
+            app.start()?;
+            Ok("start daemon successful")
         }
         Some(Commands::Stop {}) => {
             app.stop()?;

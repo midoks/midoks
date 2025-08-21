@@ -19,7 +19,7 @@ struct Cli {
 
     /// subcommand operation mode
     #[command(subcommand)]
-    command: Commands,
+    command: Option<Commands>,
 }
 /// subcommand operation mode
 #[derive(Subcommand, Debug)]
@@ -30,25 +30,24 @@ enum Commands {
         #[arg(short, long)]
         daemon: bool,
     },
+    Daemon,
     /// stop the fastcdn node server
-    Stop {},
+    Stop,
     /// reload the fastcdn node server
-    Reload {},
-
+    Reload,
     /// fastcdn node server Status
-    Status {},
-
+    Status,
     /// test function
-    Test {},
+    Test,
 }
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args = Cli::parse();
     let app = Daemon::new("fastcdn-node.pid");
-    let result: Result<&str, Box<dyn std::error::Error>> = match args.command {
-        Commands::Start { daemon } => {
-            if daemon {
+    let result: Result<&str, Box<dyn std::error::Error>> = match &args.command {
+        Some(Commands::Start { daemon }) => {
+            if *daemon {
                 app.start()?;
                 Ok("节点服务启动成功")
             } else {
@@ -56,22 +55,31 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 Ok("成功")
             }
         }
-        Commands::Stop {} => {
+        Some(Commands::Daemon) => {
+            app.start()?;
+            Ok("start daemon successful")
+        }
+        Some(Commands::Stop {}) => {
             app.stop()?;
             Ok("停止成功")
         }
-        Commands::Reload {} => {
+        Some(Commands::Reload {}) => {
             app.reload()?;
             Ok("重载成功")
         }
-        Commands::Status {} => {
+        Some(Commands::Status {}) => {
             app.status()?;
             Ok("")
         }
-        Commands::Test {} => {
+        Some(Commands::Test {}) => {
             service::test::run().await?;
             println!("测试结束");
             Ok("ok")
+        }
+        None => {
+            println!("欢迎使用 fastcdn 服务！");
+            println!("使用 --help 查看可用命令");
+            Ok("")
         }
     };
 

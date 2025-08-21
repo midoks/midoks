@@ -47,13 +47,13 @@ enum Commands {
     Test,
 }
 
-#[actix_web::main]
-async fn main() -> std::io::Result<()> {
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args = Cli::parse();
     let app = Daemon::new("fastcdn.pid");
 
     // 执行相应的操作并返回适当的退出状态码
-    let result: Result<&str, std::io::Error> = match &args.command {
+    let result: Result<&str, Box<dyn std::error::Error>> = match &args.command {
         Some(Commands::Start { daemon }) => {
             if *daemon {
                 app.start()?;
