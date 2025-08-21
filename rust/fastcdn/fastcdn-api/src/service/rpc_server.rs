@@ -5,8 +5,8 @@ use tonic::transport::Server;
 
 use fastcdn_common::rpc::hello::hello_service_server::HelloServiceServer;
 use fastcdn_common::rpc::ping::ping_service_server::PingServiceServer;
-use fastcdn_common::rpc::server::hello_service::MyHelloService;
-use fastcdn_common::rpc::server::ping_service::MyPingService;
+use fastcdn_common::rpc::server::hello::MyHelloService;
+use fastcdn_common::rpc::server::ping::MyPingService;
 
 pub struct RpcServerManager;
 

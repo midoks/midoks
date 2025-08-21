@@ -1,4 +1,5 @@
-use fastcdn_common::rpc::client::{HelloClient, PingClient};
+use fastcdn_common::rpc::client::hello::HelloClient;
+use fastcdn_common::rpc::client::ping::PingClient;
 
 pub async fn run() -> Result<(), Box<dyn std::error::Error>> {
     println!("开始测试...");

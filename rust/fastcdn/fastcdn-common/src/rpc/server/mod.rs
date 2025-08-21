@@ -2,5 +2,5 @@
 //!
 //! 包含所有gRPC服务的具体实现
 
-pub mod hello_service;
-pub mod ping_service;
+pub mod hello;
+pub mod ping;
