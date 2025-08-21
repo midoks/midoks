@@ -4,7 +4,7 @@
 use std::env;
 
 // 引入共享的RPC客户端
-use fastcdn_common::{HelloClient, PingClient};
+use fastcdn_common::rpc::client::{HelloClient, PingClient};
 
 pub async fn run() -> Result<(), Box<dyn std::error::Error>> {
     // println!("开始测试...");

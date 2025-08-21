@@ -5,10 +5,10 @@ use crate::rpc::ping::{PingRequest, PingResponse};
 
 /// PingService 实现
 #[derive(Debug, Default)]
-pub struct MyPingService {}
+pub struct FcPingService {}
 
 #[tonic::async_trait]
-impl PingService for MyPingService {
+impl PingService for FcPingService {
     async fn ping(&self, request: Request<PingRequest>) -> Result<Response<PingResponse>, Status> {
         println!("收到Ping请求: {:?}", request);
 

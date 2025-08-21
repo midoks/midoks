@@ -3,7 +3,8 @@
 // use std::process::{Command, Stdio};
 use tonic::transport::Server;
 
-use fastcdn_common::{HelloServiceServer, MyHelloService, MyPingService, PingServiceServer};
+use fastcdn_common::rpc::server::{FcPingService, MyHelloService};
+use fastcdn_common::rpc::{HelloServiceServer, PingServiceServer};
 
 pub struct RpcServerManager;
 
@@ -21,7 +22,7 @@ impl RpcServerManager {
         })?;
 
         let hello_service = MyHelloService::default();
-        let ping_service = MyPingService::default();
+        let ping_service = FcPingService::default();
 
         Server::builder()
             .add_service(HelloServiceServer::new(hello_service))
