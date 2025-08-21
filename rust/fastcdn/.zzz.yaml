@@ -11,6 +11,7 @@ dirfilter:
 - templates
 ext:
 - rs
+- proto
 lang: rust
 enablerun: true
 action:
