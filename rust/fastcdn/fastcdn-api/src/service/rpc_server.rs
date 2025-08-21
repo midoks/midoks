@@ -5,7 +5,8 @@ use tonic::transport::Server;
 
 use fastcdn_common::rpc::hello::hello_service_server::HelloServiceServer;
 use fastcdn_common::rpc::ping::ping_service_server::PingServiceServer;
-use fastcdn_common::rpc::server::{FcPingService, MyHelloService};
+use fastcdn_common::rpc::server::hello_service::MyHelloService;
+use fastcdn_common::rpc::server::ping_service::MyPingService;
 
 pub struct RpcServerManager;
 
@@ -23,7 +24,7 @@ impl RpcServerManager {
         })?;
 
         let hello_service = MyHelloService::default();
-        let ping_service = FcPingService::default();
+        let ping_service = MyPingService::default();
 
         Server::builder()
             .add_service(HelloServiceServer::new(hello_service))

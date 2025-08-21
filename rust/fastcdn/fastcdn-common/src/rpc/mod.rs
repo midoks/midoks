@@ -13,7 +13,3 @@ pub mod hello {
 pub mod ping {
     tonic::include_proto!("ping");
 }
-
-// 重新导出常用类型
-pub use hello::hello_service_server::HelloServiceServer;
-pub use ping::ping_service_server::PingServiceServer;
