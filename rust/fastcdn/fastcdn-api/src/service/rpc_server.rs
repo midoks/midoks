@@ -3,8 +3,9 @@
 // use std::process::{Command, Stdio};
 use tonic::transport::Server;
 
+use fastcdn_common::rpc::hello::hello_service_server::HelloServiceServer;
+use fastcdn_common::rpc::ping::ping_service_server::PingServiceServer;
 use fastcdn_common::rpc::server::{FcPingService, MyHelloService};
-use fastcdn_common::rpc::{HelloServiceServer, PingServiceServer};
 
 pub struct RpcServerManager;
 

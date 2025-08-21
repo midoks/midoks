@@ -4,7 +4,3 @@
 
 pub mod hello_service;
 pub mod ping_service;
-
-// 重新导出服务实现
-pub use hello_service::MyHelloService;
-pub use ping_service::FcPingService;
