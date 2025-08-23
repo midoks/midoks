@@ -43,6 +43,14 @@ impl Admin for FcAdmin {
             message: "登录成功".to_string(), // 响应消息
         };
 
+        match pool::Manager::instance().await {
+            Ok(manager) => {
+                println!("数据库管理器实例: {:?}", manager);
+                println!("addr: {}", &manager);
+            }
+            Err(e) => println!("获取数据库管理器失败: {:?}", e),
+        }
+
         Ok(Response::new(reply))
     }
 }
