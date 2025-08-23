@@ -3,8 +3,9 @@
 // use std::process::{Command, Stdio};
 use tonic::transport::Server;
 
-use fastcdn_common::rpc::hello::hello_service_server::HelloServiceServer;
-use fastcdn_common::rpc::ping::ping_server::PingServer;
+// 修复导入路径 - 使用正确的 fastcdn 模块路径
+use fastcdn_common::rpc::fastcdn::hello_service_server::HelloServiceServer;
+use fastcdn_common::rpc::fastcdn::ping_server::PingServer;
 use fastcdn_common::rpc::server::hello::MyHelloService;
 use fastcdn_common::rpc::server::ping::FcPingService;
 

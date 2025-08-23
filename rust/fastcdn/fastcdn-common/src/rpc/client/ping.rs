@@ -1,5 +1,5 @@
-use crate::rpc::ping::PingRequest;
-use crate::rpc::ping::ping_client::PingClient;
+use crate::rpc::fastcdn::PingRequest;
+use crate::rpc::fastcdn::ping_client::PingClient;
 use tonic::Request;
 
 pub struct Ping {

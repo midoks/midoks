@@ -21,7 +21,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             .build_server(true)
             .build_client(true)
             .out_dir(&out_dir)
-            .compile_protos(&proto_files, &[proto_dir])?
+            .compile_protos(&proto_files, &[proto_dir])?; // 添加分号
     }
 
     Ok(())

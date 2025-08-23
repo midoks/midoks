@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package fastcdn;
+
+// Ping服务
+service Admin {
+	// 创建管理员
+	rpc create (AdminCreateRequest) returns (AdminCreateResponse);
+	// 登录
+	rpc login(AdminLoginRequest) returns (AdminLoginResponse);
+}
+
+// 创建管理员
+message AdminCreateRequest {
+	string username = 1;
+	string password = 2;
+	string fullname = 3;
+	bytes modulesJSON = 4;
+	bool isSuper = 5;
+	bool canLogin = 6;
+}
+
+message AdminCreateResponse {
+	int64 id = 1;
+}
+
+
+// 登录
+message AdminLoginRequest {
+	string username = 1;
+	string password = 2;
+}
+
+message AdminLoginResponse {
+	int64 id = 1;
+	bool is_ok = 2;
+	string message = 3;
+}

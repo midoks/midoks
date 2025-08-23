@@ -1,9 +1,9 @@
-use tokio::sync::mpsc;
-use tokio_stream::wrappers::ReceiverStream;
 use tonic::{Request, Response, Status};
+use tokio_stream::wrappers::ReceiverStream;
+use tokio::sync::mpsc;
 
-use crate::rpc::hello::hello_service_server::HelloService;
-use crate::rpc::hello::{HelloRequest, HelloResponse};
+use crate::rpc::fastcdn::hello_service_server::HelloService;
+use crate::rpc::fastcdn::{HelloRequest, HelloResponse};
 
 /// HelloService 实现
 #[derive(Debug, Default)]

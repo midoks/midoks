@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package ping;
+package fastcdn;
 
 // Ping服务
 service Ping {

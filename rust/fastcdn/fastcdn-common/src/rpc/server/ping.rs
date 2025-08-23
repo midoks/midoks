@@ -1,7 +1,7 @@
 use tonic::{Request, Response, Status};
 
-use crate::rpc::ping::ping_server::Ping;
-use crate::rpc::ping::{PingRequest, PingResponse};
+use crate::rpc::fastcdn::ping_server::Ping;
+use crate::rpc::fastcdn::{PingRequest, PingResponse};
 
 /// Ping 实现
 #[derive(Debug, Default)]

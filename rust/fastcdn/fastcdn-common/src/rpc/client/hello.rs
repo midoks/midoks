@@ -1,6 +1,6 @@
 use tonic::Request;
-use crate::rpc::hello::hello_service_client::HelloServiceClient;
-use crate::rpc::hello::HelloRequest;
+use crate::rpc::fastcdn::hello_service_client::HelloServiceClient;
+use crate::rpc::fastcdn::HelloRequest;
 
 pub struct HelloClient {
     client: HelloServiceClient<tonic::transport::Channel>,

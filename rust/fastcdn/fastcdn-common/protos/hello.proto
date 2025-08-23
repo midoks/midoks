@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package hello;
+package fastcdn;
 
 service HelloService {
     rpc SayHello(HelloRequest) returns (HelloResponse);

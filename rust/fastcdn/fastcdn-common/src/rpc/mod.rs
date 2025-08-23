@@ -5,11 +5,10 @@
 pub mod client;
 pub mod server;
 
-// 引入生成的proto代码
-pub mod hello {
-    tonic::include_proto!("hello");
+// 引入生成的proto代码 - 所有proto文件都在同一个package中
+pub mod fastcdn {
+    tonic::include_proto!("fastcdn");
 }
 
-pub mod ping {
-    tonic::include_proto!("ping");
-}
+// 重新导出常用类型以便使用
+pub use fastcdn::*;
