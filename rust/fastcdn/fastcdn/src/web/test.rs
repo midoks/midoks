@@ -28,6 +28,25 @@ pub async fn test_rpc() {
         }
         Err(e) => println!("✗ Admin服务连接失败: {}", e),
     }
+}
+
+#[allow(dead_code)]
+pub async fn test_rpc_all() {
+    println!("正在测试gRPC连接...");
+    // 测试Admin服务 - 使用login方法
+    match AdminClient::connect("http://127.0.0.1:10001").await {
+        Ok(mut client) => {
+            let request = AdminLoginRequest {
+                username: "admin".to_string(),
+                password: "password".to_string(),
+            };
+            match client.login(request).await {
+                Ok(response) => println!("✓ Admin登录服务响应: {:?}", response),
+                Err(e) => println!("✗ Admin登录服务调用失败: {}", e),
+            }
+        }
+        Err(e) => println!("✗ Admin服务连接失败: {}", e),
+    }
 
     // 测试Ping服务
     match Ping::connect("http://127.0.0.1:10001").await {
