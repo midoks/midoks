@@ -1,7 +1,11 @@
 use tonic::{Request, Response, Status};
 
+use crate::db::pool;
+
 use crate::rpc::fastcdn::admin_server::Admin;
-use crate::rpc::fastcdn::{AdminLoginRequest, AdminLoginResponse, AdminCreateRequest, AdminCreateResponse};
+use crate::rpc::fastcdn::{
+    AdminCreateRequest, AdminCreateResponse, AdminLoginRequest, AdminLoginResponse,
+};
 
 /// Admin 实现
 #[derive(Debug, Default)]
@@ -19,6 +23,11 @@ impl Admin for FcAdmin {
             id: 1, // 示例ID，实际应该从数据库生成
         };
 
+        match pool::Manager::instance().await {
+            Ok(manager) => println!("数据库管理器实例: {:?}", manager),
+            Err(e) => println!("获取数据库管理器失败: {:?}", e),
+        }
+
         Ok(Response::new(reply))
     }
 
@@ -31,7 +40,7 @@ impl Admin for FcAdmin {
         let reply = AdminLoginResponse {
             id: 1,                           // 用户ID
             is_ok: true,                     // 登录是否成功
-            message: "登录成功".to_string(),   // 响应消息
+            message: "登录成功".to_string(), // 响应消息
         };
 
         Ok(Response::new(reply))

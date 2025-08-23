@@ -1,17 +1,58 @@
 use crate::config::ConfigDb;
+use lazy_static::lazy_static;
 use serde_json::Value;
-use sqlx::{Column, MySqlPool, Row, TypeInfo}; // 添加 TypeInfo trait
-use std::collections::HashMap; // 添加 HashMap 导入
-use std::sync::Arc;
+use sqlx::{Column, MySqlPool, Row, TypeInfo};
+use std::collections::HashMap;
+use std::sync::{Arc, Mutex};
 
-/// 数据库连接管理器
+lazy_static! {
+    static ref INSTANCE: Arc<Mutex<Option<Arc<Manager>>>> = Arc::new(Mutex::new(None));
+}
+
+#[derive(Debug)]
 pub struct Manager {
     pub pool: Arc<MySqlPool>,
 }
 
 impl Manager {
+    pub async fn instance() -> Result<Arc<Self>, Box<dyn std::error::Error>> {
+        // 首先检查是否已经初始化
+        {
+            let instance = INSTANCE.lock().unwrap();
+            if let Some(manager) = instance.as_ref() {
+                return Ok(manager.clone());
+            }
+        } // MutexGuard 在这里被释放
+
+        // 如果没有初始化，准备初始化数据
+        let database_url = {
+            let db_instance = ConfigDb::Db::instance()?;
+            let config = db_instance.lock().unwrap();
+            format!(
+                "mysql://{}:{}@{}/{}",
+                config.user, config.password, config.host, config.database
+            )
+        }; // config MutexGuard 在这里被释放
+
+        // 创建连接池（没有持有任何锁）
+        let pool = MySqlPool::connect(&database_url).await?;
+        let manager = Arc::new(Manager {
+            pool: Arc::new(pool),
+        });
+
+        // 最后设置实例
+        {
+            let mut instance = INSTANCE.lock().unwrap();
+            if instance.is_none() {
+                *instance = Some(manager.clone());
+            }
+            Ok(manager)
+        }
+    }
+
     /// 创建新的数据库管理器
     pub async fn new() -> Result<Self, Box<dyn std::error::Error>> {
+        // println!("{:?}", Manager {});
         let db_instance = ConfigDb::Db::instance()?;
         let config = db_instance.lock().unwrap();
 
@@ -20,11 +61,6 @@ impl Manager {
             "mysql://{}:{}@{}/{}",
             config.user, config.password, config.host, config.database
         );
-
-        // println!(
-        //     "正在连接数据库: {}",
-        //     database_url.replace(&config.password, "***")
-        // );
 
         // 创建连接池
         let pool = MySqlPool::connect(&database_url).await?;
@@ -362,7 +398,6 @@ impl Manager {
         Ok(result.is_some())
     }
 }
-
 
 // 移除或注释掉未使用的导入
 // use serde::{Deserialize, Serialize}; // 如果确实不需要，可以删除这行

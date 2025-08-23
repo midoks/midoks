@@ -7,13 +7,12 @@ pub struct Ping {
 }
 
 impl Ping {
-    /// 连接到PingService
+    // 连接
     pub async fn connect(addr: &str) -> Result<Self, Box<dyn std::error::Error>> {
         let client = PingClient::connect(addr.to_string()).await?;
         Ok(Self { client })
     }
-
-    /// 调用ping方法
+    // 测试
     pub async fn ping(&mut self) -> Result<String, Box<dyn std::error::Error>> {
         let request = Request::new(PingRequest {});
 

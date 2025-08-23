@@ -1,26 +1,34 @@
-// use sqlx::MySqlPool;
-// use std::sync::Arc;
-
 use std::env;
 
-// 引入共享的RPC客户端
+use fastcdn_common::rpc::fastcdn::AdminLoginRequest;
+use fastcdn_common::rpc::fastcdn::admin_client::AdminClient;
+
 use fastcdn_common::rpc::client::hello::HelloClient;
 use fastcdn_common::rpc::client::ping::Ping;
 
 pub async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    // println!("开始测试...");
-
-    // test_rpc().await;
-    // test_conf().await;
-    // test_db().await;
-
-    // println!("✓ 所有测试完成");
+    test_rpc().await;
     Ok(())
 }
 
 #[allow(dead_code)]
 pub async fn test_rpc() {
     println!("正在测试gRPC连接...");
+    // 测试Admin服务 - 使用login方法
+    match AdminClient::connect("http://127.0.0.1:10001").await {
+        Ok(mut client) => {
+            let request = AdminLoginRequest {
+                username: "admin".to_string(),
+                password: "password".to_string(),
+            };
+            match client.login(request).await {
+                Ok(response) => println!("✓ Admin登录服务响应: {:?}", response),
+                Err(e) => println!("✗ Admin登录服务调用失败: {}", e),
+            }
+        }
+        Err(e) => println!("✗ Admin服务连接失败: {}", e),
+    }
+
     // 测试Ping服务
     match Ping::connect("http://127.0.0.1:10001").await {
         Ok(mut client) => match client.ping().await {

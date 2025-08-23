@@ -3,11 +3,14 @@
 // use std::process::{Command, Stdio};
 use tonic::transport::Server;
 
-// 修复导入路径 - 使用正确的 fastcdn 模块路径
-use fastcdn_common::rpc::fastcdn::hello_service_server::HelloServiceServer;
-use fastcdn_common::rpc::fastcdn::ping_server::PingServer;
+use fastcdn_common::rpc::server::admin::FcAdmin;
 use fastcdn_common::rpc::server::hello::MyHelloService;
 use fastcdn_common::rpc::server::ping::FcPingService;
+
+// 修复导入路径 - 使用正确的 fastcdn 模块路径
+use fastcdn_common::rpc::fastcdn::admin_server::AdminServer;
+use fastcdn_common::rpc::fastcdn::hello_service_server::HelloServiceServer;
+use fastcdn_common::rpc::fastcdn::ping_server::PingServer;
 
 pub struct RpcServerManager;
 
@@ -24,12 +27,10 @@ impl RpcServerManager {
             )
         })?;
 
-        let hello = MyHelloService::default();
-        let ping = FcPingService::default();
-
         Server::builder()
-            .add_service(HelloServiceServer::new(hello))
-            .add_service(PingServer::new(ping))
+            .add_service(HelloServiceServer::new(MyHelloService::default()))
+            .add_service(PingServer::new(FcPingService::default()))
+            .add_service(AdminServer::new(FcAdmin::default()))
             .serve(addr)
             .await
             .map_err(|e| {
