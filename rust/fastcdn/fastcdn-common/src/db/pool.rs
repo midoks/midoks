@@ -34,13 +34,11 @@ impl Manager {
             )
         }; // config MutexGuard 在这里被释放
 
-        // 创建连接池（没有持有任何锁）
         let pool = MySqlPool::connect(&database_url).await?;
         let manager = Arc::new(Manager {
             pool: Arc::new(pool),
         });
 
-        // 最后设置实例
         {
             let mut instance = INSTANCE.lock().unwrap();
             if instance.is_none() {

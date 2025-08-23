@@ -46,7 +46,15 @@ impl Admin for FcAdmin {
         match pool::Manager::instance().await {
             Ok(manager) => {
                 println!("数据库管理器实例: {:?}", manager);
-                println!("addr: {}", &manager);
+                println!("addr: {:p}", &manager);
+            }
+            Err(e) => println!("获取数据库管理器失败: {:?}", e),
+        }
+
+        match pool::Manager::instance().await {
+            Ok(manager) => {
+                println!("数据库管理器实例: {:?}", manager);
+                println!("addr: {:p}", &manager);
             }
             Err(e) => println!("获取数据库管理器失败: {:?}", e),
         }
