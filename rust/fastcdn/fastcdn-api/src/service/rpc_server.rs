@@ -17,7 +17,7 @@ pub struct RpcServerManager;
 impl RpcServerManager {
     /// 创建并启动HTTP服务器
     pub async fn start() -> std::io::Result<()> {
-        println!("starting fastcdn api RPC server...");
+        println!("starting fastcdn-api rpc server...");
 
         let addr = "127.0.0.1:10001".parse().map_err(|e| {
             eprintln!("address resolution failed: {}", e);
