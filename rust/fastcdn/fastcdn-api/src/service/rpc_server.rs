@@ -7,7 +7,7 @@ use fastcdn_common::rpc::server::admin::FcAdmin;
 use fastcdn_common::rpc::server::hello::MyHelloService;
 use fastcdn_common::rpc::server::ping::FcPingService;
 
-// 修复导入路径 - 使用正确的 fastcdn 模块路径
+// fastcdn
 use fastcdn_common::rpc::fastcdn::admin_server::AdminServer;
 use fastcdn_common::rpc::fastcdn::hello_service_server::HelloServiceServer;
 use fastcdn_common::rpc::fastcdn::ping_server::PingServer;
