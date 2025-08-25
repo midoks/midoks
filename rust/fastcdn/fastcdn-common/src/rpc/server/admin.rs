@@ -35,28 +35,24 @@ impl Admin for FcAdmin {
         &self,
         request: Request<AdminLoginRequest>,
     ) -> Result<Response<AdminLoginResponse>, Status> {
-        println!("收到 admin login 请求: {:?}", request);
+        let login_req = request.into_inner();
+        println!("admin login username: {:?}", login_req.username);
+        println!("admin login password: {:?}", login_req.password);
 
         let reply = AdminLoginResponse {
-            id: 1,                           // 用户ID
-            is_ok: true,                     // 登录是否成功
-            message: "登录成功".to_string(), // 响应消息
+            id: -1,       // 用户ID
+            is_ok: false, // 登录是否成功
+            message: "登陆失败".to_string(),
         };
 
         match pool::Manager::instance().await {
-            Ok(manager) => {
-                println!("数据库管理器实例: {:?}", manager);
-                println!("addr: {:p}", &manager);
+            Ok(db) => {
+                println!("数据库管理器实例: {:?}", db);
+                println!("addr: {:p}", &db);
             }
-            Err(e) => println!("获取数据库管理器失败: {:?}", e),
-        }
-
-        match pool::Manager::instance().await {
-            Ok(manager) => {
-                println!("数据库管理器实例: {:?}", manager);
-                println!("addr: {:p}", &manager);
+            Err(e) => {
+                println!("获取数据库管理器失败: {:?}", e);
             }
-            Err(e) => println!("获取数据库管理器失败: {:?}", e),
         }
 
         Ok(Response::new(reply))

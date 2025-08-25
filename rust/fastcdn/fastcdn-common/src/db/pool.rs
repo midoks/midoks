@@ -32,7 +32,7 @@ impl Manager {
                 "mysql://{}:{}@{}/{}",
                 config.user, config.password, config.host, config.database
             )
-        }; // config MutexGuard 在这里被释放
+        }; // MutexGuard 在这里被释放
 
         let pool = MySqlPool::connect(&database_url).await?;
         let manager = Arc::new(Manager {
