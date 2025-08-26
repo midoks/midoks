@@ -1,9 +1,9 @@
 use pnet::packet::icmp::{IcmpPacket, IcmpTypes};
 use pnet::packet::ip::IpNextHeaderProtocols;
 use pnet::packet::ipv4::{Ipv4Packet, MutableIpv4Packet};
-use pnet::packet::{MutablePacket, Packet};
-use pnet::transport::{transport_channel, TransportChannelType, TransportProtocol, TransportReceiver, TransportSender};
-use std::net::{IpAddr, Ipv4Addr, ToSocketAddrs};
+use pnet::packet::Packet;
+use pnet::transport::{transport_channel, TransportChannelType, TransportReceiver, TransportSender};
+use std::net::{IpAddr, ToSocketAddrs};
 use std::time::{Duration, Instant};
 use tokio::time::timeout;
 use anyhow::{anyhow, Result};
@@ -80,7 +80,7 @@ impl IpTracer {
     }
 
     async fn trace_hop(&self, target_ip: IpAddr, ttl: u8) -> HopResult {
-        match self.send_icmp_packet(target_ip, ttl).await {
+        match self.send_ping(target_ip, ttl).await {
             Ok((ip, rtt)) => {
                 let hostname = utils::reverse_dns_lookup(ip).await;
                 let geo_info = if let Some(ref locator) = self.geo_locator {
@@ -107,71 +107,51 @@ impl IpTracer {
         }
     }
 
-    async fn send_icmp_packet(&self, target_ip: IpAddr, ttl: u8) -> Result<(IpAddr, Duration)> {
-        let protocol = TransportChannelType::Layer3(IpNextHeaderProtocols::Icmp);
-        let (mut tx, mut rx) = transport_channel(4096, protocol)?;
-
+    async fn send_ping(&self, target_ip: IpAddr, ttl: u8) -> Result<(IpAddr, Duration)> {
+        // 使用系统ping命令作为简化实现
         let start_time = Instant::now();
         
-        // 发送ICMP包
-        self.send_icmp_echo(&mut tx, target_ip, ttl)?;
+        let output = tokio::process::Command::new("ping")
+            .arg("-c")
+            .arg("1")
+            .arg("-t")
+            .arg(ttl.to_string())
+            .arg("-W")
+            .arg((self.timeout_duration.as_millis() as u32).to_string())
+            .arg(target_ip.to_string())
+            .output()
+            .await?;
+
+        let rtt = start_time.elapsed();
         
-        // 等待响应
-        let result = timeout(self.timeout_duration, self.receive_icmp_reply(&mut rx)).await;
-        
-        match result {
-            Ok(Ok(ip)) => {
-                let rtt = start_time.elapsed();
-                Ok((ip, rtt))
+        if output.status.success() {
+            Ok((target_ip, rtt))
+        } else {
+            // 尝试解析ping输出中的中间路由器IP
+            let output_str = String::from_utf8_lossy(&output.stderr);
+            if let Some(ip_str) = self.extract_intermediate_ip(&output_str) {
+                if let Ok(ip) = ip_str.parse::<IpAddr>() {
+                    return Ok((ip, rtt));
+                }
             }
-            _ => Err(anyhow!("Timeout or error receiving ICMP reply")),
+            Err(anyhow!("Ping failed or timeout"))
         }
     }
 
-    fn send_icmp_echo(&self, tx: &mut TransportSender, target_ip: IpAddr, ttl: u8) -> Result<()> {
-        if let IpAddr::V4(target_ipv4) = target_ip {
-            let mut buffer = vec![0u8; 28]; // IP header (20) + ICMP header (8)
-            let mut ip_packet = MutableIpv4Packet::new(&mut buffer).unwrap();
-            
-            ip_packet.set_version(4);
-            ip_packet.set_header_length(5);
-            ip_packet.set_total_length(28);
-            ip_packet.set_identification(rand::random());
-            ip_packet.set_ttl(ttl);
-            ip_packet.set_next_level_protocol(IpNextHeaderProtocols::Icmp);
-            ip_packet.set_destination(target_ipv4);
-            
-            // 设置ICMP Echo Request
-            let icmp_payload = &mut buffer[20..];
-            icmp_payload[0] = 8; // ICMP Type: Echo Request
-            icmp_payload[1] = 0; // ICMP Code
-            icmp_payload[4] = rand::random::<u8>(); // Identifier
-            icmp_payload[5] = rand::random::<u8>();
-            icmp_payload[6] = 0; // Sequence Number
-            icmp_payload[7] = 1;
-            
-            tx.send_to(ip_packet, IpAddr::V4(target_ipv4))?;
-        }
-        
-        Ok(())
-    }
-
-    async fn receive_icmp_reply(&self, rx: &mut TransportReceiver) -> Result<IpAddr> {
-        loop {
-            let (packet, addr) = rx.next()?;
-            
-            if let Some(ipv4_packet) = Ipv4Packet::new(packet) {
-                if ipv4_packet.get_next_level_protocol() == IpNextHeaderProtocols::Icmp {
-                    if let Some(icmp_packet) = IcmpPacket::new(ipv4_packet.payload()) {
-                        // 检查是否是Time Exceeded或Echo Reply
-                        if icmp_packet.get_icmp_type() == IcmpTypes::TimeExceeded ||
-                           icmp_packet.get_icmp_type() == IcmpTypes::EchoReply {
-                            return Ok(IpAddr::V4(ipv4_packet.get_source()));
-                        }
+    fn extract_intermediate_ip(&self, output: &str) -> Option<String> {
+        // 从ping错误输出中提取中间路由器IP
+        for line in output.lines() {
+            if line.contains("Time to live exceeded") || line.contains("TTL expired") {
+                // 尝试提取IP地址
+                let words: Vec<&str> = line.split_whitespace().collect();
+                for word in words {
+                    if word.parse::<IpAddr>().is_ok() {
+                        return Some(word.to_string());
                     }
                 }
             }
         }
+        None
     }
 
     async fn print_hop_result(&self, result: &HopResult) {
