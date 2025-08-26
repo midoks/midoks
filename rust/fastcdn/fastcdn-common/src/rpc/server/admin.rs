@@ -1,7 +1,7 @@
 use tonic::{Request, Response, Status};
 
 use crate::db::pool;
-
+use crate::rpc::auth::AuthMiddleware;
 use crate::rpc::fastcdn::admin_server::Admin;
 use crate::rpc::fastcdn::{
     AdminCreateRequest, AdminCreateResponse, AdminLoginRequest, AdminLoginResponse,
@@ -17,6 +17,9 @@ impl Admin for FcAdmin {
         &self,
         request: Request<AdminCreateRequest>,
     ) -> Result<Response<AdminCreateResponse>, Status> {
+        // 验证请求头认证
+        AuthMiddleware::verify_request(&request)?;
+        
         println!("收到 admin create 请求: {:?}", request);
 
         let reply = AdminCreateResponse {
@@ -35,6 +38,9 @@ impl Admin for FcAdmin {
         &self,
         request: Request<AdminLoginRequest>,
     ) -> Result<Response<AdminLoginResponse>, Status> {
+        // 验证请求头认证
+        AuthMiddleware::verify_request(&request)?;
+        
         let login_req = request.into_inner();
         println!("admin login username: {:?}", login_req.username);
         println!("admin login password: {:?}", login_req.password);

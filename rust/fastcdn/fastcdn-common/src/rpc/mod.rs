@@ -2,6 +2,7 @@
 //!
 //! 包含proto定义、服务器实现和客户端实现
 
+pub mod auth;
 pub mod client;
 pub mod server;
 
