@@ -79,14 +79,14 @@
             "name": "fastcdn_api_tokens",
             "engine": "InnoDB",
             "charset": "utf8mb4_general_ci",
-            "definition": "CREATE TABLE `fastcdn_api_tokens` (\n  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID',\n  `nodeId` varchar(32) DEFAULT NULL COMMENT '节点ID',\n  `secret` varchar(255) DEFAULT NULL COMMENT '节点密钥',\n  `role` varchar(64) DEFAULT NULL COMMENT '节点角色',\n  `state` tinyint(1) unsigned DEFAULT '1' COMMENT '状态',\n  PRIMARY KEY (`id`),\n  KEY `nodeId` (`nodeId`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='API令牌管理'",
+            "definition": "CREATE TABLE `fastcdn_api_tokens` (\n  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID',\n  `node_id` varchar(32) DEFAULT NULL COMMENT '节点ID',\n  `secret` varchar(255) DEFAULT NULL COMMENT '节点密钥',\n  `role` varchar(64) DEFAULT NULL COMMENT '节点角色',\n  `state` tinyint(1) unsigned DEFAULT '1' COMMENT '状态',\n  PRIMARY KEY (`id`),\n  KEY `nodeId` (`nodeId`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='API令牌管理'",
             "fields": [
                 {
                     "name": "id",
                     "definition": "bigint(20) unsigned auto_increment COMMENT 'ID'"
                 },
                 {
-                    "name": "nodeId",
+                    "name": "node_id",
                     "definition": "varchar(32) COMMENT '节点ID'"
                 },
                 {
@@ -108,8 +108,8 @@
                     "definition": "UNIQUE KEY `PRIMARY` (`id`) USING BTREE"
                 },
                 {
-                    "name": "nodeId",
-                    "definition": "KEY `nodeId` (`nodeId`) USING BTREE"
+                    "name": "node_id",
+                    "definition": "KEY `node_id` (`node_id`) USING BTREE"
                 }
             ],
             "records": []
