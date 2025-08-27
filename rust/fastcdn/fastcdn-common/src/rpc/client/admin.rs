@@ -23,10 +23,11 @@ impl Admin {
         &mut self,
         req: AdminLoginRequest,
     ) -> Result<AdminLoginResponse, Box<dyn std::error::Error>> {
+        println!("client-login\n");
         let request = Request::new(req);
-        let authenticated_request = AuthMiddleware::add_auth_headers(request)?;
+        let auth_request = AuthMiddleware::add_auth_headers(request)?;
 
-        let response = self.client.login(authenticated_request).await?;
+        let response = self.client.login(auth_request).await?;
         Ok(response.into_inner())
     }
 
@@ -35,9 +36,9 @@ impl Admin {
         req: AdminCreateRequest,
     ) -> Result<AdminCreateResponse, Box<dyn std::error::Error>> {
         let request = Request::new(req);
-        let authenticated_request = AuthMiddleware::add_auth_headers(request)?;
+        let auth_request = AuthMiddleware::add_auth_headers(request)?;
 
-        let response = self.client.create(authenticated_request).await?;
+        let response = self.client.create(auth_request).await?;
         Ok(response.into_inner())
     }
 }

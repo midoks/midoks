@@ -19,7 +19,7 @@ impl Admin for FcAdmin {
     ) -> Result<Response<AdminCreateResponse>, Status> {
         // 验证请求头认证
         AuthMiddleware::verify_request(&request)?;
-        
+
         println!("收到 admin create 请求: {:?}", request);
 
         let reply = AdminCreateResponse {
@@ -38,9 +38,14 @@ impl Admin for FcAdmin {
         &self,
         request: Request<AdminLoginRequest>,
     ) -> Result<Response<AdminLoginResponse>, Status> {
+        println!("login----service");
+
+        let metadata = request.metadata();
+        println!("metadata:{:?}", metadata);
+
         // 验证请求头认证
         AuthMiddleware::verify_request(&request)?;
-        
+
         let login_req = request.into_inner();
         println!("admin login username: {:?}", login_req.username);
         println!("admin login password: {:?}", login_req.password);
@@ -53,11 +58,11 @@ impl Admin for FcAdmin {
 
         match pool::Manager::instance().await {
             Ok(db) => {
-                println!("数据库管理器实例: {:?}", db);
+                println!("db: {:?}", db);
                 println!("addr: {:p}", &db);
             }
             Err(e) => {
-                println!("获取数据库管理器失败: {:?}", e);
+                println!("db manager fail: {:?}", e);
             }
         }
 

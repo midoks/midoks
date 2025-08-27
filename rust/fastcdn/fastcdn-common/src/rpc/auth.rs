@@ -9,12 +9,13 @@ impl AuthMiddleware {
     pub fn verify_request<T>(request: &Request<T>) -> Result<(), Status> {
         let metadata = request.metadata();
 
-        print!("metadata:{:?}", metadata);
+        println!("\nmetadata:{:?}", metadata);
         // 从请求头获取nodeId和secret
+
         let node_id = metadata
             .get("node-id")
             .and_then(|v| v.to_str().ok())
-            .ok_or_else(|| Status::unauthenticated("缺少node-id请求头"))?;
+            .ok_or_else(|| Status::unauthenticated("缺少node-id2请求头"))?;
 
         let secret = metadata
             .get("secret")
@@ -42,16 +43,16 @@ impl AuthMiddleware {
         let config = api_node_config.lock().unwrap();
 
         // 添加nodeId和secret到请求头
-        let node_id_value = MetadataValue::try_from(&config.node_id)
+        let node_id = MetadataValue::try_from(&config.node_id)
             .map_err(|e| Status::internal(format!("nodeId格式错误: {}", e)))?;
-        let secret_value = MetadataValue::try_from(&config.secret)
+        let secret = MetadataValue::try_from(&config.secret)
             .map_err(|e| Status::internal(format!("secret格式错误: {}", e)))?;
 
-        println!("node_id_value:{:?}", node_id_value);
-        println!("secret_value:{:?}", secret_value);
+        println!("node-id:{:?}", node_id);
+        println!("secret:{:?}", secret);
 
-        request.metadata_mut().insert("node-id", node_id_value);
-        request.metadata_mut().insert("secret", secret_value);
+        request.metadata_mut().insert("node-id", node_id);
+        request.metadata_mut().insert("secret", secret);
 
         Ok(request)
     }

@@ -17,9 +17,9 @@ pub struct ApiNode {
     pub secret: String,
 }
 
-// 使用 lazy_static 实现线程安全的单例
+// 修改单例实现，直接存储 Arc<Mutex<ApiNode>>
 lazy_static! {
-    static ref INSTANCE: Arc<Mutex<Option<ApiNode>>> = Arc::new(Mutex::new(None));
+    static ref INSTANCE: Arc<Mutex<Option<Arc<Mutex<ApiNode>>>>> = Arc::new(Mutex::new(None));
 }
 
 impl ApiNode {
@@ -31,12 +31,14 @@ impl ApiNode {
             let api_node = Self::load_default()?;
             api_node.validate()
                 .map_err(|e| Box::new(std::io::Error::new(std::io::ErrorKind::InvalidData, e)))?;
-            *instance_guard = Some(api_node);
+            
+            // 创建真正的单例实例
+            let shared_instance = Arc::new(Mutex::new(api_node));
+            *instance_guard = Some(shared_instance.clone());
         }
         
-        // 创建一个新的 Arc<Mutex<ApiNode>> 包装实际的 ApiNode 实例
-        let api_node = instance_guard.as_ref().unwrap().clone();
-        Ok(Arc::new(Mutex::new(api_node)))
+        // 返回共享的实例
+        Ok(instance_guard.as_ref().unwrap().clone())
     }
 
     /// 重新加载配置（更新单例实例）
@@ -46,7 +48,15 @@ impl ApiNode {
             .map_err(|e| Box::new(std::io::Error::new(std::io::ErrorKind::InvalidData, e)))?;
         
         let mut instance_guard = INSTANCE.lock().unwrap();
-        *instance_guard = Some(new_api_node);
+        if let Some(ref shared_instance) = *instance_guard {
+            // 更新现有实例的内容
+            let mut config = shared_instance.lock().unwrap();
+            *config = new_api_node;
+        } else {
+            // 如果实例不存在，创建新的
+            let shared_instance = Arc::new(Mutex::new(new_api_node));
+            *instance_guard = Some(shared_instance);
+        }
         Ok(())
     }
 

@@ -62,9 +62,7 @@ impl Manager {
 
         // 创建连接池
         let pool = MySqlPool::connect(&database_url).await?;
-
-        // println!("✓ 数据库连接成功");
-
+        println!("✓ 数据库连接成功");
         Ok(Manager {
             pool: Arc::new(pool),
         })
@@ -80,7 +78,6 @@ impl Manager {
         let row: (i32,) = sqlx::query_as("SELECT 1")
             .fetch_one(self.pool.as_ref())
             .await?;
-
         println!("✓ 数据库连接测试成功，返回值: {}", row.0);
         Ok(())
     }
