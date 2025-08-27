@@ -5,7 +5,7 @@ use tonic::transport::Server;
 
 use fastcdn_common::rpc::server::admin::FcAdmin;
 use fastcdn_common::rpc::server::hello::MyHelloService;
-use fastcdn_common::rpc::server::ping::FcPingService;
+use fastcdn_common::rpc::server::ping::FcPing;
 
 // fastcdn
 use fastcdn_common::rpc::fastcdn::admin_server::AdminServer;
@@ -29,7 +29,7 @@ impl RpcServerManager {
 
         Server::builder()
             .add_service(HelloServiceServer::new(MyHelloService::default()))
-            .add_service(PingServer::new(FcPingService::default()))
+            .add_service(PingServer::new(FcPing::default()))
             .add_service(AdminServer::new(FcAdmin::default()))
             .serve(addr)
             .await

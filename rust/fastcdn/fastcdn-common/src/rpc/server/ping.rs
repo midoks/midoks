@@ -6,14 +6,14 @@ use crate::rpc::fastcdn::{PingRequest, PingResponse};
 
 /// Ping 实现
 #[derive(Debug, Default)]
-pub struct FcPingService {}
+pub struct FcPing {}
 
 #[tonic::async_trait]
-impl Ping for FcPingService {
+impl Ping for FcPing {
     async fn ping(&self, request: Request<PingRequest>) -> Result<Response<PingResponse>, Status> {
         // 验证请求头认证
         AuthMiddleware::verify_request(&request)?;
-        
+
         println!("收到Ping请求: {:?}", request);
 
         let reply = PingResponse {};
