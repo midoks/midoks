@@ -1,9 +1,9 @@
 use std::env;
 
 use fastcdn_common::rpc::fastcdn::AdminLoginRequest;
-use fastcdn_common::rpc::fastcdn::admin_client::AdminClient;
 use fastcdn_common::rpc::fastcdn::PingRequest;
 
+use fastcdn_common::rpc::client::admin::Admin;
 use fastcdn_common::rpc::client::hello::HelloClient;
 use fastcdn_common::rpc::client::ping::Ping;
 
@@ -16,7 +16,7 @@ pub async fn run() -> Result<(), Box<dyn std::error::Error>> {
 pub async fn test_rpc() {
     println!("正在测试gRPC连接...");
     // 测试Admin服务 - 使用login方法
-    match AdminClient::connect("http://127.0.0.1:10001").await {
+    match Admin::connect("http://127.0.0.1:10001").await {
         Ok(mut client) => {
             let request = AdminLoginRequest {
                 username: "admin".to_string(),
@@ -35,7 +35,7 @@ pub async fn test_rpc() {
 pub async fn test_rpc_all() {
     println!("正在测试gRPC连接...");
     // 测试Admin服务 - 使用login方法
-    match AdminClient::connect("http://127.0.0.1:10001").await {
+    match Admin::connect("http://127.0.0.1:10001").await {
         Ok(mut client) => {
             let request = AdminLoginRequest {
                 username: "admin".to_string(),
@@ -57,7 +57,7 @@ pub async fn test_rpc_all() {
                 Ok(response) => println!("✓ Ping服务连接成功: {:?}", response),
                 Err(e) => println!("✗ Ping服务调用失败: {}", e),
             }
-        },
+        }
         Err(e) => println!("✗ Ping服务连接失败: {}", e),
     }
 

@@ -25,6 +25,7 @@ impl Admin {
     ) -> Result<AdminLoginResponse, Box<dyn std::error::Error>> {
         println!("client-login\n");
         let request = Request::new(req);
+        println!("client-request:{:?}", request);
         let auth_request = AuthMiddleware::add_auth_headers(request)?;
 
         let response = self.client.login(auth_request).await?;
