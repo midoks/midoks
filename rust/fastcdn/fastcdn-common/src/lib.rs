@@ -4,9 +4,8 @@
 
 pub mod config;
 pub mod daemon;
-pub mod rpc; // 添加这行
-
+pub mod rpc;
 pub mod db;
 
-// 导出配置读取香港
+// 导出配置读取
 pub use config::{ConfigApiAdmin, ConfigDb, ConfigServer};

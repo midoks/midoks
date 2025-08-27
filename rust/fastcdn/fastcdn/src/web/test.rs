@@ -2,6 +2,7 @@ use std::env;
 
 use fastcdn_common::rpc::fastcdn::AdminLoginRequest;
 use fastcdn_common::rpc::fastcdn::admin_client::AdminClient;
+use fastcdn_common::rpc::fastcdn::PingRequest;
 
 use fastcdn_common::rpc::client::hello::HelloClient;
 use fastcdn_common::rpc::client::ping::Ping;
@@ -50,9 +51,12 @@ pub async fn test_rpc_all() {
 
     // 测试Ping服务
     match Ping::connect("http://127.0.0.1:10001").await {
-        Ok(mut client) => match client.ping().await {
-            Ok(response) => println!("✓ Ping服务连接成功: {}", response),
-            Err(e) => println!("✗ Ping服务调用失败: {}", e),
+        Ok(mut client) => {
+            let ping_request = PingRequest {};
+            match client.ping(ping_request).await {
+                Ok(response) => println!("✓ Ping服务连接成功: {:?}", response),
+                Err(e) => println!("✗ Ping服务调用失败: {}", e),
+            }
         },
         Err(e) => println!("✗ Ping服务连接失败: {}", e),
     }

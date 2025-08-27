@@ -47,6 +47,9 @@ impl AuthMiddleware {
         let secret_value = MetadataValue::try_from(&config.secret)
             .map_err(|e| Status::internal(format!("secret格式错误: {}", e)))?;
 
+        println!("node_id_value:{:?}", node_id_value);
+        println!("secret_value:{:?}", secret_value);
+
         request.metadata_mut().insert("node-id", node_id_value);
         request.metadata_mut().insert("secret", secret_value);
 
