@@ -56,4 +56,26 @@ impl AuthMiddleware {
 
         Ok(request)
     }
+
+    /// 添加管理员请求头信息
+    pub fn add_auth_admin<T>(mut request: Request<T>) -> Result<Request<T>, Status> {
+        let api_node_config =
+            ApiNode::instance().map_err(|e| Status::internal(format!("配置加载失败: {}", e)))?;
+
+        let config = api_node_config.lock().unwrap();
+
+        // 添加nodeId和secret到请求头
+        let node_id = MetadataValue::try_from(&config.node_id)
+            .map_err(|e| Status::internal(format!("nodeId格式错误: {}", e)))?;
+        let secret = MetadataValue::try_from(&config.secret)
+            .map_err(|e| Status::internal(format!("secret格式错误: {}", e)))?;
+
+        println!("node-id:{:?}", node_id);
+        println!("secret:{:?}", secret);
+
+        request.metadata_mut().insert("node-id", node_id);
+        request.metadata_mut().insert("secret", secret);
+
+        Ok(request)
+    }
 }
