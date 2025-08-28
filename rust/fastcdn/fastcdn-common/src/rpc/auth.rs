@@ -9,8 +9,7 @@ impl AuthMiddleware {
     pub fn verify_request<T>(request: &Request<T>) -> Result<(), Status> {
         let metadata = request.metadata();
 
-        println!("\nmetadata:{:?}", metadata);
-        // 从请求头获取nodeId和secret
+        println!("metadata:{:?}", metadata);
 
         let node_id = metadata
             .get("node-id")
@@ -36,7 +35,7 @@ impl AuthMiddleware {
     }
 
     /// 为客户端请求添加认证头
-    pub fn add_auth_headers<T>(mut request: Request<T>) -> Result<Request<T>, Status> {
+    pub fn add_header_api<T>(mut request: Request<T>) -> Result<Request<T>, Status> {
         let api_node_config =
             ApiNode::instance().map_err(|e| Status::internal(format!("配置加载失败: {}", e)))?;
 
@@ -59,10 +58,10 @@ impl AuthMiddleware {
 
     /// 添加管理员请求头信息
     pub fn add_header_admin<T>(mut request: Request<T>) -> Result<Request<T>, Status> {
-        let api_node_config =
+        let api_node =
             ApiNode::instance().map_err(|e| Status::internal(format!("配置加载失败: {}", e)))?;
 
-        let config = api_node_config.lock().unwrap();
+        let config = api_node.lock().unwrap();
 
         // 添加nodeId和secret到请求头
         let node_id = MetadataValue::try_from(&config.node_id)
