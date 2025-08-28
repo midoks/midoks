@@ -25,7 +25,7 @@ impl Admin {
     ) -> Result<AdminLoginResponse, Box<dyn std::error::Error>> {
         let request = Request::new(req);
         println!("client-request:{:?}", request);
-        let auth_request = AuthMiddleware::add_auth_headers(request)?;
+        let auth_request = AuthMiddleware::add_header_api(request)?;
         println!("client-auth-request:{:?}", auth_request);
 
         let response = self.client.login(auth_request).await?;
@@ -37,7 +37,7 @@ impl Admin {
         req: AdminCreateRequest,
     ) -> Result<AdminCreateResponse, Box<dyn std::error::Error>> {
         let request = Request::new(req);
-        let auth_request = AuthMiddleware::add_auth_headers(request)?;
+        let auth_request = AuthMiddleware::add_header_api(request)?;
 
         let response = self.client.create(auth_request).await?;
         Ok(response.into_inner())

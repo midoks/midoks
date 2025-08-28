@@ -6,7 +6,7 @@ use fastcdn_common::rpc::fastcdn::PingRequest;
 use fastcdn_common::rpc::client::admin::Admin;
 use fastcdn_common::rpc::client::hello::HelloClient;
 use fastcdn_common::rpc::client::ping::Ping;
-use fastcdn_common::rpc::client::rpc::Rpc;
+use fastcdn_common::rpc::client::rpc::CommonRpc;
 
 pub async fn run() -> Result<(), Box<dyn std::error::Error>> {
     test_rpc().await;
@@ -17,7 +17,7 @@ pub async fn run() -> Result<(), Box<dyn std::error::Error>> {
 pub async fn test_rpc() {
     println!("正在测试gRPC连接...");
     // 测试Admin服务 - 使用login方法
-    match Rpc::connect("http://127.0.0.1:10001").await {
+    match CommonRpc::connect("http://127.0.0.1:10001").await {
         Ok(mut client) => {
             let request = AdminLoginRequest {
                 username: "admin".to_string(),

@@ -17,7 +17,7 @@ pub enum RequestAuth {
     Other,
 }
 
-impl Rpc {
+impl CommonRpc {
     pub async fn connect(addr: &str) -> Result<Self, Box<dyn std::error::Error>> {
         let channel = Channel::from_shared(addr.to_string())?.connect().await?;
         Ok(Rpc { channel })
