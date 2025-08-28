@@ -58,7 +58,7 @@ impl AuthMiddleware {
     }
 
     /// 添加管理员请求头信息
-    pub fn add_auth_admin<T>(mut request: Request<T>) -> Result<Request<T>, Status> {
+    pub fn add_header_admin<T>(mut request: Request<T>) -> Result<Request<T>, Status> {
         let api_node_config =
             ApiNode::instance().map_err(|e| Status::internal(format!("配置加载失败: {}", e)))?;
 

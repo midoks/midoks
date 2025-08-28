@@ -11,10 +11,10 @@ pub struct Rpc {
 }
 
 #[derive(Debug, Clone)]
-pub enum RequestType {
+pub enum RequestAuth {
     ADMIN,
     API,
-    Other(String),
+    Other,
 }
 
 impl Rpc {
@@ -27,46 +27,32 @@ impl Rpc {
     fn prepare_request_with_metadata<T>(
         &self,
         req: T,
-        request_type: RequestType,
+        request_type: RequestAuth,
     ) -> Result<Request<T>, Box<dyn std::error::Error>> {
         let mut request = Request::new(req);
 
+        request
+            .metadata_mut()
+            .insert("client-version", MetadataValue::try_from("1.0.0")?);
+
         // 根据请求类型设置特定的 metadata
         match request_type {
-            RequestType::ADMIN => {
+            RequestAuth::ADMIN => {
                 // 管理员 metadata
-                request
-                    .metadata_mut()
-                    .insert("request-type", MetadataValue::try_from("login")?);
-                request
-                    .metadata_mut()
-                    .insert("client-version", MetadataValue::try_from("1.0.0")?);
+                request = AuthMiddleware::add_header_admin(request)?;
             }
-            RequestType::API => {
+            RequestAuth::API => {
                 // api metadata
-                request
-                    .metadata_mut()
-                    .insert("request-type", MetadataValue::try_from("create-admin")?);
-                request
-                    .metadata_mut()
-                    .insert("admin-operation", MetadataValue::try_from("create")?);
+                request = AuthMiddleware::add_header_admin(request)?;
             }
-            RequestType::Other(ref op) => {
+            RequestAuth::Other => {
                 // 其他请求类型的 metadata
-                request
-                    .metadata_mut()
-                    .insert("request-type", MetadataValue::try_from("other")?);
-                request
-                    .metadata_mut()
-                    .insert("operation", MetadataValue::try_from(op.as_str())?);
+                request = AuthMiddleware::add_header_admin(request)?;
             }
         }
 
-        // 添加认证头
-        let auth_request = AuthMiddleware::add_auth_admin(request)?;
-
         // 添加通用的 metadata
-        let mut final_request = auth_request;
+        let mut final_request = request;
         let timestamp = std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
             .unwrap()
@@ -112,14 +98,14 @@ impl Rpc {
         &mut self,
         req: AdminLoginRequest,
     ) -> Result<AdminLoginResponse, Box<dyn std::error::Error>> {
-        let request = self.prepare_request_with_metadata(req, RequestType::ADMIN)?;
+        let request = self.prepare_request_with_metadata(req, RequestAuth::ADMIN)?;
         self.make_grpc_call(request, "/fastcdn.Admin/login").await
     }
     pub async fn create(
         &mut self,
         req: AdminCreateRequest,
     ) -> Result<AdminCreateResponse, Box<dyn std::error::Error>> {
-        let request = self.prepare_request_with_metadata(req, RequestType::ADMIN)?;
+        let request = self.prepare_request_with_metadata(req, RequestAuth::ADMIN)?;
         self.make_grpc_call(request, "/fastcdn.Admin/create").await
     }
 }
