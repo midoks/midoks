@@ -63,7 +63,7 @@ impl Rpc {
         }
 
         // 添加认证头
-        let auth_request = AuthMiddleware::add_auth_headers(request)?;
+        let auth_request = AuthMiddleware::add_auth_admin(request)?;
 
         // 添加通用的 metadata
         let mut final_request = auth_request;
