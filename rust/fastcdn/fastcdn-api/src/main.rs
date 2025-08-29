@@ -54,23 +54,19 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // 执行相应的操作并返回适当的退出状态码
     let result: Result<&str, Box<dyn std::error::Error>> = match &args.command {
-        Some(Commands::Setup {}) => {
-            match setup::Setup::instance().await {
-                Ok(cmd_setup) => {
-                    match cmd_setup.install().await {
-                        Ok(_) => Ok("setup completed successfully!"),
-                        Err(e) => {
-                            eprintln!("setup failed: {}", e);
-                            Err(e)
-                        }
-                    }
-                }
+        Some(Commands::Setup {}) => match setup::Setup::instance().await {
+            Ok(cmd_setup) => match cmd_setup.install().await {
+                Ok(_) => Ok("setup completed successfully!"),
                 Err(e) => {
-                    eprintln!("setup instance creation failed: {}", e);
+                    eprintln!("setup failed: {}", e);
                     Err(e)
                 }
+            },
+            Err(e) => {
+                eprintln!("setup instance failed: {}", e);
+                Err(e)
             }
-        }
+        },
         Some(Commands::Start { daemon }) => {
             if *daemon {
                 let _ = app.start();
