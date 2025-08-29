@@ -26,17 +26,24 @@ impl fmt::Display for AesError {
 
 impl Error for AesError {}
 
+/// 调整IV长度到16字节
+/// 如果IV长度大于16字节，截取前16字节
+/// 如果IV长度小于16字节，用零填充到16字节
+fn adjust_iv_length(iv: &[u8]) -> [u8; 16] {
+    let mut adjusted_iv = [0u8; 16];
+    let copy_len = std::cmp::min(iv.len(), 16);
+    adjusted_iv[..copy_len].copy_from_slice(&iv[..copy_len]);
+    adjusted_iv
+}
+
 /// AES-128-CFB 加密
 pub fn aes128_cfb_encrypt(key: &[u8], iv: &[u8], plaintext: &[u8]) -> Result<Vec<u8>, AesError> {
     if key.len() != 16 {
         return Err(AesError::InvalidKeyLength);
     }
-    if iv.len() != 16 {
-        return Err(AesError::InvalidIvLength);
-    }
-
+    let adjusted_iv = adjust_iv_length(iv);
     let cipher = Aes128::new(GenericArray::from_slice(key));
-    let mut feedback = *GenericArray::from_slice(iv);
+    let mut feedback = *GenericArray::from_slice(&adjusted_iv);
     let mut ciphertext = Vec::with_capacity(plaintext.len());
 
     for &byte in plaintext {
@@ -59,12 +66,9 @@ pub fn aes128_cfb_decrypt(key: &[u8], iv: &[u8], ciphertext: &[u8]) -> Result<Ve
     if key.len() != 16 {
         return Err(AesError::InvalidKeyLength);
     }
-    if iv.len() != 16 {
-        return Err(AesError::InvalidIvLength);
-    }
-
+    let adjusted_iv = adjust_iv_length(iv);
     let cipher = Aes128::new(GenericArray::from_slice(key));
-    let mut feedback = *GenericArray::from_slice(iv);
+    let mut feedback = *GenericArray::from_slice(&adjusted_iv);
     let mut plaintext = Vec::with_capacity(ciphertext.len());
 
     for &byte in ciphertext {
@@ -87,12 +91,9 @@ pub fn aes192_cfb_encrypt(key: &[u8], iv: &[u8], plaintext: &[u8]) -> Result<Vec
     if key.len() != 24 {
         return Err(AesError::InvalidKeyLength);
     }
-    if iv.len() != 16 {
-        return Err(AesError::InvalidIvLength);
-    }
-
+    let adjusted_iv = adjust_iv_length(iv);
     let cipher = Aes192::new(GenericArray::from_slice(key));
-    let mut feedback = *GenericArray::from_slice(iv);
+    let mut feedback = *GenericArray::from_slice(&adjusted_iv);
     let mut ciphertext = Vec::with_capacity(plaintext.len());
 
     for &byte in plaintext {
@@ -115,12 +116,9 @@ pub fn aes192_cfb_decrypt(key: &[u8], iv: &[u8], ciphertext: &[u8]) -> Result<Ve
     if key.len() != 24 {
         return Err(AesError::InvalidKeyLength);
     }
-    if iv.len() != 16 {
-        return Err(AesError::InvalidIvLength);
-    }
-
+    let adjusted_iv = adjust_iv_length(iv);
     let cipher = Aes192::new(GenericArray::from_slice(key));
-    let mut feedback = *GenericArray::from_slice(iv);
+    let mut feedback = *GenericArray::from_slice(&adjusted_iv);
     let mut plaintext = Vec::with_capacity(ciphertext.len());
 
     for &byte in ciphertext {
@@ -143,12 +141,9 @@ pub fn aes256_cfb_encrypt(key: &[u8], iv: &[u8], plaintext: &[u8]) -> Result<Vec
     if key.len() != 32 {
         return Err(AesError::InvalidKeyLength);
     }
-    if iv.len() != 16 {
-        return Err(AesError::InvalidIvLength);
-    }
-
+    let adjusted_iv = adjust_iv_length(iv);
     let cipher = Aes256::new(GenericArray::from_slice(key));
-    let mut feedback = *GenericArray::from_slice(iv);
+    let mut feedback = *GenericArray::from_slice(&adjusted_iv);
     let mut ciphertext = Vec::with_capacity(plaintext.len());
 
     for &byte in plaintext {
@@ -171,12 +166,9 @@ pub fn aes256_cfb_decrypt(key: &[u8], iv: &[u8], ciphertext: &[u8]) -> Result<Ve
     if key.len() != 32 {
         return Err(AesError::InvalidKeyLength);
     }
-    if iv.len() != 16 {
-        return Err(AesError::InvalidIvLength);
-    }
-
+    let adjusted_iv = adjust_iv_length(iv);
     let cipher = Aes256::new(GenericArray::from_slice(key));
-    let mut feedback = *GenericArray::from_slice(iv);
+    let mut feedback = *GenericArray::from_slice(&adjusted_iv);
     let mut plaintext = Vec::with_capacity(ciphertext.len());
 
     for &byte in ciphertext {
@@ -294,12 +286,24 @@ mod tests {
     }
 
     #[test]
-    fn test_invalid_iv_length() {
+    fn test_iv_length_adjustment() {
         let key = b"1234567890123456"; // 16 bytes
-        let iv = b"short"; // 5 bytes, invalid
+        let short_iv = b"short"; // 5 bytes, will be padded
+        let long_iv = b"this_is_a_very_long_iv_that_exceeds_16_bytes"; // >16 bytes, will be truncated
         let plaintext = b"Hello, World!";
 
-        let result = aes128_cfb_encrypt(key, iv, plaintext);
-        assert!(matches!(result, Err(AesError::InvalidIvLength)));
+        // Test with short IV (should be padded)
+        let result1 = aes128_cfb_encrypt(key, short_iv, plaintext);
+        assert!(result1.is_ok());
+
+        // Test with long IV (should be truncated)
+        let result2 = aes128_cfb_encrypt(key, long_iv, plaintext);
+        assert!(result2.is_ok());
+
+        // Both should produce valid ciphertext
+        let ciphertext1 = result1.unwrap();
+        let ciphertext2 = result2.unwrap();
+        assert!(!ciphertext1.is_empty());
+        assert!(!ciphertext2.is_empty());
     }
 }
