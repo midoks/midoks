@@ -1,8 +1,8 @@
-use std::sync::Arc;
-
 use fastcdn_common::db::dump::TableInfo;
+use lazy_static::lazy_static;
 use rust_embed::RustEmbed;
 use serde::{Deserialize, Serialize};
+use std::sync::{Arc, Mutex};
 
 #[derive(RustEmbed, Debug)]
 #[folder = "src/setup/db_files/"]
@@ -68,7 +68,7 @@ pub async fn is_tables_exists(tables: &[TableInfo], name: &str) -> bool {
 }
 
 lazy_static! {
-    static ref INSTANCE: Arc<Mutex<Option<Arc<Manager>>>> = Arc::new(Mutex::new(None));
+    static ref INSTANCE: Arc<Mutex<Option<Arc<Setup>>>> = Arc::new(Mutex::new(None));
 }
 
 /// 守护进程管理器
@@ -76,7 +76,7 @@ lazy_static! {
 pub struct Setup {}
 
 impl Setup {
-    pub async fn new() -> Result<Arc<Self>, Box<dyn std::error::Error>> {
+    pub async fn instance() -> Result<Arc<Self>, Box<dyn std::error::Error>> {
         {
             let instance = INSTANCE.lock().unwrap();
             if let Some(setup) = instance.as_ref() {
