@@ -65,7 +65,7 @@ impl AuthMiddleware {
 
         // 添加nodeId和secret到请求头
         let node_id = MetadataValue::try_from(&config.node_id)
-            .map_err(|e| Status::internal(format!("nodeId格式错误: {}", e)))?;
+            .map_err(|e| Status::internal(format!("node-id格式错误: {}", e)))?;
         let secret = MetadataValue::try_from(&config.secret)
             .map_err(|e| Status::internal(format!("secret格式错误: {}", e)))?;
 
