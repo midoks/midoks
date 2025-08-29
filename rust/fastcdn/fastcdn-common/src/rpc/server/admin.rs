@@ -39,12 +39,8 @@ impl Admin for FcAdmin {
         request: Request<AdminLoginRequest>,
     ) -> Result<Response<AdminLoginResponse>, Status> {
         println!("login----service");
-
-        let metadata = request.metadata();
-        println!("metadata:{:?}", metadata);
-
         // 验证请求头认证
-        AuthMiddleware::verify_request(&request)?;
+        AuthMiddleware::verify_admin_request(&request)?;
 
         let login_req = request.into_inner();
         println!("admin login username: {:?}", login_req.username);

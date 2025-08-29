@@ -23,12 +23,12 @@ impl AuthMiddleware {
         let node_id = metadata
             .get("node-id")
             .and_then(|v| v.to_str().ok())
-            .ok_or_else(|| Status::unauthenticated("缺少node-id请求头"))?;
+            .ok_or_else(|| Status::unauthenticated("missing node-id request header"))?;
 
-        let secret = metadata
-            .get("secret")
+        let token = metadata
+            .get("token")
             .and_then(|v| v.to_str().ok())
-            .ok_or_else(|| Status::unauthenticated("缺少secret请求头"))?;
+            .ok_or_else(|| Status::unauthenticated("missing token request header"))?;
 
         // 获取配置并验证凭据
         let api_node = ApiNode::instance()
@@ -36,8 +36,38 @@ impl AuthMiddleware {
 
         let config = api_node.lock().unwrap();
 
-        if !config.verify_credentials(node_id, secret) {
-            return Err(Status::unauthenticated("无效的nodeId或secret"));
+        if !config.verify_credentials(node_id, token) {
+            return Err(Status::unauthenticated("invalid node-id or secret"));
+        }
+
+        Ok(())
+    }
+
+    pub fn verify_admin_request<T>(request: &Request<T>) -> Result<(), Status> {
+        let metadata = request.metadata();
+
+        println!("verify_admin_request metadata:{:?}", metadata);
+
+        let node_id = metadata
+            .get("node-id")
+            .and_then(|v| v.to_str().ok())
+            .ok_or_else(|| Status::unauthenticated("missing node-id request header"))?;
+
+        let token = metadata
+            .get("token")
+            .and_then(|v| v.to_str().ok())
+            .ok_or_else(|| Status::unauthenticated("missing token request header"))?;
+
+        println!("token:{:?}", token);
+
+        // 获取配置并验证凭据
+        let api_node = ApiNode::instance()
+            .map_err(|e| Status::internal(format!("configuration loading failed: {}", e)))?;
+
+        let config = api_node.lock().unwrap();
+
+        if !config.verify_credentials(node_id, token) {
+            return Err(Status::unauthenticated("invalid node-id or token"));
         }
 
         Ok(())
