@@ -1,13 +1,13 @@
 use crate::config::api_node::ApiNode;
 use base64::{Engine as _, engine::general_purpose};
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use tonic::{Request, Status, metadata::MetadataValue};
 
 /// RPC认证中间件
 pub struct AuthMiddleware;
 
-#[derive(Serialize, Debug)]
-struct EncJsonData {
+#[derive(Serialize, Deserialize, Debug)]
+struct MetaDataHeader {
     timestamp: String,
     r#type: String,
     user_id: u16,
@@ -46,7 +46,7 @@ impl AuthMiddleware {
     pub fn verify_admin_request<T>(request: &Request<T>) -> Result<(), Status> {
         let metadata = request.metadata();
 
-        println!("verify_admin_request metadata:{:?}", metadata);
+        // println!("metadata:{:?}", metadata);
 
         let node_id = metadata
             .get("node-id")
@@ -58,14 +58,38 @@ impl AuthMiddleware {
             .and_then(|v| v.to_str().ok())
             .ok_or_else(|| Status::unauthenticated("missing token request header"))?;
 
-        println!("token:{:?}", token);
+        let token_base64_decode = general_purpose::STANDARD
+            .decode(&token)
+            .map_err(|e| Status::invalid_argument(format!("decode token failed: {}", e)))?;
 
-        // 获取配置并验证凭据
+        // 获取配置用于解密
         let api_node = ApiNode::instance()
             .map_err(|e| Status::internal(format!("configuration loading failed: {}", e)))?;
-
         let config = api_node.lock().unwrap();
 
+        // 使用AES解密
+        let cipher = crate::utils::aes::AesCfbCipher::new(256)
+            .map_err(|e| Status::internal(format!("aes cipher creation failed: {}", e)))?;
+        let decrypted_header = cipher
+            .decrypt(
+                config.secret.as_bytes(),
+                config.node_id.as_bytes(),
+                &token_base64_decode,
+            )
+            .map_err(|e| Status::invalid_argument(format!("decryption header failed: {}", e)))?;
+
+        let header_jstr = String::from_utf8(decrypted_header)
+            .map_err(|e| Status::invalid_argument(format!("header json utf8: {}", e)))?;
+        let header: MetaDataHeader = serde_json::from_str(&header_jstr)
+            .map_err(|e| Status::invalid_argument(format!("header json parse failed: {}", e)))?;
+        println!("header:{:?}", header);
+
+        // 验证 token 类型
+        if header.r#type != "admin" {
+            return Err(Status::unauthenticated("invalid token type"));
+        }
+
+        // 验证凭据
         if !config.verify_credentials(node_id, token) {
             return Err(Status::unauthenticated("invalid node-id or token"));
         }
@@ -86,7 +110,7 @@ impl AuthMiddleware {
             .as_secs()
             .to_string();
 
-        let args = &EncJsonData {
+        let args = &MetaDataHeader {
             timestamp: timestamp.clone(),
             r#type: "api".to_string(),
             user_id: 0,
@@ -133,7 +157,7 @@ impl AuthMiddleware {
             .as_secs()
             .to_string();
 
-        let args = &EncJsonData {
+        let args = &MetaDataHeader {
             timestamp: timestamp.clone(),
             r#type: "admin".to_string(),
             user_id: 0,
