@@ -31,9 +31,10 @@ impl CommonRpc {
     ) -> Result<Request<T>, Box<dyn std::error::Error>> {
         let mut request = Request::new(req);
 
+        let version = env!("CARGO_PKG_VERSION");
         request
             .metadata_mut()
-            .insert("client-version", MetadataValue::try_from("1.0.0")?);
+            .insert("client-version", MetadataValue::try_from(version)?);
 
         // 根据请求类型设置特定的 metadata
         match request_type {
