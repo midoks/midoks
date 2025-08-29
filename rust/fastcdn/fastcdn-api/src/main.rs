@@ -56,7 +56,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let result: Result<&str, Box<dyn std::error::Error>> = match &args.command {
         Some(Commands::Setup {}) => {
             let cmd_setup = setup::Setup::instance();
-            match cmd_setup::install().await {
+            match cmd_setup.install().await {
                 Ok(_) => Ok("setup completed successfully!"),
                 Err(e) => {
                     eprintln!("setup failed: {}", e);

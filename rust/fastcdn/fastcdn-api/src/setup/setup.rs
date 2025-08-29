@@ -94,7 +94,8 @@ impl Setup {
     }
 
     pub async fn install(&self) -> Result<(), Box<dyn std::error::Error>> {
-        self.install_db().await
+        self.install_db().await;
+        Ok(())
     }
 
     pub async fn install_db(&self) -> Result<(), Box<dyn std::error::Error>> {
