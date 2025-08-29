@@ -93,11 +93,11 @@ impl Setup {
         }
     }
 
-    pub async fn install() -> Result<(), Box<dyn std::error::Error>> {
-        Self::install_db().await
+    pub async fn install(&self) -> Result<(), Box<dyn std::error::Error>> {
+        self.install_db().await
     }
 
-    pub async fn install_db() -> Result<(), Box<dyn std::error::Error>> {
+    pub async fn install_db(&self) -> Result<(), Box<dyn std::error::Error>> {
         let install_embed_file =
             DbFiles::get("install.json").ok_or("install.json file not found")?;
         // 将字节数据转换为字符串
