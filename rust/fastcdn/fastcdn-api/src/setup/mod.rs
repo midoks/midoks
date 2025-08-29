@@ -1,3 +1,2 @@
 pub mod setup;
-
-pub use setup::install_db;
+pub use setup::Setup;

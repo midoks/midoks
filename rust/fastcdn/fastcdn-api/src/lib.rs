@@ -1,2 +1,1 @@
 //! FastCDN API库
-//!
