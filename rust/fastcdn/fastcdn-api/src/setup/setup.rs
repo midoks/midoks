@@ -95,7 +95,7 @@ impl Setup {
 
     pub async fn install(&self) -> Result<(), Box<dyn std::error::Error>> {
         // 初始化安装创建数据库
-        self.install_db().await;
+        self.install_db().await?;
         Ok(())
     }
 
