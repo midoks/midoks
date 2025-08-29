@@ -1,8 +1,8 @@
+use super::{load_default, load_from_file};
+use lazy_static::lazy_static;
 use serde::{Deserialize, Serialize};
 use std::path::Path;
 use std::sync::{Arc, Mutex};
-use lazy_static::lazy_static;
-use super::{load_from_file, load_default};
 
 /// 默认API节点配置文件路径
 const CONF_YAML: &str = "configs/api_node.yaml";
@@ -26,17 +26,18 @@ impl ApiNode {
     /// 获取单例实例
     pub fn instance() -> Result<Arc<Mutex<ApiNode>>, Box<dyn std::error::Error>> {
         let mut instance_guard = INSTANCE.lock().unwrap();
-        
+
         if instance_guard.is_none() {
             let api_node = Self::load_default()?;
-            api_node.validate()
+            api_node
+                .validate()
                 .map_err(|e| Box::new(std::io::Error::new(std::io::ErrorKind::InvalidData, e)))?;
-            
+
             // 创建真正的单例实例
             let shared_instance = Arc::new(Mutex::new(api_node));
             *instance_guard = Some(shared_instance.clone());
         }
-        
+
         // 返回共享的实例
         Ok(instance_guard.as_ref().unwrap().clone())
     }
@@ -44,9 +45,10 @@ impl ApiNode {
     /// 重新加载配置（更新单例实例）
     pub fn reload() -> Result<(), Box<dyn std::error::Error>> {
         let new_api_node = Self::load_default()?;
-        new_api_node.validate()
+        new_api_node
+            .validate()
             .map_err(|e| Box::new(std::io::Error::new(std::io::ErrorKind::InvalidData, e)))?;
-        
+
         let mut instance_guard = INSTANCE.lock().unwrap();
         if let Some(ref shared_instance) = *instance_guard {
             // 更新现有实例的内容

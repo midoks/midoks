@@ -52,7 +52,7 @@ impl<T> BaseClient<T> {
 
     /// 为请求添加认证头
     pub fn add_auth_headers<R>(&self, request: Request<R>) -> Result<Request<R>, Box<dyn Error>> {
-        AuthMiddleware::add_auth_headers(request).map_err(|e| Box::new(e) as Box<dyn Error>)
+        AuthMiddleware::add_header_api(request).map_err(|e| Box::new(e) as Box<dyn Error>)
     }
 }
 
@@ -93,7 +93,7 @@ macro_rules! impl_base_rpc_client {
                 &self,
                 request: tonic::Request<R>,
             ) -> Result<tonic::Request<R>, Box<dyn std::error::Error>> {
-                crate::rpc::auth::AuthMiddleware::add_auth_headers(request)
+                crate::rpc::auth::AuthMiddleware::add_header_api(request)
                     .map_err(|e| Box::new(e) as Box<dyn std::error::Error>)
             }
         }

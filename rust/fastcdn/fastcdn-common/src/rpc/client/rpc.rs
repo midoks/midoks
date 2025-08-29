@@ -6,7 +6,7 @@ use tonic::codegen::*;
 use tonic::transport::Channel;
 use tonic::{Request, metadata::MetadataValue};
 
-pub struct Rpc {
+pub struct CommonRpc {
     channel: Channel,
 }
 
@@ -20,7 +20,7 @@ pub enum RequestAuth {
 impl CommonRpc {
     pub async fn connect(addr: &str) -> Result<Self, Box<dyn std::error::Error>> {
         let channel = Channel::from_shared(addr.to_string())?.connect().await?;
-        Ok(Rpc { channel })
+        Ok(CommonRpc { channel })
     }
 
     /// 统一的 metadata 处理方法
@@ -43,7 +43,7 @@ impl CommonRpc {
             }
             RequestAuth::API => {
                 // api metadata
-                request = AuthMiddleware::add_header_admin(request)?;
+                request = AuthMiddleware::add_header_api(request)?;
             }
             RequestAuth::Other => {
                 // 其他请求类型的 metadata

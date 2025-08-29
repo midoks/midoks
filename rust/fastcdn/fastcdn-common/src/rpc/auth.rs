@@ -14,7 +14,7 @@ impl AuthMiddleware {
         let node_id = metadata
             .get("node-id")
             .and_then(|v| v.to_str().ok())
-            .ok_or_else(|| Status::unauthenticated("缺少node-id2请求头"))?;
+            .ok_or_else(|| Status::unauthenticated("缺少node-id请求头"))?;
 
         let secret = metadata
             .get("secret")
