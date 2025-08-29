@@ -41,10 +41,16 @@ impl CommonRpc {
             RequestAuth::ADMIN => {
                 // 管理员 metadata
                 request = AuthMiddleware::add_header_admin(request)?;
+                request
+                    .metadata_mut()
+                    .insert("client-id", MetadataValue::try_from("fastcdn-admin")?);
             }
             RequestAuth::API => {
                 // api metadata
                 request = AuthMiddleware::add_header_api(request)?;
+                request
+                    .metadata_mut()
+                    .insert("client-id", MetadataValue::try_from("fastcdn-api")?);
             }
             RequestAuth::Other => {
                 // 其他请求类型的 metadata
@@ -52,27 +58,22 @@ impl CommonRpc {
             }
         }
 
-        // 添加通用的 metadata
-        let mut final_request = request;
         let timestamp = std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
             .unwrap()
             .as_secs()
             .to_string();
-        final_request
+        request
             .metadata_mut()
             .insert("timestamp", MetadataValue::try_from(&timestamp)?);
-        final_request
-            .metadata_mut()
-            .insert("client-id", MetadataValue::try_from("fastcdn-client")?);
 
         println!(
             "准备请求 - 类型: {:?}, metadata: {:?}",
             request_type,
-            final_request.metadata()
+            request.metadata()
         );
 
-        Ok(final_request)
+        Ok(request)
     }
 
     /// 统一的 gRPC 调用方法
