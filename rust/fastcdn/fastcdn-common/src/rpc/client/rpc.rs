@@ -36,6 +36,15 @@ impl CommonRpc {
             .metadata_mut()
             .insert("client-version", MetadataValue::try_from(version)?);
 
+        let timestamp = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_secs()
+            .to_string();
+        request
+            .metadata_mut()
+            .insert("timestamp", MetadataValue::try_from(&timestamp)?);
+
         // 根据请求类型设置特定的 metadata
         match request_type {
             RequestAuth::ADMIN => {
@@ -57,15 +66,6 @@ impl CommonRpc {
                 request = AuthMiddleware::add_header_admin(request)?;
             }
         }
-
-        let timestamp = std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .unwrap()
-            .as_secs()
-            .to_string();
-        request
-            .metadata_mut()
-            .insert("timestamp", MetadataValue::try_from(&timestamp)?);
 
         println!(
             "准备请求 - 类型: {:?}, metadata: {:?}",
