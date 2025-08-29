@@ -58,7 +58,7 @@ impl AuthMiddleware {
             .and_then(|v| v.to_str().ok())
             .ok_or_else(|| Status::unauthenticated("missing token request header"))?;
 
-        let token_base64_decode = general_purpose::STANDARD
+        let header_token = general_purpose::STANDARD
             .decode(&token)
             .map_err(|e| Status::invalid_argument(format!("decode token failed: {}", e)))?;
 
@@ -74,7 +74,7 @@ impl AuthMiddleware {
             .decrypt(
                 config.secret.as_bytes(),
                 config.node_id.as_bytes(),
-                &token_base64_decode,
+                &header_token,
             )
             .map_err(|e| Status::invalid_argument(format!("decryption header failed: {}", e)))?;
 
