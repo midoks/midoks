@@ -22,10 +22,10 @@ impl AuthMiddleware {
             .ok_or_else(|| Status::unauthenticated("缺少secret请求头"))?;
 
         // 获取配置并验证凭据
-        let api_node_config =
-            ApiNode::instance().map_err(|e| Status::internal(format!("配置加载失败: {}", e)))?;
+        let api_node = ApiNode::instance()
+            .map_err(|e| Status::internal(format!("configuration loading failed: {}", e)))?;
 
-        let config = api_node_config.lock().unwrap();
+        let config = api_node.lock().unwrap();
 
         if !config.verify_credentials(node_id, secret) {
             return Err(Status::unauthenticated("无效的nodeId或secret"));
@@ -36,8 +36,8 @@ impl AuthMiddleware {
 
     /// 为客户端请求添加认证头
     pub fn add_header_api<T>(mut request: Request<T>) -> Result<Request<T>, Status> {
-        let api_node_config =
-            ApiNode::instance().map_err(|e| Status::internal(format!("配置加载失败: {}", e)))?;
+        let api_node_config = ApiNode::instance()
+            .map_err(|e| Status::internal(format!("configuration loading failed: {}", e)))?;
 
         let config = api_node_config.lock().unwrap();
 
@@ -58,8 +58,8 @@ impl AuthMiddleware {
 
     /// 添加管理员请求头信息
     pub fn add_header_admin<T>(mut request: Request<T>) -> Result<Request<T>, Status> {
-        let api_node =
-            ApiNode::instance().map_err(|e| Status::internal(format!("配置加载失败: {}", e)))?;
+        let api_node = ApiNode::instance()
+            .map_err(|e| Status::internal(format!("configuration loading failed: {}", e)))?;
 
         let config = api_node.lock().unwrap();
 
