@@ -108,7 +108,7 @@ impl Setup {
     }
     pub async fn check_admin_node(&self) -> Result<(), Box<dyn std::error::Error>> {
         let db = pool::Manager::instance().await?;
-        // 使用新的查询构建器API，更加清晰易读
+
         let query = db
             .query_builder("api_tokens")
             .select(&["id", "node_id", "secret", "role"])
