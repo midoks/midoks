@@ -1,7 +1,7 @@
 use rand::Rng;
 
-const hexChars          = "0123456789abcdef";
-cons hexCharsLength    = hexChars.len();
+const hexChars: &str = "0123456789abcdef";
+const hexCharsLength: usize = hexChars.len();
 
 const letterChars       = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 const letterCharsLength = letterChars.len();
