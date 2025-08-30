@@ -113,39 +113,31 @@ impl Setup {
             .query_builder("api_tokens")
             .select(&["id", "node_id", "secret", "role"])
             .where_eq("role", "admin");
+        let token_row = db.query(query).await?;
+        if token_row.len() == 0 {
+            let node_id = fastcdn_common::utils::rand::hex_string(32);
+            let secret = fastcdn_common::utils::rand::string(32);
+            println!("{:?}", node_id);
+            println!("{:?}", secret);
 
-        match db.query(query).await {
-            Ok(tokens) => {
-                if tokens.len() == 0 {
-                    let node_id = fastcdn_common::utils::rand::hex_string(32);
-                    let secret = fastcdn_common::utils::rand::string(32);
-                    println!("{:?}", node_id);
-                    println!("{:?}", secret);
+            let mut data = std::collections::HashMap::new();
+            data.insert("node_id".to_string(), serde_json::Value::String(node_id));
+            data.insert("secret".to_string(), serde_json::Value::String(secret));
+            data.insert(
+                "role".to_string(),
+                serde_json::Value::String("admin".to_string()),
+            );
 
-                    let mut data = std::collections::HashMap::new();
-                    data.insert("node_id".to_string(), serde_json::Value::String(node_id));
-                    data.insert("secret".to_string(), serde_json::Value::String(secret));
-                    data.insert(
-                        "role".to_string(),
-                        serde_json::Value::String("admin".to_string()),
-                    );
-
-                    match db.insert("fastcdn_api_tokens", &data).await {
-                        Ok(id) => {
-                            println!("insert token success, id: {}", id);
-                        }
-                        Err(e) => {
-                            println!("insert token fail: {:?}", e);
-                        }
-                    }
+            match db.insert("fastcdn_api_tokens", &data).await {
+                Ok(id) => {
+                    println!("insert token success, id: {}", id);
                 }
-                println!("tokens: {:?}", tokens);
-            }
-            Err(e) => {
-                println!("select tokens fail: {:?}", e);
+                Err(e) => {
+                    return Err(e);
+                }
             }
         }
-
+        println!("token_row: {:?}", token_row);
         Ok(())
     }
 
