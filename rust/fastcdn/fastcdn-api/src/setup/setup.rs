@@ -205,57 +205,6 @@ impl Setup {
         Ok(())
     }
 
-    pub async fn check_admin_node_bk(&self) -> Result<(), Box<dyn std::error::Error>> {
-        match pool::Manager::instance().await {
-            Ok(db) => {
-                println!("db: {:?}", db);
-
-                // 使用新的查询构建器API，更加清晰易读
-                let query = db
-                    .query_builder("fastcdn_api_tokens")
-                    .select(&["id", "node_id", "secret", "role"])
-                    .where_eq("role", "admin");
-
-                match db.query(query).await {
-                    Ok(tokens) => {
-                        if tokens.len() == 0 {
-                            let node_id = fastcdn_common::utils::rand::hex_string(32);
-                            let secret = fastcdn_common::utils::rand::string(32);
-                            println!("{:?}", node_id);
-                            println!("{:?}", secret);
-
-                            let mut data = std::collections::HashMap::new();
-                            data.insert("node_id".to_string(), serde_json::Value::String(node_id));
-                            data.insert("secret".to_string(), serde_json::Value::String(secret));
-                            data.insert(
-                                "role".to_string(),
-                                serde_json::Value::String("admin".to_string()),
-                            );
-
-                            match db.insert("fastcdn_api_tokens", &data).await {
-                                Ok(id) => {
-                                    println!("insert token success, id: {}", id);
-                                }
-                                Err(e) => {
-                                    println!("insert token fail: {:?}", e);
-                                }
-                            }
-                        }
-                        println!("tokens: {:?}", tokens);
-                    }
-                    Err(e) => {
-                        println!("select tokens fail: {:?}", e);
-                    }
-                }
-            }
-            Err(e) => {
-                println!("db manager fail: {:?}", e);
-            }
-        }
-
-        Ok(())
-    }
-
     pub async fn install_db(&self) -> Result<(), Box<dyn std::error::Error>> {
         let install_embed_file =
             DbFiles::get("install.json").ok_or("install.json file not found")?;
