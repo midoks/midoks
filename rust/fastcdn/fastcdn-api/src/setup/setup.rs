@@ -103,10 +103,10 @@ impl Setup {
     }
 
     pub async fn check_data(&self) -> Result<(), Box<dyn std::error::Error>> {
-        self.check_admin_node2().await?;
+        self.check_admin_node().await?;
         Ok(())
     }
-    pub async fn check_admin_node2(&self) -> Result<(), Box<dyn std::error::Error>> {
+    pub async fn check_admin_node(&self) -> Result<(), Box<dyn std::error::Error>> {
         let db = pool::Manager::instance().await?;
         // 使用新的查询构建器API，更加清晰易读
         let query = db
@@ -117,8 +117,8 @@ impl Setup {
         if token_row.len() == 0 {
             let node_id = fastcdn_common::utils::rand::hex_string(32);
             let secret = fastcdn_common::utils::rand::string(32);
-            println!("{:?}", node_id);
-            println!("{:?}", secret);
+            // println!("{:?}", node_id);
+            // println!("{:?}", secret);
 
             let mut data = std::collections::HashMap::new();
             data.insert("node_id".to_string(), serde_json::Value::String(node_id));
@@ -128,20 +128,19 @@ impl Setup {
                 serde_json::Value::String("admin".to_string()),
             );
 
-            match db.insert("fastcdn_api_tokens", &data).await {
-                Ok(id) => {
-                    println!("insert token success, id: {}", id);
+            match db.insert("api_tokens", &data).await {
+                Ok(_id) => {
+                    return Ok(());
                 }
                 Err(e) => {
                     return Err(e);
                 }
             }
         }
-        println!("token_row: {:?}", token_row);
         Ok(())
     }
 
-    pub async fn check_admin_node(&self) -> Result<(), Box<dyn std::error::Error>> {
+    pub async fn check_admin_node_bk(&self) -> Result<(), Box<dyn std::error::Error>> {
         match pool::Manager::instance().await {
             Ok(db) => {
                 println!("db: {:?}", db);
