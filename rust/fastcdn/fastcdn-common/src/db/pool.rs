@@ -1,10 +1,10 @@
 use crate::config::ConfigDb;
+use crate::db::query_builder::{DeleteBuilder, InsertBuilder, QueryBuilder, UpdateBuilder};
 use lazy_static::lazy_static;
 use serde_json::Value;
 use sqlx::{Column, MySqlPool, Row, TypeInfo};
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
-use crate::db::query_builder::{QueryBuilder, InsertBuilder, UpdateBuilder, DeleteBuilder};
 
 lazy_static! {
     static ref INSTANCE: Arc<Mutex<Option<Arc<Manager>>>> = Arc::new(Mutex::new(None));
@@ -39,7 +39,7 @@ impl Manager {
         let pool = MySqlPool::connect(&database_url).await?;
         let manager = Arc::new(Manager {
             pool: Arc::new(pool),
-            table_prefix: String::new(), // 默认无前缀
+            table_prefix: "fastcdn_".to_string(),
         });
 
         {
@@ -75,13 +75,6 @@ impl Manager {
     /// 获取数据库连接池
     pub fn get_pool(&self) -> Arc<MySqlPool> {
         self.pool.clone()
-    }
-
-    /// 设置表前缀
-    pub fn set_table_prefix(&self, prefix: &str) {
-        // 注意：由于Manager被包装在Arc中，无法直接修改
-        // 建议使用with_prefix方法创建新实例
-        panic!("Cannot modify Arc<Manager> directly. Use with_prefix() instead.");
     }
 
     /// 获取表前缀
@@ -439,10 +432,13 @@ impl Manager {
     // ========== 查询构建器方法 ==========
 
     /// 使用查询构建器进行查询
-    pub async fn query(&self, builder: QueryBuilder) -> Result<Vec<Value>, Box<dyn std::error::Error>> {
+    pub async fn query(
+        &self,
+        builder: QueryBuilder,
+    ) -> Result<Vec<Value>, Box<dyn std::error::Error>> {
         let sql = builder.build_sql();
         let params = builder.get_params();
-        
+
         let mut query = sqlx::query(&sql);
         for param in params {
             query = query.bind(param);
@@ -476,7 +472,10 @@ impl Manager {
                     }
                     "FLOAT" | "DOUBLE" | "DECIMAL" => {
                         if let Ok(val) = row.try_get::<f64, _>(i) {
-                            Value::Number(serde_json::Number::from_f64(val).unwrap_or(serde_json::Number::from(0)))
+                            Value::Number(
+                                serde_json::Number::from_f64(val)
+                                    .unwrap_or(serde_json::Number::from(0)),
+                            )
                         } else {
                             Value::Null
                         }
@@ -497,29 +496,41 @@ impl Manager {
     }
 
     /// 使用插入构建器进行插入
-    pub async fn insert_with_builder(&self, builder: InsertBuilder) -> Result<u64, Box<dyn std::error::Error>> {
+    pub async fn insert_with_builder(
+        &self,
+        builder: InsertBuilder,
+    ) -> Result<u64, Box<dyn std::error::Error>> {
         self.insert(builder.get_table(), builder.get_data()).await
     }
 
     /// 使用更新构建器进行更新
-    pub async fn update_with_builder(&self, builder: UpdateBuilder) -> Result<u64, Box<dyn std::error::Error>> {
+    pub async fn update_with_builder(
+        &self,
+        builder: UpdateBuilder,
+    ) -> Result<u64, Box<dyn std::error::Error>> {
         let data_json = Value::Object(
-            builder.get_data().iter()
+            builder
+                .get_data()
+                .iter()
                 .map(|(k, v)| (k.clone(), v.clone()))
-                .collect()
+                .collect(),
         );
-        
+
         let condition = builder.get_conditions();
         let params: Vec<&str> = builder.get_params().iter().map(|s| s.as_str()).collect();
-        
-        self.update(builder.get_table(), &data_json, &condition, &params).await
+
+        self.update(builder.get_table(), &data_json, &condition, &params)
+            .await
     }
 
     /// 使用删除构建器进行删除
-    pub async fn delete_with_builder(&self, builder: DeleteBuilder) -> Result<u64, Box<dyn std::error::Error>> {
+    pub async fn delete_with_builder(
+        &self,
+        builder: DeleteBuilder,
+    ) -> Result<u64, Box<dyn std::error::Error>> {
         let condition = builder.get_conditions();
         let params: Vec<&str> = builder.get_params().iter().map(|s| s.as_str()).collect();
-        
+
         self.delete(builder.get_table(), &condition, &params).await
     }
 
