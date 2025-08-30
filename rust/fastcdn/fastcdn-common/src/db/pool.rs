@@ -4,6 +4,7 @@ use serde_json::Value;
 use sqlx::{Column, MySqlPool, Row, TypeInfo};
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
+use crate::db::query_builder::{QueryBuilder, InsertBuilder, UpdateBuilder, DeleteBuilder};
 
 lazy_static! {
     static ref INSTANCE: Arc<Mutex<Option<Arc<Manager>>>> = Arc::new(Mutex::new(None));
@@ -12,6 +13,7 @@ lazy_static! {
 #[derive(Debug)]
 pub struct Manager {
     pub pool: Arc<MySqlPool>,
+    pub table_prefix: String,
 }
 
 impl Manager {
@@ -37,6 +39,7 @@ impl Manager {
         let pool = MySqlPool::connect(&database_url).await?;
         let manager = Arc::new(Manager {
             pool: Arc::new(pool),
+            table_prefix: String::new(), // 默认无前缀
         });
 
         {
@@ -65,12 +68,42 @@ impl Manager {
         println!("✓ 数据库连接成功");
         Ok(Manager {
             pool: Arc::new(pool),
+            table_prefix: String::new(), // 默认无前缀
         })
     }
 
     /// 获取数据库连接池
     pub fn get_pool(&self) -> Arc<MySqlPool> {
         self.pool.clone()
+    }
+
+    /// 设置表前缀
+    pub fn set_table_prefix(&self, prefix: &str) {
+        // 注意：由于Manager被包装在Arc中，无法直接修改
+        // 建议使用with_prefix方法创建新实例
+        panic!("Cannot modify Arc<Manager> directly. Use with_prefix() instead.");
+    }
+
+    /// 获取表前缀
+    pub fn get_table_prefix(&self) -> &str {
+        &self.table_prefix
+    }
+
+    /// 获取带前缀的表名
+    pub fn get_table_name(&self, table: &str) -> String {
+        if self.table_prefix.is_empty() {
+            table.to_string()
+        } else {
+            format!("{}{}", self.table_prefix, table)
+        }
+    }
+
+    /// 创建带指定前缀的新Manager实例
+    pub fn with_prefix(&self, prefix: &str) -> Manager {
+        Manager {
+            pool: self.pool.clone(),
+            table_prefix: prefix.to_string(),
+        }
     }
 
     /// 测试数据库连接
@@ -115,12 +148,13 @@ impl Manager {
         table: &str,
         data: &HashMap<String, Value>,
     ) -> Result<u64, Box<dyn std::error::Error>> {
+        let table_name = self.get_table_name(table);
         let columns: Vec<String> = data.keys().cloned().collect();
         let placeholders: Vec<String> = (0..columns.len()).map(|_| "?".to_string()).collect();
 
         let sql = format!(
             "INSERT INTO {} ({}) VALUES ({})",
-            table,
+            table_name,
             columns.join(", "),
             placeholders.join(", ")
         );
@@ -165,6 +199,7 @@ impl Manager {
         condition: Option<&str>,
         params: Option<&[&str]>, // 简化为字符串切片
     ) -> Result<Vec<Value>, Box<dyn std::error::Error>> {
+        let table_name = self.get_table_name(table);
         let cols = columns
             .map(|c| c.join(", "))
             .unwrap_or_else(|| "*".to_string());
@@ -172,7 +207,7 @@ impl Manager {
             .map(|c| format!(" WHERE {}", c))
             .unwrap_or_default();
 
-        let sql = format!("SELECT {} FROM {}{}", cols, table, where_clause);
+        let sql = format!("SELECT {} FROM {}{}", cols, table_name, where_clause);
         println!("select:{:?}", sql);
         let mut query = sqlx::query(&sql);
 
@@ -274,12 +309,13 @@ impl Manager {
         condition: &str,
         condition_params: &[&str],
     ) -> Result<u64, Box<dyn std::error::Error>> {
+        let table_name = self.get_table_name(table);
         if let Value::Object(map) = data {
             let set_clauses: Vec<String> = map.keys().map(|k| format!("{} = ?", k)).collect();
 
             let sql = format!(
                 "UPDATE {} SET {} WHERE {}",
-                table,
+                table_name,
                 set_clauses.join(", "),
                 condition
             );
@@ -340,7 +376,8 @@ impl Manager {
         condition: &str,
         params: &[&str],
     ) -> Result<u64, Box<dyn std::error::Error>> {
-        let sql = format!("DELETE FROM {} WHERE {}", table, condition);
+        let table_name = self.get_table_name(table);
+        let sql = format!("DELETE FROM {} WHERE {}", table_name, condition);
 
         let mut query = sqlx::query(&sql);
 
@@ -368,10 +405,11 @@ impl Manager {
         table: &str,
         condition: Option<&str>,
     ) -> Result<i64, Box<dyn std::error::Error>> {
+        let table_name = self.get_table_name(table);
         let where_clause = condition
             .map(|c| format!(" WHERE {}", c))
             .unwrap_or_default();
-        let sql = format!("SELECT COUNT(*) FROM {}{}", table, where_clause);
+        let sql = format!("SELECT COUNT(*) FROM {}{}", table_name, where_clause);
 
         let row: (i64,) = sqlx::query_as(&sql).fetch_one(self.pool.as_ref()).await?;
 
@@ -396,5 +434,116 @@ impl Manager {
 
         let result = query.fetch_optional(self.pool.as_ref()).await?;
         Ok(result.is_some())
+    }
+
+    // ========== 查询构建器方法 ==========
+
+    /// 使用查询构建器进行查询
+    pub async fn query(&self, builder: QueryBuilder) -> Result<Vec<Value>, Box<dyn std::error::Error>> {
+        let sql = builder.build_sql();
+        let params = builder.get_params();
+        
+        let mut query = sqlx::query(&sql);
+        for param in params {
+            query = query.bind(param);
+        }
+        let rows = query.fetch_all(&*self.pool).await?;
+
+        let mut results = Vec::new();
+        for row in rows {
+            let mut obj = serde_json::Map::new();
+            for (i, column) in row.columns().iter().enumerate() {
+                let column_name = column.name();
+                let type_info = column.type_info();
+                let type_name = type_info.name();
+
+                let value = match type_name {
+                    "INT" | "BIGINT" | "SMALLINT" | "TINYINT" | "BIGINT UNSIGNED" => {
+                        if let Ok(val) = row.try_get::<u64, _>(i) {
+                            Value::Number(serde_json::Number::from(val))
+                        } else if let Ok(val) = row.try_get::<i64, _>(i) {
+                            Value::Number(serde_json::Number::from(val))
+                        } else {
+                            Value::Null
+                        }
+                    }
+                    "BOOLEAN" | "TINYINT UNSIGNED" => {
+                        if let Ok(val) = row.try_get::<bool, _>(i) {
+                            Value::Bool(val)
+                        } else {
+                            Value::Null
+                        }
+                    }
+                    "FLOAT" | "DOUBLE" | "DECIMAL" => {
+                        if let Ok(val) = row.try_get::<f64, _>(i) {
+                            Value::Number(serde_json::Number::from_f64(val).unwrap_or(serde_json::Number::from(0)))
+                        } else {
+                            Value::Null
+                        }
+                    }
+                    _ => {
+                        if let Ok(val) = row.try_get::<String, _>(i) {
+                            Value::String(val)
+                        } else {
+                            Value::Null
+                        }
+                    }
+                };
+                obj.insert(column_name.to_string(), value);
+            }
+            results.push(Value::Object(obj));
+        }
+        Ok(results)
+    }
+
+    /// 使用插入构建器进行插入
+    pub async fn insert_with_builder(&self, builder: InsertBuilder) -> Result<u64, Box<dyn std::error::Error>> {
+        self.insert(builder.get_table(), builder.get_data()).await
+    }
+
+    /// 使用更新构建器进行更新
+    pub async fn update_with_builder(&self, builder: UpdateBuilder) -> Result<u64, Box<dyn std::error::Error>> {
+        let data_json = Value::Object(
+            builder.get_data().iter()
+                .map(|(k, v)| (k.clone(), v.clone()))
+                .collect()
+        );
+        
+        let condition = builder.get_conditions();
+        let params: Vec<&str> = builder.get_params().iter().map(|s| s.as_str()).collect();
+        
+        self.update(builder.get_table(), &data_json, &condition, &params).await
+    }
+
+    /// 使用删除构建器进行删除
+    pub async fn delete_with_builder(&self, builder: DeleteBuilder) -> Result<u64, Box<dyn std::error::Error>> {
+        let condition = builder.get_conditions();
+        let params: Vec<&str> = builder.get_params().iter().map(|s| s.as_str()).collect();
+        
+        self.delete(builder.get_table(), &condition, &params).await
+    }
+
+    /// 创建查询构建器
+    pub fn query_builder(&self, table: &str) -> QueryBuilder {
+        let table_name = self.get_table_name(table);
+        QueryBuilder::new(&table_name)
+    }
+
+    /// 创建插入构建器
+    pub fn insert_builder(&self, table: &str) -> InsertBuilder {
+        let table_name = self.get_table_name(table);
+        InsertBuilder::new(&table_name)
+    }
+
+    /// 创建更新构建器
+    pub fn update_builder(&self, table: &str) -> UpdateBuilder {
+        let table_name = self.get_table_name(table);
+        UpdateBuilder::new(&table_name)
+    }
+
+    /// 创建删除构建器
+    pub fn delete_builder(&self, table: &str) -> DeleteBuilder {
+        let table_name = self.get_table_name(table);
+        DeleteBuilder::new(&table_name)
     }
 }

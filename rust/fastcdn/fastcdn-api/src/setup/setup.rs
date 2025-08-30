@@ -103,7 +103,53 @@ impl Setup {
     }
 
     pub async fn check_data(&self) -> Result<(), Box<dyn std::error::Error>> {
-        self.check_admin_node().await?;
+        self.check_admin_node2().await?;
+        Ok(())
+    }
+    pub async fn check_admin_node2(&self) -> Result<(), Box<dyn std::error::Error>> {
+        let mut db = pool::Manager::instance().await?;
+        println!("db: {:?}", db);
+        db = db.with_prefix("fastcdn_").into();
+        println!("db2: {:?}", db);
+
+        // 使用新的查询构建器API，更加清晰易读
+        let query = db
+            .query_builder("api_tokens")
+            .select(&["id", "node_id", "secret", "role"])
+            .where_eq("role", "admin");
+
+        match db.query(query).await {
+            Ok(tokens) => {
+                if tokens.len() == 0 {
+                    let node_id = fastcdn_common::utils::rand::hex_string(32);
+                    let secret = fastcdn_common::utils::rand::string(32);
+                    println!("{:?}", node_id);
+                    println!("{:?}", secret);
+
+                    let mut data = std::collections::HashMap::new();
+                    data.insert("node_id".to_string(), serde_json::Value::String(node_id));
+                    data.insert("secret".to_string(), serde_json::Value::String(secret));
+                    data.insert(
+                        "role".to_string(),
+                        serde_json::Value::String("admin".to_string()),
+                    );
+
+                    match db.insert("fastcdn_api_tokens", &data).await {
+                        Ok(id) => {
+                            println!("insert token success, id: {}", id);
+                        }
+                        Err(e) => {
+                            println!("insert token fail: {:?}", e);
+                        }
+                    }
+                }
+                println!("tokens: {:?}", tokens);
+            }
+            Err(e) => {
+                println!("select tokens fail: {:?}", e);
+            }
+        }
+
         Ok(())
     }
 
@@ -112,15 +158,13 @@ impl Setup {
             Ok(db) => {
                 println!("db: {:?}", db);
 
-                match db
-                    .select(
-                        "fastcdn_api_tokens",
-                        Some(&["id,node_id,secret,role"]),
-                        Some("role='admin'"),
-                        Some(&[]),
-                    )
-                    .await
-                {
+                // 使用新的查询构建器API，更加清晰易读
+                let query = db
+                    .query_builder("fastcdn_api_tokens")
+                    .select(&["id", "node_id", "secret", "role"])
+                    .where_eq("role", "admin");
+
+                match db.query(query).await {
                     Ok(tokens) => {
                         if tokens.len() == 0 {
                             let node_id = fastcdn_common::utils::rand::hex_string(32);
