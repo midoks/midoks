@@ -104,8 +104,11 @@ impl Setup {
 
     pub async fn check_data(&self) -> Result<(), Box<dyn std::error::Error>> {
         self.check_admin_node().await?;
+        self.check_user_node().await?;
+        self.check_cluster().await?;
         Ok(())
     }
+
     pub async fn check_admin_node(&self) -> Result<(), Box<dyn std::error::Error>> {
         let db = pool::Manager::instance().await?;
 
@@ -124,6 +127,70 @@ impl Setup {
             data.insert(
                 "role".to_string(),
                 serde_json::Value::String("admin".to_string()),
+            );
+
+            match db.insert("api_tokens", &data).await {
+                Ok(_id) => {
+                    return Ok(());
+                }
+                Err(e) => {
+                    return Err(e);
+                }
+            }
+        }
+        Ok(())
+    }
+
+    pub async fn check_user_node(&self) -> Result<(), Box<dyn std::error::Error>> {
+        let db = pool::Manager::instance().await?;
+
+        let query = db
+            .query_builder("api_tokens")
+            .select(&["id", "node_id", "secret", "role"])
+            .where_eq("role", "user");
+        let token_row = db.query(query).await?;
+        if token_row.len() == 0 {
+            let node_id = fastcdn_common::utils::rand::hex_string(32);
+            let secret = fastcdn_common::utils::rand::string(32);
+
+            let mut data = std::collections::HashMap::new();
+            data.insert("node_id".to_string(), serde_json::Value::String(node_id));
+            data.insert("secret".to_string(), serde_json::Value::String(secret));
+            data.insert(
+                "role".to_string(),
+                serde_json::Value::String("user".to_string()),
+            );
+
+            match db.insert("api_tokens", &data).await {
+                Ok(_id) => {
+                    return Ok(());
+                }
+                Err(e) => {
+                    return Err(e);
+                }
+            }
+        }
+        Ok(())
+    }
+
+    pub async fn check_cluster(&self) -> Result<(), Box<dyn std::error::Error>> {
+        let db = pool::Manager::instance().await?;
+
+        let query = db
+            .query_builder("api_tokens")
+            .select(&["id", "node_id", "secret", "role"])
+            .where_eq("role", "cluster");
+        let token_row = db.query(query).await?;
+        if token_row.len() == 0 {
+            let node_id = fastcdn_common::utils::rand::hex_string(32);
+            let secret = fastcdn_common::utils::rand::string(32);
+
+            let mut data = std::collections::HashMap::new();
+            data.insert("node_id".to_string(), serde_json::Value::String(node_id));
+            data.insert("secret".to_string(), serde_json::Value::String(secret));
+            data.insert(
+                "role".to_string(),
+                serde_json::Value::String("cluster".to_string()),
             );
 
             match db.insert("api_tokens", &data).await {
