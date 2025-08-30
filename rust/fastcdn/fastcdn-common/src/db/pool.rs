@@ -173,7 +173,7 @@ impl Manager {
             .unwrap_or_default();
 
         let sql = format!("SELECT {} FROM {}{}", cols, table, where_clause);
-
+        println!("select:{:?}", sql);
         let mut query = sqlx::query(&sql);
 
         // 绑定参数
@@ -393,6 +393,3 @@ impl Manager {
         Ok(result.is_some())
     }
 }
-
-// 移除或注释掉未使用的导入
-// use serde::{Deserialize, Serialize}; // 如果确实不需要，可以删除这行

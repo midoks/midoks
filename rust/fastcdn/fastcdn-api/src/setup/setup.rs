@@ -1,4 +1,6 @@
 use fastcdn_common::db::dump::TableInfo;
+use fastcdn_common::db::pool;
+
 use lazy_static::lazy_static;
 use rust_embed::RustEmbed;
 use serde::{Deserialize, Serialize};
@@ -106,11 +108,55 @@ impl Setup {
     }
 
     pub async fn check_admin_node(&self) -> Result<(), Box<dyn std::error::Error>> {
-        let node_id = fastcdn_common::utils::rand::hex_string(32);
-        let secret = fastcdn_common::utils::rand::string(32);
+        match pool::Manager::instance().await {
+            Ok(db) => {
+                println!("db: {:?}", db);
 
-        println!("{:?}", node_id);
-        println!("{:?}", secret);
+                match db
+                    .select(
+                        "fastcdn_api_tokens",
+                        None, //Some(&["id,node_id,select,role"])
+                        Some("role='admin'"),
+                        Some(&[]),
+                    )
+                    .await
+                {
+                    Ok(tokens) => {
+                        if tokens.len() == 0 {
+                            let node_id = fastcdn_common::utils::rand::hex_string(32);
+                            let secret = fastcdn_common::utils::rand::string(32);
+                            println!("{:?}", node_id);
+                            println!("{:?}", secret);
+
+                            let mut data = std::collections::HashMap::new();
+                            data.insert("node_id".to_string(), serde_json::Value::String(node_id));
+                            data.insert("secret".to_string(), serde_json::Value::String(secret));
+                            data.insert(
+                                "role".to_string(),
+                                serde_json::Value::String("admin".to_string()),
+                            );
+
+                            match db.insert("fastcdn_api_tokens", &data).await {
+                                Ok(id) => {
+                                    println!("insert token success, id: {}", id);
+                                }
+                                Err(e) => {
+                                    println!("insert token fail: {:?}", e);
+                                }
+                            }
+                        }
+                        println!("tokens: {:?}", tokens);
+                    }
+                    Err(e) => {
+                        println!("select tokens fail: {:?}", e);
+                    }
+                }
+            }
+            Err(e) => {
+                println!("db manager fail: {:?}", e);
+            }
+        }
+
         Ok(())
     }
 
