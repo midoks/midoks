@@ -117,8 +117,6 @@ impl Setup {
         if token_row.len() == 0 {
             let node_id = fastcdn_common::utils::rand::hex_string(32);
             let secret = fastcdn_common::utils::rand::string(32);
-            // println!("{:?}", node_id);
-            // println!("{:?}", secret);
 
             let mut data = std::collections::HashMap::new();
             data.insert("node_id".to_string(), serde_json::Value::String(node_id));
