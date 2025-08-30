@@ -199,10 +199,15 @@ impl Manager {
                         let val: Option<String> = row.try_get(i).unwrap_or(None);
                         val.map(Value::String).unwrap_or(Value::Null)
                     }
-                    "INT" | "BIGINT" | "SMALLINT" | "TINYINT" => {
-                        let val: Option<i64> = row.try_get(i).unwrap_or(None);
-                        val.map(|v| Value::Number(serde_json::Number::from(v)))
-                            .unwrap_or(Value::Null)
+                    "INT" | "BIGINT" | "BIGINT UNSIGNED" | "SMALLINT" | "TINYINT" => {
+                        // 首先尝试获取 u64 (适用于 UNSIGNED 类型)
+                        if let Ok(Some(val)) = row.try_get::<Option<u64>, _>(i) {
+                            Value::Number(serde_json::Number::from(val))
+                        } else if let Ok(Some(val)) = row.try_get::<Option<i64>, _>(i) {
+                            Value::Number(serde_json::Number::from(val))
+                        } else {
+                            Value::Null
+                        }
                     }
                     "FLOAT" | "DOUBLE" | "DECIMAL" => {
                         let val: Option<f64> = row.try_get(i).unwrap_or(None);
@@ -214,7 +219,7 @@ impl Manager {
                         })
                         .unwrap_or(Value::Null)
                     }
-                    "BOOLEAN" | "BOOL" => {
+                    "BOOLEAN" | "BOOL" | "TINYINT UNSIGNED" => {
                         let val: Option<bool> = row.try_get(i).unwrap_or(None);
                         val.map(Value::Bool).unwrap_or(Value::Null)
                     }
