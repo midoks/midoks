@@ -115,7 +115,7 @@ impl Setup {
                 match db
                     .select(
                         "fastcdn_api_tokens",
-                        None, //Some(&["id,node_id,select,role"])
+                        Some(&["id,node_id,secret,role"]),
                         Some("role='admin'"),
                         Some(&[]),
                     )
