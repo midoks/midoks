@@ -96,6 +96,21 @@ impl Setup {
     pub async fn install(&self) -> Result<(), Box<dyn std::error::Error>> {
         // 初始化安装创建数据库
         self.install_db().await?;
+        self.check_data().await?;
+        Ok(())
+    }
+
+    pub async fn check_data(&self) -> Result<(), Box<dyn std::error::Error>> {
+        self.check_admin_node().await?;
+        Ok(())
+    }
+
+    pub async fn check_admin_node(&self) -> Result<(), Box<dyn std::error::Error>> {
+        let node_id = fastcdn_common::utils::rand::hex_string(32);
+        let secret = fastcdn_common::utils::rand::string(32);
+
+        println!("{:?}", node_id);
+        println!("{:?}", secret);
         Ok(())
     }
 

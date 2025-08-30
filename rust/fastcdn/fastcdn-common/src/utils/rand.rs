@@ -1,24 +1,32 @@
 use rand::Rng;
 
-const hexChars: &str = "0123456789abcdef";
-const hexCharsLength: usize = hexChars.len();
+const HEX_CHARS: &str = "0123456789abcdef";
+const HEX_CHARS_LENGTH: usize = HEX_CHARS.len();
 
-const letterChars       = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-const letterCharsLength = letterChars.len();
+const LETTER_CHARS: &str = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+const LETTER_CHARS_LENGTH: usize = LETTER_CHARS.len();
 
 /// 生成指定字符集内的随机字符
-fn string() -> char {
+pub fn string(length: usize) -> String {
     let mut rng = rand::thread_rng();
-    const CHARSET: &[u8] = letterChars;
+    let charset = LETTER_CHARS.as_bytes();
 
-    let idx = rng.gen_range(0..CHARSET.len());
-    CHARSET[idx] as char
+    (0..length)
+        .map(|_| {
+            let idx = rng.gen_range(0..LETTER_CHARS_LENGTH);
+            charset[idx] as char
+        })
+        .collect()
 }
 
-fn hex_string() -> char {
+pub fn hex_string(length: usize) -> String {
     let mut rng = rand::thread_rng();
-    const CHARSET: &[u8] = hexChars;
+    let charset = HEX_CHARS.as_bytes();
 
-    let idx = rng.gen_range(0..CHARSET.len());
-    CHARSET[idx] as char
+    (0..length)
+        .map(|_| {
+            let idx = rng.gen_range(0..HEX_CHARS_LENGTH);
+            charset[idx] as char
+        })
+        .collect()
 }
