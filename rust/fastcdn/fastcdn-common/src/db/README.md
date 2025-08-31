@@ -34,7 +34,7 @@ let tokens = manager.query(query).await?;
 ### 查询操作 (SELECT)
 
 ```rust
-use fastcdn_common::db::Manager;
+use crate::db::Manager;
 
 // 基本查询
 let query = manager.query_builder("users")
@@ -147,7 +147,7 @@ let affected = manager.delete_with_builder(delete).await?;
 ### 基本用法
 
 ```rust
-use fastcdn_common::db::pool::Manager;
+use crate::db::pool::Manager;
 
 // 获取数据库管理器实例
 let db = Manager::instance().await?;

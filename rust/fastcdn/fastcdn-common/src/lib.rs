@@ -4,8 +4,9 @@
 
 pub mod config;
 pub mod daemon;
-pub mod rpc;
 pub mod db;
+pub mod orm;
+pub mod rpc;
 pub mod utils;
 
 // 导出配置读取

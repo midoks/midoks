@@ -139,12 +139,8 @@ impl Setup {
     pub async fn check_api_tokens(&self, name: &str) -> Result<(), Box<dyn std::error::Error>> {
         let db = pool::Manager::instance().await?;
 
-        let query = db
-            .query_builder("api_tokens")
-            .select(&["id", "node_id", "secret", "role"])
-            .where_eq("role", name);
-        let token_row = db.query(query).await?;
-        if token_row.len() == 0 {
+        let rows = fastcdn_common::orm::api_token::get_by_role(name).await?;
+        if rows.len() == 0 {
             let node_id = fastcdn_common::utils::rand::hex_string(32);
             let secret = fastcdn_common::utils::rand::string(32);
 
