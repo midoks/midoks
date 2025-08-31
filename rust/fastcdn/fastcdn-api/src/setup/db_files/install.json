@@ -212,6 +212,97 @@
                 }
             ],
             "records": []
+        },
+        {
+            "name": "fastcdn_ip_lists",
+            "engine": "InnoDB",
+            "charset": "utf8mb4_general_ci",
+            "definition": "CREATE TABLE `fastcdn_ip_lists` (\n  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID',\n  `is_on` tinyint(1) unsigned DEFAULT '1' COMMENT '是否启用',\n  `type` varchar(255) DEFAULT NULL COMMENT '类型',\n  `admin_id` bigint(20) unsigned DEFAULT '0' COMMENT '用户ID',\n  `user_id` bigint(20) unsigned DEFAULT '0' COMMENT '用户ID',\n  `server_id` bigint(20) unsigned DEFAULT '0' COMMENT '服务ID',\n  `name` varchar(255) DEFAULT NULL COMMENT '列表名',\n  `code` varchar(255) DEFAULT NULL COMMENT '代号',\n  `state` tinyint(1) unsigned DEFAULT '1' COMMENT '状态',\n  `created_at` bigint(11) unsigned DEFAULT '0' COMMENT '创建时间',\n  `timeout` json DEFAULT NULL COMMENT '默认超时时间',\n  `actions` json DEFAULT NULL COMMENT 'IP触发的动作',\n  `description` varchar(512) DEFAULT NULL COMMENT '描述',\n  `is_public` tinyint(1) unsigned DEFAULT '0' COMMENT '是否公用',\n  `is_global` tinyint(1) unsigned DEFAULT '0' COMMENT '是否全局',\n  PRIMARY KEY (`id`),\n  KEY `user_id` (`user_id`),\n  KEY `type` (`type`),\n  KEY `server_id` (`server_id`),\n  KEY `code` (`code`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='IP名单'",
+            "fields": [
+                {
+                    "name": "id",
+                    "definition": "bigint(20) unsigned auto_increment COMMENT 'ID'"
+                },
+                {
+                    "name": "is_on",
+                    "definition": "tinyint(1) unsigned DEFAULT '1' COMMENT '是否启用'"
+                },
+                {
+                    "name": "type",
+                    "definition": "varchar(255) COMMENT '类型'"
+                },
+                {
+                    "name": "admin_id",
+                    "definition": "bigint(20) unsigned DEFAULT '0' COMMENT '用户ID'"
+                },
+                {
+                    "name": "user_id",
+                    "definition": "bigint(20) unsigned DEFAULT '0' COMMENT '用户ID'"
+                },
+                {
+                    "name": "server_id",
+                    "definition": "bigint(20) unsigned DEFAULT '0' COMMENT '服务ID'"
+                },
+                {
+                    "name": "name",
+                    "definition": "varchar(255) COMMENT '列表名'"
+                },
+                {
+                    "name": "code",
+                    "definition": "varchar(255) COMMENT '代号'"
+                },
+                {
+                    "name": "state",
+                    "definition": "tinyint(1) unsigned DEFAULT '1' COMMENT '状态'"
+                },
+                {
+                    "name": "created_at",
+                    "definition": "int(11) unsigned DEFAULT '0' COMMENT '创建时间'"
+                },
+                {
+                    "name": "timeout",
+                    "definition": "json COMMENT '默认超时时间'"
+                },
+                {
+                    "name": "actions",
+                    "definition": "json COMMENT 'IP触发的动作'"
+                },
+                {
+                    "name": "description",
+                    "definition": "varchar(512) COMMENT '描述'"
+                },
+                {
+                    "name": "is_public",
+                    "definition": "tinyint(1) unsigned DEFAULT '0' COMMENT '是否公用'"
+                },
+                {
+                    "name": "is_global",
+                    "definition": "tinyint(1) unsigned DEFAULT '0' COMMENT '是否全局'"
+                }
+            ],
+            "indexes": [
+                {
+                    "name": "PRIMARY",
+                    "definition": "UNIQUE KEY `PRIMARY` (`id`) USING BTREE"
+                },
+                {
+                    "name": "user_id",
+                    "definition": "KEY `user_id` (`user_id`) USING BTREE"
+                },
+                {
+                    "name": "type",
+                    "definition": "KEY `type` (`type`) USING BTREE"
+                },
+                {
+                    "name": "server_id",
+                    "definition": "KEY `server_id` (`server_id`) USING BTREE"
+                },
+                {
+                    "name": "code",
+                    "definition": "KEY `code` (`code`) USING BTREE"
+                }
+            ],
+            "records": []
         }
     ]
 }
