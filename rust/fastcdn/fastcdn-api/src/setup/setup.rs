@@ -103,7 +103,7 @@ impl Setup {
         Ok(())
     }
 
-    pub async fn check_iplist() -> Result<(), Box<dyn std::error::Error>> {
+    pub async fn check_iplist(&self) -> Result<(), Box<dyn std::error::Error>> {
         let nums = fastcdn_common::orm::iplist::count().await?;
         println!("check_iplist:{:?}", nums);
 

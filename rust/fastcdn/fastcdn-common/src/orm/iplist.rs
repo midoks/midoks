@@ -12,13 +12,22 @@ pub async fn add(
     code: &str,
     is_public: u8,
     is_global: u8,
-) -> Result<bool, Box<dyn std::error::Error>> {
+) -> Result<u64, Box<dyn std::error::Error>> {
     let time_unix = utils::time::now_unix();
     let db = pool::Manager::instance().await?;
     let mut data = std::collections::HashMap::new();
-    data.insert("name".to_string(), serde_json::Value::String(name));
-    data.insert("type".to_string(), serde_json::Value::String(stype));
-    data.insert("code".to_string(), serde_json::Value::String(code));
+    data.insert(
+        "name".to_string(),
+        serde_json::Value::String(name.to_string()),
+    );
+    data.insert(
+        "type".to_string(),
+        serde_json::Value::String(stype.to_string()),
+    );
+    data.insert(
+        "code".to_string(),
+        serde_json::Value::String(code.to_string()),
+    );
     data.insert(
         "is_public".to_string(),
         serde_json::Value::Number(serde_json::Number::from(is_public)),
@@ -32,6 +41,6 @@ pub async fn add(
         serde_json::Value::String(time_unix),
     );
 
-    let _ = db.insert("ip_list", &data).await;
-    Ok(false)
+    let id = db.insert("ip_list", &data).await?;
+    Ok(id)
 }
