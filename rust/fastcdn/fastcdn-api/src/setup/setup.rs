@@ -1,5 +1,5 @@
-use fastcdn_common::db::dump::TableInfo;
 use fastcdn_common::db::pool;
+use fastcdn_common::{db::dump::TableInfo, utils};
 
 use lazy_static::lazy_static;
 use rust_embed::RustEmbed;
@@ -99,6 +99,17 @@ impl Setup {
         // 初始化安装创建数据库
         self.install_db().await?;
         self.check_data().await?;
+        self.check_iplist().await?;
+        Ok(())
+    }
+
+    pub async fn check_iplist() -> Result<(), Box<dyn std::error::Error>> {
+        let nums = fastcdn_common::orm::iplist::count().await?;
+        println!("check_iplist:{:?}", nums);
+
+        if nums < 1 {
+            fastcdn_common::orm::iplist::add("黑名单", "black", "black", 1, 1).await?;
+        }
         Ok(())
     }
 
