@@ -37,10 +37,10 @@ pub async fn add(
         serde_json::Value::Number(serde_json::Number::from(is_global)),
     );
     data.insert(
-        "create_at".to_string(),
+        "created_at".to_string(),
         serde_json::Value::String(time_unix),
     );
 
-    let id = db.insert("ip_list", &data).await?;
+    let id = db.insert("ip_lists", &data).await?;
     Ok(id)
 }

@@ -107,8 +107,9 @@ impl Setup {
         let nums = fastcdn_common::orm::iplist::count().await?;
         println!("check_iplist:{:?}", nums);
 
-        if nums < 1 {
+        if nums < 2 {
             fastcdn_common::orm::iplist::add("黑名单", "black", "black", 1, 1).await?;
+            fastcdn_common::orm::iplist::add("白名单", "white", "white", 1, 1).await?;
         }
         Ok(())
     }
