@@ -303,6 +303,200 @@
                 }
             ],
             "records": []
+        },
+        {
+            "name": "fastcdn_users",
+            "engine": "InnoDB",
+            "charset": "utf8mb4_general_ci",
+            "definition": "CREATE TABLE `fastcdn_users` (\n  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID',\n  `is_on` tinyint(1) unsigned DEFAULT '1' COMMENT '是否启用',\n  `username` varchar(64) DEFAULT NULL COMMENT '用户名',\n  `password` varchar(32) DEFAULT NULL COMMENT '密码',\n  `fullname` varchar(64) DEFAULT NULL COMMENT '真实姓名',\n  `mobile` varchar(11) DEFAULT NULL COMMENT '手机号',\n  `verified_mobile` varchar(20) DEFAULT NULL COMMENT '已验证手机号',\n  `mobile_is_verified` tinyint(1) unsigned DEFAULT '0' COMMENT '手机号是否已验证',\n  `tel` varchar(255) DEFAULT NULL COMMENT '联系电话',\n  `remark` varchar(1024) DEFAULT NULL COMMENT '备注',\n  `email` varchar(255) DEFAULT NULL COMMENT '邮箱地址',\n  `verified_email` varchar(255) DEFAULT NULL COMMENT '激活后的邮箱',\n  `email_is_verified` tinyint(1) unsigned DEFAULT '0' COMMENT '邮箱是否已验证',\n  `avatar_file_id` bigint(20) unsigned DEFAULT '0' COMMENT '头像文件ID',\n  `created_at` bigint(11) unsigned DEFAULT '0' COMMENT '创建时间',\n  `day` varchar(8) DEFAULT NULL COMMENT 'YYYYMMDD',\n  `updated_at` bigint(11) unsigned DEFAULT '0' COMMENT '修改时间',\n  `state` tinyint(1) unsigned DEFAULT '1' COMMENT '状态',\n  `source` varchar(255) DEFAULT NULL COMMENT '来源',\n  `cluster_id` int(11) unsigned DEFAULT '0' COMMENT '集群ID',\n  `features` json DEFAULT NULL COMMENT '允许操作的特征',\n  `registered_ip` varchar(64) DEFAULT NULL COMMENT '注册使用的IP',\n  `is_rejected` tinyint(1) unsigned DEFAULT '0' COMMENT '是否已拒绝',\n  `reject_reason` varchar(255) DEFAULT NULL COMMENT '拒绝理由',\n  `is_verified` tinyint(1) unsigned DEFAULT '1' COMMENT '是否验证通过',\n  `require_plans` tinyint(1) unsigned DEFAULT '0' COMMENT '是否需要购买套餐',\n  `modules` json DEFAULT NULL COMMENT '用户模块',\n  `price_type` varchar(32) DEFAULT NULL COMMENT '计费类型：traffic|bandwidth',\n  `price_period` varchar(32) DEFAULT NULL COMMENT '结算周期',\n  `servers_enabled` tinyint(1) unsigned DEFAULT '1' COMMENT '是否禁用所有服务',\n  `notification` json DEFAULT NULL COMMENT '通知设置',\n  `bandwidth_algo` varchar(16) DEFAULT NULL COMMENT '带宽算法',\n  `bandwidth_modifier` decimal(4,0) unsigned DEFAULT '0' COMMENT '带宽修正值',\n  `lang` varchar(64) DEFAULT NULL COMMENT '语言代号',\n  PRIMARY KEY (`id`),\n  UNIQUE KEY `username_state` (`username`,`state`),\n  KEY `username` (`username`),\n  KEY `day` (`day`),\n  KEY `verified_email` (`verified_email`),\n  KEY `verified_mobile` (`verified_mobile`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户'",
+            "fields": [
+                {
+                    "name": "id",
+                    "definition": "bigint(20) unsigned auto_increment COMMENT 'ID'"
+                },
+                {
+                    "name": "is_on",
+                    "definition": "tinyint(1) unsigned DEFAULT '1' COMMENT '是否启用'"
+                },
+                {
+                    "name": "username",
+                    "definition": "varchar(64) COMMENT '用户名'"
+                },
+                {
+                    "name": "password",
+                    "definition": "varchar(32) COMMENT '密码'"
+                },
+                {
+                    "name": "fullname",
+                    "definition": "varchar(64) COMMENT '真实姓名'"
+                },
+                {
+                    "name": "mobile",
+                    "definition": "varchar(11) COMMENT '手机号'"
+                },
+                {
+                    "name": "verified_mobile",
+                    "definition": "varchar(20) COMMENT '已验证手机号'"
+                },
+                {
+                    "name": "mobile_is_verified",
+                    "definition": "tinyint(1) unsigned DEFAULT '0' COMMENT '手机号是否已验证'"
+                },
+                {
+                    "name": "tel",
+                    "definition": "varchar(255) COMMENT '联系电话'"
+                },
+                {
+                    "name": "remark",
+                    "definition": "varchar(1024) COMMENT '备注'"
+                },
+                {
+                    "name": "email",
+                    "definition": "varchar(255) COMMENT '邮箱地址'"
+                },
+                {
+                    "name": "verified_email",
+                    "definition": "varchar(255) COMMENT '激活后的邮箱'"
+                },
+                {
+                    "name": "email_is_verified",
+                    "definition": "tinyint(1) unsigned DEFAULT '0' COMMENT '邮箱是否已验证'"
+                },
+                {
+                    "name": "avatar_file_id",
+                    "definition": "bigint(20) unsigned DEFAULT '0' COMMENT '头像文件ID'"
+                },
+                {
+                    "name": "created_at",
+                    "definition": "bigint(11) unsigned DEFAULT '0' COMMENT '创建时间'"
+                },
+                {
+                    "name": "day",
+                    "definition": "varchar(8) COMMENT 'YYYYMMDD'"
+                },
+                {
+                    "name": "updated_at",
+                    "definition": "bigint(11) unsigned DEFAULT '0' COMMENT '修改时间'"
+                },
+                {
+                    "name": "state",
+                    "definition": "tinyint(1) unsigned DEFAULT '1' COMMENT '状态'"
+                },
+                {
+                    "name": "source",
+                    "definition": "varchar(255) COMMENT '来源'"
+                },
+                {
+                    "name": "cluster_id",
+                    "definition": "int(11) unsigned DEFAULT '0' COMMENT '集群ID'"
+                },
+                {
+                    "name": "features",
+                    "definition": "json COMMENT '允许操作的特征'"
+                },
+                {
+                    "name": "registered_ip",
+                    "definition": "varchar(64) COMMENT '注册使用的IP'"
+                },
+                {
+                    "name": "is_rejected",
+                    "definition": "tinyint(1) unsigned DEFAULT '0' COMMENT '是否已拒绝'"
+                },
+                {
+                    "name": "reject_reason",
+                    "definition": "varchar(255) COMMENT '拒绝理由'"
+                },
+                {
+                    "name": "is_verified",
+                    "definition": "tinyint(1) unsigned DEFAULT '1' COMMENT '是否验证通过'"
+                },
+                {
+                    "name": "require_plans",
+                    "definition": "tinyint(1) unsigned DEFAULT '0' COMMENT '是否需要购买套餐'"
+                },
+                {
+                    "name": "modules",
+                    "definition": "json COMMENT '用户模块'"
+                },
+                {
+                    "name": "price_type",
+                    "definition": "varchar(32) COMMENT '计费类型：traffic|bandwidth'"
+                },
+                {
+                    "name": "price_period",
+                    "definition": "varchar(32) COMMENT '结算周期'"
+                },
+                {
+                    "name": "servers_enabled",
+                    "definition": "tinyint(1) unsigned DEFAULT '1' COMMENT '是否禁用所有服务'"
+                },
+                {
+                    "name": "notification",
+                    "definition": "json COMMENT '通知设置'"
+                },
+                {
+                    "name": "bandwidth_algo",
+                    "definition": "varchar(16) COMMENT '带宽算法'"
+                },
+                {
+                    "name": "bandwidth_modifier",
+                    "definition": "decimal(4,0) unsigned DEFAULT '0' COMMENT '带宽修正值'"
+                },
+                {
+                    "name": "lang",
+                    "definition": "varchar(64) COMMENT '语言代号'"
+                }
+            ],
+            "indexes": [
+                {
+                    "name": "PRIMARY",
+                    "definition": "UNIQUE KEY `PRIMARY` (`id`) USING BTREE"
+                },
+                {
+                    "name": "username_state",
+                    "definition": "UNIQUE KEY `username_state` (`username`,`state`) USING BTREE"
+                },
+                {
+                    "name": "username",
+                    "definition": "KEY `username` (`username`) USING BTREE"
+                },
+                {
+                    "name": "day",
+                    "definition": "KEY `day` (`day`) USING BTREE"
+                },
+                {
+                    "name": "verified_email",
+                    "definition": "KEY `verified_email` (`verified_email`) USING BTREE"
+                },
+                {
+                    "name": "verified_mobile",
+                    "definition": "KEY `verified_mobile` (`verified_mobile`) USING BTREE"
+                }
+            ],
+            "records": []
+        },
+        {
+            "name": "fastcdn_versions",
+            "engine": "InnoDB",
+            "charset": "utf8mb4_general_ci",
+            "definition": "CREATE TABLE `fastcdn_versions` (\n  `id` bigint(16) unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID',\n  `version` varchar(64) DEFAULT NULL,\n  PRIMARY KEY (`id`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='数据库结构版本'",
+            "fields": [
+                {
+                    "name": "id",
+                    "definition": "bigint(16) unsigned auto_increment COMMENT 'ID'"
+                },
+                {
+                    "name": "version",
+                    "definition": "varchar(64)"
+                }
+            ],
+            "indexes": [
+                {
+                    "name": "PRIMARY",
+                    "definition": "UNIQUE KEY `PRIMARY` (`id`) USING BTREE"
+                }
+            ],
+            "records": []
         }
     ]
 }
