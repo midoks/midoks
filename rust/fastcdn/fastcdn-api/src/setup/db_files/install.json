@@ -497,6 +497,221 @@
                 }
             ],
             "records": []
+        },
+        {
+            "name": "fastcdn_node_clusters",
+            "engine": "InnoDB",
+            "charset": "utf8mb4_general_ci",
+            "definition": "CREATE TABLE `fastcdn_node_clusters` (\n  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID',\n  `admin_id` bigint(20) unsigned DEFAULT '0' COMMENT '管理员ID',\n  `user_id` bigint(20) unsigned DEFAULT '0' COMMENT '用户ID',\n  `is_on` tinyint(1) unsigned DEFAULT '1' COMMENT '是否启用',\n  `name` varchar(255) DEFAULT NULL COMMENT '名称',\n  `use_all_api_nodes` tinyint(1) unsigned DEFAULT '1' COMMENT '是否使用所有API节点',\n  `api_nodes` json DEFAULT NULL COMMENT '使用的API节点',\n  `install_dir` varchar(512) DEFAULT NULL COMMENT '安装目录',\n  `order` int(11) unsigned DEFAULT '0' COMMENT '排序',\n  `created_at` bigint(11) unsigned DEFAULT '0' COMMENT '创建时间',\n  `grant_id` int(11) unsigned DEFAULT '0' COMMENT '默认认证方式',\n  `ssh_params` json DEFAULT NULL COMMENT 'SSH默认参数',\n  `state` tinyint(1) unsigned DEFAULT '1' COMMENT '状态',\n  `auto_register` tinyint(1) unsigned DEFAULT '1' COMMENT '是否开启自动注册',\n  `unique_id` varchar(32) DEFAULT NULL COMMENT '唯一ID',\n  `secret` varchar(32) DEFAULT NULL COMMENT '密钥',\n  `health_check` json DEFAULT NULL COMMENT '健康检查',\n  `dns_name` varchar(255) DEFAULT NULL COMMENT 'DNS名称',\n  `dns_domain_id` int(11) unsigned DEFAULT '0' COMMENT '域名ID',\n  `dns` json DEFAULT NULL COMMENT 'DNS配置',\n  `toa` json DEFAULT NULL COMMENT 'TOA配置',\n  `cache_policy_id` int(11) unsigned DEFAULT '0' COMMENT '缓存策略ID',\n  `http_firewall_policy_id` int(11) unsigned DEFAULT '0' COMMENT 'WAF策略ID',\n  `access_log` json DEFAULT NULL COMMENT '访问日志设置',\n  `system_services` json DEFAULT NULL COMMENT '系统服务设置',\n  `time_zone` varchar(64) DEFAULT NULL COMMENT '时区',\n  `node_max_threads` int(11) unsigned DEFAULT '0' COMMENT '节点最大线程数',\n  `ddos_protection` json DEFAULT NULL COMMENT 'DDoS防护设置',\n  `auto_open_ports` tinyint(1) unsigned DEFAULT '1' COMMENT '是否自动尝试开放端口',\n  `is_pinned` tinyint(1) unsigned DEFAULT '0' COMMENT '是否置顶',\n  `webp` json DEFAULT NULL COMMENT 'WebP设置',\n  `uam` json DEFAULT NULL COMMENT 'UAM设置',\n  `clock` json DEFAULT NULL COMMENT '时钟配置',\n  `global_server_config` json DEFAULT NULL COMMENT '全局服务配置',\n  `auto_remote_start` tinyint(1) unsigned DEFAULT '1' COMMENT '自动远程启动',\n  `auto_install_nftables` tinyint(1) unsigned DEFAULT '0' COMMENT '自动安装nftables',\n  `is_ad` tinyint(1) unsigned DEFAULT '0' COMMENT '是否为高防集群',\n  `http_pages` json DEFAULT NULL COMMENT '自定义页面设置',\n  `cc` json DEFAULT NULL COMMENT 'CC设置',\n  `http3` json DEFAULT NULL COMMENT 'HTTP3设置',\n  `auto_system_tuning` tinyint(1) unsigned DEFAULT '1' COMMENT '是否自动调整系统参数',\n  `network_security` json DEFAULT NULL COMMENT '网络安全策略',\n  `auto_trim_disks` tinyint(1) unsigned DEFAULT '1' COMMENT '是否自动执行TRIM',\n  `max_concurrent_reads` int(11) unsigned DEFAULT '0' COMMENT '节点并发读限制',\n  `max_concurrent_writes` int(11) unsigned DEFAULT '0' COMMENT '节点并发写限制',\n  PRIMARY KEY (`id`),\n  KEY `unique_id` (`unique_id`),\n  KEY `grant_id` (`grant_id`),\n  KEY `dns_domain_id` (`dns_domain_id`),\n  KEY `cache_policy_id` (`cache_policy_id`),\n  KEY `http_firewall_policy_id` (`http_firewall_policy_id`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='节点集群'",
+            "fields": [
+                {
+                    "name": "id",
+                    "definition": "bigint(20) unsigned auto_increment COMMENT 'ID'"
+                },
+                {
+                    "name": "admin_id",
+                    "definition": "int(11) unsigned DEFAULT '0' COMMENT '管理员ID'"
+                },
+                {
+                    "name": "user_id",
+                    "definition": "int(11) unsigned DEFAULT '0' COMMENT '用户ID'"
+                },
+                {
+                    "name": "is_on",
+                    "definition": "tinyint(1) unsigned DEFAULT '1' COMMENT '是否启用'"
+                },
+                {
+                    "name": "name",
+                    "definition": "varchar(255) COMMENT '名称'"
+                },
+                {
+                    "name": "use_all_api_nodes",
+                    "definition": "tinyint(1) unsigned DEFAULT '1' COMMENT '是否使用所有API节点'"
+                },
+                {
+                    "name": "api_nodes",
+                    "definition": "json COMMENT '使用的API节点'"
+                },
+                {
+                    "name": "install_dir",
+                    "definition": "varchar(512) COMMENT '安装目录'"
+                },
+                {
+                    "name": "order",
+                    "definition": "int(11) unsigned DEFAULT '0' COMMENT '排序'"
+                },
+                {
+                    "name": "created_at",
+                    "definition": "bigint(11) unsigned DEFAULT '0' COMMENT '创建时间'"
+                },
+                {
+                    "name": "grant_id",
+                    "definition": "int(11) unsigned DEFAULT '0' COMMENT '默认认证方式'"
+                },
+                {
+                    "name": "ssh_params",
+                    "definition": "json COMMENT 'SSH默认参数'"
+                },
+                {
+                    "name": "state",
+                    "definition": "tinyint(1) unsigned DEFAULT '1' COMMENT '状态'"
+                },
+                {
+                    "name": "auto_register",
+                    "definition": "tinyint(1) unsigned DEFAULT '1' COMMENT '是否开启自动注册'"
+                },
+                {
+                    "name": "unique_id",
+                    "definition": "varchar(32) COMMENT '唯一ID'"
+                },
+                {
+                    "name": "secret",
+                    "definition": "varchar(32) COMMENT '密钥'"
+                },
+                {
+                    "name": "health_check",
+                    "definition": "json COMMENT '健康检查'"
+                },
+                {
+                    "name": "dns_name",
+                    "definition": "varchar(255) COMMENT 'DNS名称'"
+                },
+                {
+                    "name": "dns_domain_id",
+                    "definition": "int(11) unsigned DEFAULT '0' COMMENT '域名ID'"
+                },
+                {
+                    "name": "dns",
+                    "definition": "json COMMENT 'DNS配置'"
+                },
+                {
+                    "name": "toa",
+                    "definition": "json COMMENT 'TOA配置'"
+                },
+                {
+                    "name": "cache_policy_id",
+                    "definition": "bigint(20) unsigned DEFAULT '0' COMMENT '缓存策略ID'"
+                },
+                {
+                    "name": "http_firewall_policy_id",
+                    "definition": "int(11) unsigned DEFAULT '0' COMMENT 'WAF策略ID'"
+                },
+                {
+                    "name": "access_log",
+                    "definition": "json COMMENT '访问日志设置'"
+                },
+                {
+                    "name": "system_services",
+                    "definition": "json COMMENT '系统服务设置'"
+                },
+                {
+                    "name": "time_zone",
+                    "definition": "varchar(64) COMMENT '时区'"
+                },
+                {
+                    "name": "node_max_threads",
+                    "definition": "int(11) unsigned DEFAULT '0' COMMENT '节点最大线程数'"
+                },
+                {
+                    "name": "ddos_protection",
+                    "definition": "json COMMENT 'DDoS防护设置'"
+                },
+                {
+                    "name": "auto_open_ports",
+                    "definition": "tinyint(1) unsigned DEFAULT '1' COMMENT '是否自动尝试开放端口'"
+                },
+                {
+                    "name": "is_pinned",
+                    "definition": "tinyint(1) unsigned DEFAULT '0' COMMENT '是否置顶'"
+                },
+                {
+                    "name": "webp",
+                    "definition": "json COMMENT 'WebP设置'"
+                },
+                {
+                    "name": "uam",
+                    "definition": "json COMMENT 'UAM设置'"
+                },
+                {
+                    "name": "clock",
+                    "definition": "json COMMENT '时钟配置'"
+                },
+                {
+                    "name": "global_server_config",
+                    "definition": "json COMMENT '全局服务配置'"
+                },
+                {
+                    "name": "auto_remote_start",
+                    "definition": "tinyint(1) unsigned DEFAULT '1' COMMENT '自动远程启动'"
+                },
+                {
+                    "name": "auto_install_nftables",
+                    "definition": "tinyint(1) unsigned DEFAULT '0' COMMENT '自动安装nftables'"
+                },
+                {
+                    "name": "is_ad",
+                    "definition": "tinyint(1) unsigned DEFAULT '0' COMMENT '是否为高防集群'"
+                },
+                {
+                    "name": "http_pages",
+                    "definition": "json COMMENT '自定义页面设置'"
+                },
+                {
+                    "name": "cc",
+                    "definition": "json COMMENT 'CC设置'"
+                },
+                {
+                    "name": "http3",
+                    "definition": "json COMMENT 'HTTP3设置'"
+                },
+                {
+                    "name": "auto_system_tuning",
+                    "definition": "tinyint(1) unsigned DEFAULT '1' COMMENT '是否自动调整系统参数'"
+                },
+                {
+                    "name": "network_security",
+                    "definition": "json COMMENT '网络安全策略'"
+                },
+                {
+                    "name": "auto_trim_disks",
+                    "definition": "tinyint(1) unsigned DEFAULT '1' COMMENT '是否自动执行TRIM'"
+                },
+                {
+                    "name": "max_concurrent_reads",
+                    "definition": "int(11) unsigned DEFAULT '0' COMMENT '节点并发读限制'"
+                },
+                {
+                    "name": "max_concurrent_writes",
+                    "definition": "int(11) unsigned DEFAULT '0' COMMENT '节点并发写限制'"
+                }
+            ],
+            "indexes": [
+                {
+                    "name": "PRIMARY",
+                    "definition": "UNIQUE KEY `PRIMARY` (`id`) USING BTREE"
+                },
+                {
+                    "name": "unique_id",
+                    "definition": "KEY `unique_id` (`unique_id`) USING BTREE"
+                },
+                {
+                    "name": "grant_id",
+                    "definition": "KEY `grant_id` (`grant_id`) USING BTREE"
+                },
+                {
+                    "name": "dns_domain_id",
+                    "definition": "KEY `dns_domain_id` (`dns_domain_id`) USING BTREE"
+                },
+                {
+                    "name": "cache_policy_id",
+                    "definition": "KEY `cache_policy_id` (`cache_policy_id`) USING BTREE"
+                },
+                {
+                    "name": "http_firewall_policy_id",
+                    "definition": "KEY `http_firewall_policy_id` (`http_firewall_policy_id`) USING BTREE"
+                }
+            ],
+            "records": []
         }
     ]
 }
