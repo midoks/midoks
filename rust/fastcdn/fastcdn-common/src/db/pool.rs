@@ -515,25 +515,21 @@ impl Manager {
 
     /// 创建查询构建器
     pub fn query_builder(&self, table: &str) -> QueryBuilder {
-        let table_name = self.get_table_name(table);
-        QueryBuilder::new(&table_name)
+        QueryBuilder::new(&table)
     }
 
     /// 创建插入构建器
     pub fn insert_builder(&self, table: &str) -> InsertBuilder {
-        let table_name = self.get_table_name(table);
-        InsertBuilder::new(&table_name)
+        InsertBuilder::new(&table)
     }
 
     /// 创建更新构建器
     pub fn update_builder(&self, table: &str) -> UpdateBuilder {
-        let table_name = self.get_table_name(table);
-        UpdateBuilder::new(&table_name)
+        UpdateBuilder::new(&table)
     }
 
     /// 创建删除构建器
     pub fn delete_builder(&self, table: &str) -> DeleteBuilder {
-        let table_name = self.get_table_name(table);
-        DeleteBuilder::new(&table_name)
+        DeleteBuilder::new(&table)
     }
 }
