@@ -1,10 +1,13 @@
-use crate::{db::pool, utils};
+use crate::db::pool;
 
 pub async fn count() -> Result<i64, Box<dyn std::error::Error>> {
     let db = pool::Manager::instance().await?;
     let results = db.count("node_clusters", None).await?;
     Ok(results)
 }
+
+//获取默认集群ID
+pub async fn get_default_id() {}
 
 pub async fn add(
     name: &str,

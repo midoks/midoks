@@ -124,6 +124,10 @@ impl Setup {
     }
 
     pub async fn check_user(&self) -> Result<(), Box<dyn std::error::Error>> {
+        let user_nums = fastcdn_common::orm::user::count().await?;
+        if user_nums > 1 {
+            return Ok(());
+        }
         Ok(())
     }
 
