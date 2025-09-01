@@ -51,27 +51,6 @@ impl Manager {
         }
     }
 
-    /// 创建新的数据库管理器
-    pub async fn new() -> Result<Self, Box<dyn std::error::Error>> {
-        // println!("{:?}", Manager {});
-        let db_instance = ConfigDb::Db::instance()?;
-        let config = db_instance.lock().unwrap();
-
-        // 构建数据库连接字符串
-        let database_url = format!(
-            "mysql://{}:{}@{}/{}",
-            config.user, config.password, config.host, config.database
-        );
-
-        // 创建连接池
-        let pool = MySqlPool::connect(&database_url).await?;
-        println!("✓ 数据库连接成功");
-        Ok(Manager {
-            pool: Arc::new(pool),
-            table_prefix: String::new(), // 默认无前缀
-        })
-    }
-
     /// 获取数据库连接池
     pub fn get_pool(&self) -> Arc<MySqlPool> {
         self.pool.clone()

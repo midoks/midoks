@@ -1,5 +1,4 @@
-use fastcdn_common::db::pool;
-use fastcdn_common::{db::dump::TableInfo, utils};
+use fastcdn_common::db::dump::TableInfo;
 
 use lazy_static::lazy_static;
 use rust_embed::RustEmbed;
@@ -118,6 +117,7 @@ impl Setup {
         self.check_cluster().await?;
         self.check_dns().await?;
         self.check_api().await?;
+        self.check_version().await?;
         Ok(())
     }
 
@@ -146,6 +146,14 @@ impl Setup {
         Ok(())
     }
 
+    pub async fn check_version(&self) -> Result<(), Box<dyn std::error::Error>> {
+        let fastcdn_version = env!("CARGO_PKG_VERSION");
+        println!("fastcdn_version:{:?}", fastcdn_version);
+        let oo = fastcdn_common::orm::version::update(fastcdn_version).await?;
+        println!("ii:{:?}", oo);
+        Ok(())
+    }
+
     pub async fn check_api_tokens(&self, name: &str) -> Result<(), Box<dyn std::error::Error>> {
         let rows = fastcdn_common::orm::api_token::get_by_role(name).await?;
         if rows.len() == 0 {
@@ -171,7 +179,7 @@ impl Setup {
         let install_json_str = std::str::from_utf8(&install_embed_file.data)?;
         let install_config: InstallConfig = serde_json::from_str(install_json_str)?;
 
-        let db = fastcdn_common::db::pool::Manager::new().await?;
+        let db = fastcdn_common::db::pool::Manager::instance().await?;
         let dump_sql = db.dump().await?;
 
         // 遍历所有表

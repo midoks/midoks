@@ -104,7 +104,7 @@ pub async fn test_conf() {
 #[allow(dead_code)]
 pub async fn test_db() {
     // 测试数据库连接
-    match fastcdn_common::db::pool::Manager::new().await {
+    match fastcdn_common::db::pool::Manager::instance().await {
         Ok(db_manager) => {
             println!("✓ 数据库管理器创建成功");
 
