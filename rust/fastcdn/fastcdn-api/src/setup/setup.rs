@@ -147,22 +147,12 @@ impl Setup {
     }
 
     pub async fn check_api_tokens(&self, name: &str) -> Result<(), Box<dyn std::error::Error>> {
-        let db = pool::Manager::instance().await?;
-
         let rows = fastcdn_common::orm::api_token::get_by_role(name).await?;
         if rows.len() == 0 {
             let node_id = fastcdn_common::utils::rand::hex_string(32);
             let secret = fastcdn_common::utils::rand::string(32);
 
-            let mut data = std::collections::HashMap::new();
-            data.insert("node_id".to_string(), serde_json::Value::String(node_id));
-            data.insert("secret".to_string(), serde_json::Value::String(secret));
-            data.insert(
-                "role".to_string(),
-                serde_json::Value::String(name.to_string()),
-            );
-
-            match db.insert("api_tokens", &data).await {
+            match fastcdn_common::orm::api_token::add(&name, &node_id, &secret).await {
                 Ok(_id) => {
                     return Ok(());
                 }

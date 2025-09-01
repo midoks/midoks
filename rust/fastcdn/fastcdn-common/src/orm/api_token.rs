@@ -9,3 +9,27 @@ pub async fn get_by_role(name: &str) -> Result<Vec<serde_json::Value>, Box<dyn s
     let results = db.query(query).await?;
     Ok(results)
 }
+
+pub async fn add(
+    role: &str,
+    node_id: &str,
+    secret: &str,
+) -> Result<u64, Box<dyn std::error::Error>> {
+    let db = pool::Manager::instance().await?;
+    let mut data = std::collections::HashMap::new();
+    data.insert(
+        "role".to_string(),
+        serde_json::Value::String(role.to_string()),
+    );
+    data.insert(
+        "node_id".to_string(),
+        serde_json::Value::String(node_id.to_string()),
+    );
+    data.insert(
+        "secret".to_string(),
+        serde_json::Value::String(secret.to_string()),
+    );
+
+    let id = db.insert("api_tokens", &data).await?;
+    Ok(id)
+}
