@@ -115,10 +115,15 @@ impl Setup {
         self.check_admin_node().await?;
         self.check_user_node().await?;
         self.check_cluster().await?;
+        self.check_user().await?;
         self.check_iplist().await?;
         self.check_dns().await?;
         self.check_api().await?;
         self.check_version().await?;
+        Ok(())
+    }
+
+    pub async fn check_user(&self) -> Result<(), Box<dyn std::error::Error>> {
         Ok(())
     }
 
