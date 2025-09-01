@@ -131,11 +131,6 @@ impl Setup {
         Ok(())
     }
 
-    pub async fn check_cluster(&self) -> Result<(), Box<dyn std::error::Error>> {
-        let _ = self.check_api_tokens("cluster").await;
-        Ok(())
-    }
-
     pub async fn check_dns(&self) -> Result<(), Box<dyn std::error::Error>> {
         let _ = self.check_api_tokens("dns").await;
         Ok(())
@@ -149,6 +144,11 @@ impl Setup {
     pub async fn check_version(&self) -> Result<(), Box<dyn std::error::Error>> {
         let fastcdn_version = env!("CARGO_PKG_VERSION");
         let _ = fastcdn_common::orm::version::update(fastcdn_version).await?;
+        Ok(())
+    }
+
+    pub async fn check_cluster(&self) -> Result<(), Box<dyn std::error::Error>> {
+        // let _ = self.check_api_tokens("cluster").await;
         Ok(())
     }
 
