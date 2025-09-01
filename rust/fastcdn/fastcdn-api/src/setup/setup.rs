@@ -148,9 +148,7 @@ impl Setup {
 
     pub async fn check_version(&self) -> Result<(), Box<dyn std::error::Error>> {
         let fastcdn_version = env!("CARGO_PKG_VERSION");
-        println!("fastcdn_version:{:?}", fastcdn_version);
-        let oo = fastcdn_common::orm::version::update(fastcdn_version).await?;
-        println!("ii:{:?}", oo);
+        let _ = fastcdn_common::orm::version::update(fastcdn_version).await?;
         Ok(())
     }
 
