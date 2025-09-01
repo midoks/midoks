@@ -5,6 +5,7 @@
 pub mod config;
 pub mod daemon;
 pub mod db;
+pub mod option;
 pub mod orm;
 pub mod rpc;
 pub mod utils;

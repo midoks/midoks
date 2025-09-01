@@ -98,7 +98,7 @@ impl Setup {
         // 初始化安装创建数据库
         self.install_db().await?;
         self.check_data().await?;
-        self.check_iplist().await?;
+
         Ok(())
     }
 
@@ -115,6 +115,7 @@ impl Setup {
         self.check_admin_node().await?;
         self.check_user_node().await?;
         self.check_cluster().await?;
+        self.check_iplist().await?;
         self.check_dns().await?;
         self.check_api().await?;
         self.check_version().await?;
@@ -148,7 +149,36 @@ impl Setup {
     }
 
     pub async fn check_cluster(&self) -> Result<(), Box<dyn std::error::Error>> {
-        // let _ = self.check_api_tokens("cluster").await;
+        let nums = fastcdn_common::orm::node_cluster::count().await?;
+        if nums < 1 {
+            let option = fastcdn_common::option::cluster_dns::default();
+            let option_str = serde_json::to_string(&option);
+            let default_dns_name = format!("g{}.cdn", fastcdn_common::utils::rand::hex_string(6));
+
+            let node_id = fastcdn_common::utils::rand::hex_string(32);
+            let secret = fastcdn_common::utils::rand::string(32);
+
+            fastcdn_common::orm::node_cluster::add(
+                "默认集群",
+                true,
+                true,
+                &node_id,
+                &secret,
+                &option_str?,
+                &default_dns_name,
+            )
+            .await?;
+
+            match fastcdn_common::orm::api_token::add("cluster", &node_id, &secret).await {
+                Ok(_id) => {
+                    return Ok(());
+                }
+                Err(e) => {
+                    return Err(e);
+                }
+            }
+        }
+
         Ok(())
     }
 
