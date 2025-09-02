@@ -1,5 +1,4 @@
 use fastcdn_common::db::dump::TableInfo;
-
 use lazy_static::lazy_static;
 use rust_embed::RustEmbed;
 use serde::{Deserialize, Serialize};
@@ -128,6 +127,7 @@ impl Setup {
         if user_nums > 1 {
             return Ok(());
         }
+
         Ok(())
     }
 
@@ -178,14 +178,13 @@ impl Setup {
             )
             .await?;
 
-            match fastcdn_common::orm::api_token::add("cluster", &node_id, &secret).await {
-                Ok(_id) => {
-                    return Ok(());
-                }
-                Err(e) => {
-                    return Err(e);
-                }
-            }
+            let cluster_id =
+                fastcdn_common::orm::api_token::add("cluster", &node_id, &secret).await?;
+
+            let username = format!("g{}.cdn", fastcdn_common::utils::rand::hex_string(6));
+            let pass_rnd = fastcdn_common::utils::rand::hex_string(32);
+            fastcdn_common::orm::user::add(&username, &pass_rnd, "默认用户", 1, 1, cluster_id)
+                .await?;
         }
 
         Ok(())
