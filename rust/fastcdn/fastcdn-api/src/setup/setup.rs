@@ -122,6 +122,11 @@ impl Setup {
             return Err("can not find admin node token, please run the setup again".into());
         }
 
+        let api_node_id =
+            fastcdn_common::orm::api_node::find_enabled_api_node_id_with_addr(protocol, host, port)
+                .await?;
+        if api_node_id == 0 {}
+
         println!("id:{:?}", data[0].get("id"));
         println!("node_id:{:?}", data[0].get("node_id"));
         Ok(())
