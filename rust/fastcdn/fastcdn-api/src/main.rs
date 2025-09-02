@@ -42,7 +42,14 @@ enum Commands {
     /// fastcdn api server Status
     Status {},
     /// fastcdn api server setup cmd
-    Setup {},
+    Setup {
+        #[arg(short, long)]
+        protocol: String,
+        #[arg(short, long)]
+        host: String,
+        #[arg(short, long)]
+        port: u16,
+    },
     /// test function
     Test {},
 }
@@ -54,18 +61,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // 执行相应的操作并返回适当的退出状态码
     let result: Result<&str, Box<dyn std::error::Error>> = match &args.command {
-        Some(Commands::Setup {}) => match setup::Setup::instance().await {
-            Ok(cmd_setup) => match cmd_setup.install().await {
+        Some(Commands::Setup {
+            protocol,
+            host,
+            port,
+        }) => match setup::Setup::instance().await {
+            Ok(cmd_setup) => match cmd_setup.install(protocol, host, *port).await {
                 Ok(_) => Ok("setup completed successfully!"),
-                Err(e) => {
-                    eprintln!("setup failed: {}", e);
-                    Err(e)
-                }
+                Err(e) => Err(e),
             },
-            Err(e) => {
-                eprintln!("setup instance failed: {}", e);
-                Err(e)
-            }
+            Err(e) => Err(e),
         },
         Some(Commands::Start { daemon }) => {
             if *daemon {
@@ -109,8 +114,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             Ok(())
         }
         Err(error) => {
-            eprintln!("fastcdn-api error: {}", error);
-            Err(error)
+            println!("{}", error);
+            Ok(())
         }
     }
 }

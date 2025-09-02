@@ -513,6 +513,14 @@ impl Manager {
         self.delete(builder.get_table(), &condition, &params).await
     }
 
+    /// 使用查询构建器进行查询
+    pub async fn query_with_builder(
+        &self,
+        builder: QueryBuilder,
+    ) -> Result<Vec<Value>, Box<dyn std::error::Error>> {
+        self.query(builder).await
+    }
+
     /// 创建查询构建器
     pub fn query_builder(&self, table: &str) -> QueryBuilder {
         QueryBuilder::new(&table)

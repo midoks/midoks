@@ -93,11 +93,37 @@ impl Setup {
         }
     }
 
-    pub async fn install(&self) -> Result<(), Box<dyn std::error::Error>> {
+    pub async fn install(
+        &self,
+        protocol: &str,
+        host: &str,
+        port: u16,
+    ) -> Result<(), Box<dyn std::error::Error>> {
+        if protocol.is_empty() {
+            return Err("the protocol cannot be empty.".into());
+        }
+
+        if protocol != "http" && protocol != "https" {
+            return Err("the protocol only supports http and https!".into());
+        }
+
+        if host.is_empty() {
+            return Err("the host cannot be empty.".into());
+        }
+
+        println!("{:?}", port);
+
         // 初始化安装创建数据库
         self.install_db().await?;
         self.check_data().await?;
 
+        let data = fastcdn_common::orm::api_token::find_enabled_token_with_role("admin").await?;
+        if data.is_empty() {
+            return Err("can not find admin node token, please run the setup again".into());
+        }
+
+        println!("id:{:?}", data[0].get("id"));
+        println!("node_id:{:?}", data[0].get("node_id"));
         Ok(())
     }
 
@@ -127,7 +153,6 @@ impl Setup {
         if user_nums > 1 {
             return Ok(());
         }
-
         Ok(())
     }
 

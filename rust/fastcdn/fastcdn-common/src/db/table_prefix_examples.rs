@@ -35,22 +35,22 @@ pub async fn table_prefix_examples() -> Result<(), Box<dyn std::error::Error>> {
     
     // 5. 演示在查询构建器中的使用
     println!("\n5. 查询构建器中的表前缀:");
-    let query_builder = db_with_test_prefix.query_builder("orders");
+    let _query_builder = db_with_test_prefix.query_builder("orders");
     println!("   查询构建器使用的表名会自动添加前缀");
     
     // 6. 演示在插入构建器中的使用
     println!("\n6. 插入构建器中的表前缀:");
-    let insert_builder = db_with_test_prefix.insert_builder("customers");
+    let _insert_builder = db_with_test_prefix.insert_builder("customers");
     println!("   插入构建器使用的表名会自动添加前缀");
     
     // 7. 演示在更新构建器中的使用
     println!("\n7. 更新构建器中的表前缀:");
-    let update_builder = db_with_test_prefix.update_builder("inventory");
+    let _update_builder = db_with_test_prefix.update_builder("inventory");
     println!("   更新构建器使用的表名会自动添加前缀");
     
     // 8. 演示在删除构建器中的使用
     println!("\n8. 删除构建器中的表前缀:");
-    let delete_builder = db_with_test_prefix.delete_builder("logs");
+    let _delete_builder = db_with_test_prefix.delete_builder("logs");
     println!("   删除构建器使用的表名会自动添加前缀");
     
     // 9. 演示传统方法中的表前缀

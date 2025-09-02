@@ -4,8 +4,6 @@
 //! 相比原来的方法，新API更加清晰和易于使用。
 
 use crate::db::pool::Manager;
-use crate::db::{QueryBuilder, InsertBuilder, UpdateBuilder, DeleteBuilder};
-use serde_json::Value;
 
 /// 示例：使用查询构建器进行复杂查询
 pub async fn example_complex_query() -> Result<(), Box<dyn std::error::Error>> {
