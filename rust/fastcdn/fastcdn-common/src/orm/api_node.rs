@@ -3,7 +3,7 @@ use crate::db::pool;
 pub async fn find_enabled_api_node_id_with_addr(
     protocol: &str,
     host: &str,
-    port: u16,
+    port: &str,
 ) -> Result<u64, Box<dyn std::error::Error>> {
     let db = pool::Manager::instance().await?;
 
@@ -17,8 +17,8 @@ pub async fn find_enabled_api_node_id_with_addr(
         serde_json::Value::String(host.to_string()),
     );
     data.insert(
-        "port".to_string(),
-        serde_json::Value::Number(serde_json::Number::from(port)),
+        "port_range".to_string(),
+        serde_json::Value::String(port.to_string()),
     );
 
     let addr = serde_json::to_string(&data)?;
@@ -26,7 +26,7 @@ pub async fn find_enabled_api_node_id_with_addr(
     let query = db
         .query_builder(&table_name)
         .select(&["id"])
-        .where_with_param("JSON_CONTAINS(access_addrs, :addr)", &addr);
+        .where_with_param("JSON_CONTAINS(access_addrs, ?)", &addr);
     let results = db.query_with_builder(query).await?;
     if let Some(first_result) = results.first() {
         if let Some(id_value) = first_result.get("id") {

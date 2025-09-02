@@ -117,18 +117,35 @@ impl Setup {
         self.install_db().await?;
         self.check_data().await?;
 
-        let data = fastcdn_common::orm::api_token::find_enabled_token_with_role("admin").await?;
-        if data.is_empty() {
+        let api_token_data =
+            fastcdn_common::orm::api_token::find_enabled_token_with_role("admin").await?;
+        if api_token_data.is_empty() {
             return Err("can not find admin node token, please run the setup again".into());
         }
 
-        let api_node_id =
-            fastcdn_common::orm::api_node::find_enabled_api_node_id_with_addr(protocol, host, port)
-                .await?;
+        let api_node_id = fastcdn_common::orm::api_node::find_enabled_api_node_id_with_addr(
+            protocol,
+            host,
+            &port.to_string(),
+        )
+        .await?;
         if api_node_id == 0 {}
 
-        println!("id:{:?}", data[0].get("id"));
-        println!("node_id:{:?}", data[0].get("node_id"));
+        println!("id:{:?}", api_token_data[0].get("id"));
+        println!("node_id:{:?}", api_token_data[0].get("node_id"));
+
+        let api_config = fastcdn_common::config::api::Api {
+            node_id: api_token_data[0].get("node_id")
+                .and_then(|v| v.as_str())
+                .unwrap_or_default()
+                .to_string(),
+            secret: api_token_data[0].get("secret")
+                .and_then(|v| v.as_str())
+                .unwrap_or_default()
+                .to_string(),
+        };
+
+        api_config.write()?;
         Ok(())
     }
 
