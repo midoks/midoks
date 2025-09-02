@@ -1,4 +1,16 @@
-use crate::db::pool;
+use crate::{db::pool, utils};
+
+pub async fn gen_unique_id() -> Result<String, Box<dyn std::error::Error>> {
+    let unique_id = utils::rand::hex_string(32);
+    let db = pool::Manager::instance().await?;
+    let table_name = db.get_table_name("api_nodes");
+    let query = db
+        .query_builder(&table_name)
+        .where_eq("unique_id ", &unique_id);
+    let results = db.query_with_builder(query).await?;
+    println!("{:?}", results);
+    Ok(unique_id)
+}
 
 pub async fn find_enabled_api_node_id_with_addr(
     protocol: &str,
@@ -39,25 +51,30 @@ pub async fn find_enabled_api_node_id_with_addr(
 }
 
 pub async fn add(
-    role: &str,
-    node_id: &str,
-    secret: &str,
+    name: &str,
+    description: &str,
+    // http_json: &str,
+    // https_json: &str,
 ) -> Result<u64, Box<dyn std::error::Error>> {
-    let db = pool::Manager::instance().await?;
-    let mut data = std::collections::HashMap::new();
-    data.insert(
-        "role".to_string(),
-        serde_json::Value::String(role.to_string()),
-    );
-    data.insert(
-        "node_id".to_string(),
-        serde_json::Value::String(node_id.to_string()),
-    );
-    data.insert(
-        "secret".to_string(),
-        serde_json::Value::String(secret.to_string()),
-    );
+    let unique_id = gen_unique_id().await?;
+    println!("unique_id:{:?}", unique_id);
+    println!("name:{:?}", name);
+    println!("description:{:?}", description);
+    // let db = pool::Manager::instance().await?;
+    // let mut data = std::collections::HashMap::new();
+    // data.insert(
+    //     "role".to_string(),
+    //     serde_json::Value::String(role.to_string()),
+    // );
+    // data.insert(
+    //     "node_id".to_string(),
+    //     serde_json::Value::String(node_id.to_string()),
+    // );
+    // data.insert(
+    //     "secret".to_string(),
+    //     serde_json::Value::String(secret.to_string()),
+    // );
 
-    let id = db.insert("api_nodes", &data).await?;
-    Ok(id)
+    // let id = db.insert("api_nodes", &data).await?;
+    Ok(0)
 }

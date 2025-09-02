@@ -129,17 +129,27 @@ impl Setup {
             &port.to_string(),
         )
         .await?;
-        if api_node_id == 0 {}
+        if api_node_id == 0 {
+            let http_json = "";
+            let https_json = "";
+
+            println!("http_json:{:?}", http_json);
+            println!("https_json:{:?}", https_json);
+
+            fastcdn_common::orm::api_node::add("默认API节点", "这是默认创建的第一个API节点").await?;
+        }
 
         println!("id:{:?}", api_token_data[0].get("id"));
         println!("node_id:{:?}", api_token_data[0].get("node_id"));
 
         let api_config = fastcdn_common::config::api::Api {
-            node_id: api_token_data[0].get("node_id")
+            node_id: api_token_data[0]
+                .get("node_id")
                 .and_then(|v| v.as_str())
                 .unwrap_or_default()
                 .to_string(),
-            secret: api_token_data[0].get("secret")
+            secret: api_token_data[0]
+                .get("secret")
                 .and_then(|v| v.as_str())
                 .unwrap_or_default()
                 .to_string(),
