@@ -27,18 +27,13 @@ impl StaticHandler {
 
     /// 首页重定向
     pub async fn index() -> impl Responder {
-        // let path = req.path().trim_start_matches('/');
-        match Asset::get("/index.html") {
+        match Asset::get("index.html") {
             Some(content) => {
-                let mime = from_path(path).first_or_octet_stream();
+                let mime = from_path("index.html").first_or_octet_stream();
                 let body: Cow<[u8]> = content.data.into();
                 HttpResponse::Ok().content_type(mime.as_ref()).body(body)
             }
             None => HttpResponse::NotFound().body("404 Not Found"),
         }
-
-        // HttpResponse::Found()
-        //     .append_header(("Location", "/static/index.html"))
-        //     .finish()
     }
 }
