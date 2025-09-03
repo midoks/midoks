@@ -121,7 +121,7 @@ impl Setup {
             return Err("can not find admin node token, please run the setup again".into());
         }
 
-        let api_node_id = fastcdn_common::orm::api_node::find_enabled_id_with_addr(
+        let mut api_node_id = fastcdn_common::orm::api_node::find_enabled_id_with_addr(
             protocol,
             host,
             &port.to_string(),
@@ -150,7 +150,7 @@ impl Setup {
             println!("http_json:{:?}", http_json);
             println!("https_json:{:?}", https_json);
 
-            fastcdn_common::orm::api_node::add(
+            api_node_id = fastcdn_common::orm::api_node::add(
                 "默认API节点",
                 "这是默认创建的第一个API节点",
                 http_json,
