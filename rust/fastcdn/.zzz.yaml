@@ -20,8 +20,8 @@ action:
   - echo "before"
   after:
   # - ./target/release/fastcdn-api setup --protocol=http --host=127.0.0.1 --port 10001
-  # - ./target/release/fastcdn-api start -d
-  # - ./target/release/fastcdn start -d
+  - ./target/release/fastcdn-api start -d
+  - ./target/release/fastcdn start &
   - ./target/release/fastcdn test
   # - ./target/release/fastcdn-node start -d
   exit:
