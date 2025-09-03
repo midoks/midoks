@@ -1,4 +1,4 @@
-use crate::{constant, db::pool, orm::api_token, utils};
+use crate::{constant, db::pool, option, orm::api_token, utils};
 
 pub async fn gen_unique_id() -> Result<String, Box<dyn std::error::Error>> {
     let db = pool::Manager::instance().await?;
@@ -23,21 +23,16 @@ pub async fn find_enabled_api_node_id_with_addr(
 ) -> Result<u64, Box<dyn std::error::Error>> {
     let db = pool::Manager::instance().await?;
 
-    let mut data = std::collections::HashMap::new();
-    data.insert(
-        "protocol".to_string(),
-        serde_json::Value::String(protocol.to_string()),
-    );
-    data.insert(
-        "host".to_string(),
-        serde_json::Value::String(host.to_string()),
-    );
-    data.insert(
-        "port_range".to_string(),
-        serde_json::Value::String(port.to_string()),
-    );
+    let addr = option::network_address::NetworkAddressConfig {
+        protocal: protocol.to_string(),
+        host: host.to_string(),
+        port_range: port.to_string(),
+        min_port: 0,
+        max_port: 0,
+        host_has_variables: false,
+    };
 
-    let addr = serde_json::to_string(&data)?;
+    let addr = serde_json::to_string(&[addr])?;
     let table_name = db.get_table_name("api_nodes");
     let query = db
         .query_builder(&table_name)
@@ -60,6 +55,7 @@ pub async fn create(
     description: Option<&str>,
     http: Option<&str>,
     https: Option<&str>,
+    access_addrs: Option<&str>,
     unique_id: &str,
     secret: &str,
 ) -> Result<u64, Box<dyn std::error::Error>> {
@@ -85,6 +81,11 @@ pub async fn create(
         "https".to_string(),
         serde_json::Value::String(https.unwrap_or("").to_string()),
     );
+
+    data.insert(
+        "access_addrs".to_string(),
+        serde_json::Value::String(access_addrs.unwrap_or("").to_string()),
+    );
     data.insert(
         "unique_id".to_string(),
         serde_json::Value::String(unique_id.to_string()),
@@ -100,8 +101,9 @@ pub async fn create(
 pub async fn add(
     name: &str,
     description: &str,
-    // http_json: &str,
-    // https_json: &str,
+    http_json: &str,
+    https_json: &str,
+    access_addrs: &str,
 ) -> Result<u64, Box<dyn std::error::Error>> {
     let unique_id = gen_unique_id().await?;
     let secret = utils::rand::string(32);
@@ -112,15 +114,14 @@ pub async fn add(
         Some(1),
         Some(name),
         Some(description),
-        Some(""),
-        Some(""),
+        Some(http_json),
+        Some(https_json),
+        Some(access_addrs),
         &unique_id,
         &secret,
     )
     .await?;
     println!("unique_id:{:?}", unique_id);
     println!("secret:{:?}", secret);
-    println!("name:{:?}", name);
-    println!("description:{:?}", description);
     Ok(id)
 }

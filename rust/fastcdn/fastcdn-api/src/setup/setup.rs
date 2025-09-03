@@ -1,4 +1,4 @@
-use fastcdn_common::db::dump::TableInfo;
+use fastcdn_common::{db::dump::TableInfo, option::network_address::NetworkAddressConfig};
 use lazy_static::lazy_static;
 use rust_embed::RustEmbed;
 use serde::{Deserialize, Serialize};
@@ -100,15 +100,15 @@ impl Setup {
         port: u16,
     ) -> Result<(), Box<dyn std::error::Error>> {
         if protocol.is_empty() {
-            return Err("the protocol cannot be empty.".into());
+            return Err("protocol cannot be empty.".into());
         }
 
         if protocol != "http" && protocol != "https" {
-            return Err("the protocol only supports http and https!".into());
+            return Err("protocol only supports http and https!".into());
         }
 
         if host.is_empty() {
-            return Err("the host cannot be empty.".into());
+            return Err("host cannot be empty.".into());
         }
 
         println!("{:?}", port);
@@ -129,14 +129,37 @@ impl Setup {
             &port.to_string(),
         )
         .await?;
+
+        println!("api_node_id:{:?}", api_node_id);
         if api_node_id == 0 {
-            let http_json = "";
-            let https_json = "";
+            let addr = NetworkAddressConfig {
+                protocal: protocol.to_string(),
+                host: host.to_string(),
+                port_range: port.to_string(),
+                min_port: 0,
+                max_port: 0,
+                host_has_variables: false,
+            };
+            println!("{:?}", addr);
+
+            let access_addrs = serde_json::to_string(&[addr])?;
+
+            let http_json = "{}";
+            if protocol == "http" {}
+
+            let https_json = "{}";
 
             println!("http_json:{:?}", http_json);
             println!("https_json:{:?}", https_json);
 
-            fastcdn_common::orm::api_node::add("默认API节点", "这是默认创建的第一个API节点").await?;
+            fastcdn_common::orm::api_node::add(
+                "默认API节点",
+                "这是默认创建的第一个API节点",
+                http_json,
+                https_json,
+                &access_addrs,
+            )
+            .await?;
         }
 
         println!("id:{:?}", api_token_data[0].get("id"));

@@ -418,6 +418,9 @@ impl Manager {
         let sql = builder.build_sql();
         let params = builder.get_params();
 
+        // println!("sql:{:?}", sql);
+        // println!("params:{:?}", params);
+
         let mut query = sqlx::query(&sql);
         for param in params {
             query = query.bind(param);
