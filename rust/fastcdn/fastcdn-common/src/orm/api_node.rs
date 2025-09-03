@@ -16,7 +16,35 @@ pub async fn gen_unique_id() -> Result<String, Box<dyn std::error::Error>> {
     }
 }
 
-pub async fn find_enabled_api_node_id_with_addr(
+pub async fn find_enabled_with_id(
+    id: u64,
+) -> Result<Vec<serde_json::Value>, Box<dyn std::error::Error>> {
+    let db = pool::Manager::instance().await?;
+    let table_name = db.get_table_name("api_nodes");
+    let query = db
+        .query_builder(&table_name)
+        .select(&[
+            "id",
+            "is_on",
+            "name",
+            "access_addrs",
+            "description",
+            "unique_id",
+            "secret",
+            "http",
+            "https",
+            "admin_id",
+            "created_at",
+            "order",
+            "status",
+            "is_primary",
+        ])
+        .where_with_param("id=?", &id.to_string());
+    let results = db.query_with_builder(query).await?;
+    Ok(results)
+}
+
+pub async fn find_enabled_id_with_addr(
     protocol: &str,
     host: &str,
     port: &str,

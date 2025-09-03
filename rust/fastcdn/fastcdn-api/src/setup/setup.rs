@@ -123,7 +123,7 @@ impl Setup {
             return Err("can not find admin node token, please run the setup again".into());
         }
 
-        let api_node_id = fastcdn_common::orm::api_node::find_enabled_api_node_id_with_addr(
+        let api_node_id = fastcdn_common::orm::api_node::find_enabled_id_with_addr(
             protocol,
             host,
             &port.to_string(),
@@ -165,13 +165,15 @@ impl Setup {
         println!("id:{:?}", api_token_data[0].get("id"));
         println!("node_id:{:?}", api_token_data[0].get("node_id"));
 
+        let data = fastcdn_common::orm::api_node::find_enabled_with_id(api_node_id).await?;
+
         let api_config = fastcdn_common::config::api::Api {
-            node_id: api_token_data[0]
-                .get("node_id")
+            node_id: data[0]
+                .get("unique_id")
                 .and_then(|v| v.as_str())
                 .unwrap_or_default()
                 .to_string(),
-            secret: api_token_data[0]
+            secret: data[0]
                 .get("secret")
                 .and_then(|v| v.as_str())
                 .unwrap_or_default()
