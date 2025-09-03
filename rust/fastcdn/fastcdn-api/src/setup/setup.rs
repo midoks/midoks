@@ -111,8 +111,6 @@ impl Setup {
             return Err("host cannot be empty.".into());
         }
 
-        println!("{:?}", port);
-
         // 初始化安装创建数据库
         self.install_db().await?;
         self.check_data().await?;
@@ -162,11 +160,7 @@ impl Setup {
             .await?;
         }
 
-        println!("id:{:?}", api_token_data[0].get("id"));
-        println!("node_id:{:?}", api_token_data[0].get("node_id"));
-
         let data = fastcdn_common::orm::api_node::find_enabled_with_id(api_node_id).await?;
-
         let api_config = fastcdn_common::config::api::Api {
             node_id: data[0]
                 .get("unique_id")
