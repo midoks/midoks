@@ -3,6 +3,7 @@
 //! 提供 RPC 客户端和服务器的共享实现
 
 pub mod config;
+pub mod constant;
 pub mod daemon;
 pub mod db;
 pub mod option;

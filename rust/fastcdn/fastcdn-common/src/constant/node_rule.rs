@@ -1,0 +1,12 @@
+pub const ADMIN: &str = "admin";
+pub const USER: &str = "user";
+pub const PROVIDER: &str = "provider";
+pub const API: &str = "api";
+pub const DATABASE: &str = "database";
+pub const LOG: &str = "log";
+pub const DNS: &str = "dns";
+pub const MONITOR: &str = "monitor";
+pub const NODE: &str = "node";
+pub const CLUSTER: &str = "cluster";
+pub const AUTHORITY: &str = "authority";
+pub const REPORT: &str = "report";
