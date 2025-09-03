@@ -24,20 +24,20 @@ pub async fn find_enabled_with_id(
     let query = db
         .query_builder(&table_name)
         .select(&[
-            "id",
-            "is_on",
-            "name",
-            "access_addrs",
-            "description",
-            "unique_id",
-            "secret",
-            "http",
-            "https",
-            "admin_id",
-            "created_at",
-            "order",
-            "status",
-            "is_primary",
+            "`id`",
+            "`is_on`",
+            "`name`",
+            "`access_addrs`",
+            "`description`",
+            "`unique_id`",
+            "`secret`",
+            "`http`",
+            "`https`",
+            "`admin_id`",
+            "`created_at`",
+            "`order`",
+            "`status`",
+            "`is_primary`",
         ])
         .where_with_param("id=?", &id.to_string());
     let results = db.query_with_builder(query).await?;
