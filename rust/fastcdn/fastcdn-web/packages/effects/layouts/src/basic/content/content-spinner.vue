@@ -8,5 +8,5 @@ defineOptions({ name: 'LayoutContentSpinner' });
 const { spinning } = useContentSpinner();
 </script>
 <template>
-  <VbenSpinner :spinning="spinning" />
+    <VbenSpinner :spinning="spinning" />
 </template>

@@ -10,19 +10,19 @@ import { DialogDescription, useForwardProps } from 'radix-vue';
 const props = defineProps<DialogDescriptionProps & { class?: any }>();
 
 const delegatedProps = computed(() => {
-  const { class: _, ...delegated } = props;
+    const { class: _, ...delegated } = props;
 
-  return delegated;
+    return delegated;
 });
 
 const forwardedProps = useForwardProps(delegatedProps);
 </script>
 
 <template>
-  <DialogDescription
-    v-bind="forwardedProps"
-    :class="cn('text-muted-foreground text-sm', props.class)"
-  >
-    <slot></slot>
-  </DialogDescription>
+    <DialogDescription
+        v-bind="forwardedProps"
+        :class="cn('text-muted-foreground text-sm', props.class)"
+    >
+        <slot></slot>
+    </DialogDescription>
 </template>

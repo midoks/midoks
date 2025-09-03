@@ -1,9 +1,9 @@
 export default eventHandler(async (event) => {
-  const userinfo = verifyAccessToken(event);
-  if (!userinfo) {
-    return unAuthorizedResponse(event);
-  }
-  const data = `
+    const userinfo = verifyAccessToken(event);
+    if (!userinfo) {
+        return unAuthorizedResponse(event);
+    }
+    const data = `
   {
     "code": 0,
     "message": "success",
@@ -23,6 +23,6 @@ export default eventHandler(async (event) => {
             ]
   }
   `;
-  setHeader(event, 'Content-Type', 'application/json');
-  return data;
+    setHeader(event, 'Content-Type', 'application/json');
+    return data;
 });

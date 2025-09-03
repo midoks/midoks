@@ -5,5 +5,5 @@ defineOptions({ name: 'Fallback403Demo' });
 </script>
 
 <template>
-  <Fallback status="403" />
+    <Fallback status="403" />
 </template>

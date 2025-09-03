@@ -9,9 +9,9 @@ import { TinyColor } from '@ctrl/tinycolor';
  * @returns {string} HSL格式的颜色字符串。
  */
 function convertToHsl(color: string): string {
-  const { a, h, l, s } = new TinyColor(color).toHsl();
-  const hsl = `hsl(${Math.round(h)} ${Math.round(s * 100)}% ${Math.round(l * 100)}%)`;
-  return a < 1 ? `${hsl} ${a}` : hsl;
+    const { a, h, l, s } = new TinyColor(color).toHsl();
+    const hsl = `hsl(${Math.round(h)} ${Math.round(s * 100)}% ${Math.round(l * 100)}%)`;
+    return a < 1 ? `${hsl} ${a}` : hsl;
 }
 
 /**
@@ -24,9 +24,9 @@ function convertToHsl(color: string): string {
  * @returns {string} 可以作为CSS变量使用的HSL格式的颜色字符串。
  */
 function convertToHslCssVar(color: string): string {
-  const { a, h, l, s } = new TinyColor(color).toHsl();
-  const hsl = `${Math.round(h)} ${Math.round(s * 100)}% ${Math.round(l * 100)}%`;
-  return a < 1 ? `${hsl} / ${a}` : hsl;
+    const { a, h, l, s } = new TinyColor(color).toHsl();
+    const hsl = `${Math.round(h)} ${Math.round(s * 100)}% ${Math.round(l * 100)}%`;
+    return a < 1 ? `${hsl} / ${a}` : hsl;
 }
 
 /**
@@ -38,7 +38,9 @@ function convertToHslCssVar(color: string): string {
  * @returns 如果颜色值有效，则返回对应的RGB颜色字符串；如果无效，则返回rgb(0, 0, 0)
  */
 function convertToRgb(str: string): string {
-  return new TinyColor(str.replaceAll(/deg|grad|rad|turn/g, '')).toRgbString();
+    return new TinyColor(
+        str.replaceAll(/deg|grad|rad|turn/g, ''),
+    ).toRgbString();
 }
 
 /**
@@ -47,16 +49,16 @@ function convertToRgb(str: string): string {
  * 如果颜色有效返回true，否则返回false
  */
 function isValidColor(color?: string) {
-  if (!color) {
-    return false;
-  }
-  return new TinyColor(color).isValid;
+    if (!color) {
+        return false;
+    }
+    return new TinyColor(color).isValid;
 }
 
 export {
-  convertToHsl,
-  convertToHslCssVar,
-  convertToRgb,
-  isValidColor,
-  TinyColor,
+    convertToHsl,
+    convertToHslCssVar,
+    convertToRgb,
+    isValidColor,
+    TinyColor,
 };

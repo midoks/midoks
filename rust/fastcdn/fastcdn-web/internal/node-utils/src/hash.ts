@@ -6,13 +6,13 @@ import { createHash } from 'node:crypto';
  * @param hashLSize
  */
 function generatorContentHash(content: string, hashLSize?: number) {
-  const hash = createHash('md5').update(content, 'utf8').digest('hex');
+    const hash = createHash('md5').update(content, 'utf8').digest('hex');
 
-  if (hashLSize) {
-    return hash.slice(0, hashLSize);
-  }
+    if (hashLSize) {
+        return hash.slice(0, hashLSize);
+    }
 
-  return hash;
+    return hash;
 }
 
 export { generatorContentHash };

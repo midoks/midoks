@@ -5,5 +5,5 @@ defineOptions({ name: 'FallbackOfflineDemo' });
 </script>
 
 <template>
-  <Fallback status="offline" />
+    <Fallback status="offline" />
 </template>

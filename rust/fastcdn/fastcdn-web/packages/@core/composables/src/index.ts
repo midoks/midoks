@@ -6,8 +6,8 @@ export * from './use-scroll-lock';
 export * from './use-simple-locale';
 export * from './use-sortable';
 export {
-  useEmitAsProps,
-  useForwardExpose,
-  useForwardProps,
-  useForwardPropsEmits,
+    useEmitAsProps,
+    useForwardExpose,
+    useForwardProps,
+    useForwardPropsEmits,
 } from 'radix-vue';

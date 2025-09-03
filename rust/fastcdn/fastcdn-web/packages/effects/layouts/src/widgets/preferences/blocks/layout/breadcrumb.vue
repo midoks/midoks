@@ -9,7 +9,7 @@ import SwitchItem from '../switch-item.vue';
 import ToggleItem from '../toggle-item.vue';
 
 defineOptions({
-  name: 'PreferenceBreadcrumbConfig',
+    name: 'PreferenceBreadcrumbConfig',
 });
 
 const props = defineProps<{ disabled?: boolean }>();
@@ -21,36 +21,36 @@ const breadcrumbShowHome = defineModel<boolean>('breadcrumbShowHome');
 const breadcrumbHideOnlyOne = defineModel<boolean>('breadcrumbHideOnlyOne');
 
 const typeItems: SelectOption[] = [
-  { label: $t('preferences.normal'), value: 'normal' },
-  { label: $t('preferences.breadcrumb.background'), value: 'background' },
+    { label: $t('preferences.normal'), value: 'normal' },
+    { label: $t('preferences.breadcrumb.background'), value: 'background' },
 ];
 
 const disableItem = computed(() => {
-  return !breadcrumbEnable.value || props.disabled;
+    return !breadcrumbEnable.value || props.disabled;
 });
 </script>
 
 <template>
-  <SwitchItem v-model="breadcrumbEnable" :disabled="disabled">
-    {{ $t('preferences.breadcrumb.enable') }}
-  </SwitchItem>
-  <SwitchItem v-model="breadcrumbHideOnlyOne" :disabled="disableItem">
-    {{ $t('preferences.breadcrumb.hideOnlyOne') }}
-  </SwitchItem>
-  <SwitchItem v-model="breadcrumbShowIcon" :disabled="disableItem">
-    {{ $t('preferences.breadcrumb.icon') }}
-  </SwitchItem>
-  <SwitchItem
-    v-model="breadcrumbShowHome"
-    :disabled="disableItem || !breadcrumbShowIcon"
-  >
-    {{ $t('preferences.breadcrumb.home') }}
-  </SwitchItem>
-  <ToggleItem
-    v-model="breadcrumbStyleType"
-    :disabled="disableItem"
-    :items="typeItems"
-  >
-    {{ $t('preferences.breadcrumb.style') }}
-  </ToggleItem>
+    <SwitchItem v-model="breadcrumbEnable" :disabled="disabled">
+        {{ $t('preferences.breadcrumb.enable') }}
+    </SwitchItem>
+    <SwitchItem v-model="breadcrumbHideOnlyOne" :disabled="disableItem">
+        {{ $t('preferences.breadcrumb.hideOnlyOne') }}
+    </SwitchItem>
+    <SwitchItem v-model="breadcrumbShowIcon" :disabled="disableItem">
+        {{ $t('preferences.breadcrumb.icon') }}
+    </SwitchItem>
+    <SwitchItem
+        v-model="breadcrumbShowHome"
+        :disabled="disableItem || !breadcrumbShowIcon"
+    >
+        {{ $t('preferences.breadcrumb.home') }}
+    </SwitchItem>
+    <ToggleItem
+        v-model="breadcrumbStyleType"
+        :disabled="disableItem"
+        :items="typeItems"
+    >
+        {{ $t('preferences.breadcrumb.style') }}
+    </ToggleItem>
 </template>

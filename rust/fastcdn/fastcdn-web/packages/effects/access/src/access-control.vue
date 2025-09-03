@@ -11,37 +11,37 @@ import { computed } from 'vue';
 import { useAccess } from './use-access';
 
 interface Props {
-  /**
-   * Specified codes is visible
-   * @default []
-   */
-  codes?: string[];
+    /**
+     * Specified codes is visible
+     * @default []
+     */
+    codes?: string[];
 
-  /**
-   * 通过什么方式来控制组件，如果是 role，则传入角色，如果是 code，则传入权限码
-   * @default 'role'
-   */
-  type?: 'code' | 'role';
+    /**
+     * 通过什么方式来控制组件，如果是 role，则传入角色，如果是 code，则传入权限码
+     * @default 'role'
+     */
+    type?: 'code' | 'role';
 }
 
 defineOptions({
-  name: 'AccessControl',
+    name: 'AccessControl',
 });
 
 const props = withDefaults(defineProps<Props>(), {
-  codes: () => [],
-  type: 'role',
+    codes: () => [],
+    type: 'role',
 });
 
 const { hasAccessByCodes, hasAccessByRoles } = useAccess();
 
 const hasAuth = computed(() => {
-  const { codes, type } = props;
-  return type === 'role' ? hasAccessByRoles(codes) : hasAccessByCodes(codes);
+    const { codes, type } = props;
+    return type === 'role' ? hasAccessByRoles(codes) : hasAccessByCodes(codes);
 });
 </script>
 
 <template>
-  <slot v-if="!codes"></slot>
-  <slot v-else-if="hasAuth"></slot>
+    <slot v-if="!codes"></slot>
+    <slot v-else-if="hasAuth"></slot>
 </template>

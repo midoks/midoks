@@ -13,13 +13,13 @@ const SvgCakeIcon = createIconifyIcon('svg:cake');
 const SvgAntdvLogoIcon = createIconifyIcon('svg:antdv-logo');
 
 export {
-  SvgAntdvLogoIcon,
-  SvgAvatar1Icon,
-  SvgAvatar2Icon,
-  SvgAvatar3Icon,
-  SvgAvatar4Icon,
-  SvgBellIcon,
-  SvgCakeIcon,
-  SvgCardIcon,
-  SvgDownloadIcon,
+    SvgAntdvLogoIcon,
+    SvgAvatar1Icon,
+    SvgAvatar2Icon,
+    SvgAvatar3Icon,
+    SvgAvatar4Icon,
+    SvgBellIcon,
+    SvgCakeIcon,
+    SvgCardIcon,
+    SvgDownloadIcon,
 };

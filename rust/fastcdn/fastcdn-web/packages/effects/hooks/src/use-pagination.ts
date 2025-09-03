@@ -11,48 +11,48 @@ import { computed, ref, unref } from 'vue';
  * @throws {Error} If pageNo or pageSize are invalid
  */
 function pagination<T = any>(list: T[], pageNo: number, pageSize: number): T[] {
-  if (pageNo < 1) throw new Error('Page number must be positive');
-  if (pageSize < 1) throw new Error('Page size must be positive');
+    if (pageNo < 1) throw new Error('Page number must be positive');
+    if (pageSize < 1) throw new Error('Page size must be positive');
 
-  const offset = (pageNo - 1) * Number(pageSize);
-  const ret =
-    offset + pageSize >= list.length
-      ? list.slice(offset)
-      : list.slice(offset, offset + pageSize);
-  return ret;
+    const offset = (pageNo - 1) * Number(pageSize);
+    const ret =
+        offset + pageSize >= list.length
+            ? list.slice(offset)
+            : list.slice(offset, offset + pageSize);
+    return ret;
 }
 
 export function usePagination<T = any>(list: Ref<T[]>, pageSize: number) {
-  const currentPage = ref(1);
-  const pageSizeRef = ref(pageSize);
+    const currentPage = ref(1);
+    const pageSizeRef = ref(pageSize);
 
-  const totalPages = computed(() =>
-    Math.ceil(unref(list).length / unref(pageSizeRef)),
-  );
+    const totalPages = computed(() =>
+        Math.ceil(unref(list).length / unref(pageSizeRef)),
+    );
 
-  const paginationList = computed(() => {
-    return pagination(unref(list), unref(currentPage), unref(pageSizeRef));
-  });
+    const paginationList = computed(() => {
+        return pagination(unref(list), unref(currentPage), unref(pageSizeRef));
+    });
 
-  const total = computed(() => {
-    return unref(list).length;
-  });
+    const total = computed(() => {
+        return unref(list).length;
+    });
 
-  function setCurrentPage(page: number) {
-    if (page < 1 || page > unref(totalPages)) {
-      throw new Error('Invalid page number');
+    function setCurrentPage(page: number) {
+        if (page < 1 || page > unref(totalPages)) {
+            throw new Error('Invalid page number');
+        }
+        currentPage.value = page;
     }
-    currentPage.value = page;
-  }
 
-  function setPageSize(pageSize: number) {
-    if (pageSize < 1) {
-      throw new Error('Page size must be positive');
+    function setPageSize(pageSize: number) {
+        if (pageSize < 1) {
+            throw new Error('Page size must be positive');
+        }
+        pageSizeRef.value = pageSize;
+        // Reset to first page to prevent invalid state
+        currentPage.value = 1;
     }
-    pageSizeRef.value = pageSize;
-    // Reset to first page to prevent invalid state
-    currentPage.value = 1;
-  }
 
-  return { setCurrentPage, total, setPageSize, paginationList };
+    return { setCurrentPage, total, setPageSize, paginationList };
 }

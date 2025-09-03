@@ -1,5 +1,5 @@
 export default defineEventHandler(() => {
-  return `
+    return `
 <h1>Hello Vben Admin</h1>
 <h2>Mock service is starting</h2>
 <ul>

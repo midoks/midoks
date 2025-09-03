@@ -9,24 +9,24 @@ import { Menu } from './components';
 import SubMenu from './sub-menu.vue';
 
 interface Props extends MenuProps {
-  menus: MenuRecordRaw[];
+    menus: MenuRecordRaw[];
 }
 
 defineOptions({
-  name: 'MenuView',
+    name: 'MenuView',
 });
 
 const props = withDefaults(defineProps<Props>(), {
-  collapse: false,
+    collapse: false,
 });
 
 const forward = useForwardProps(props);
 </script>
 
 <template>
-  <Menu v-bind="forward">
-    <template v-for="menu in menus" :key="menu.path">
-      <SubMenu :menu="menu" />
-    </template>
-  </Menu>
+    <Menu v-bind="forward">
+        <template v-for="menu in menus" :key="menu.path">
+            <SubMenu :menu="menu" />
+        </template>
+    </Menu>
 </template>

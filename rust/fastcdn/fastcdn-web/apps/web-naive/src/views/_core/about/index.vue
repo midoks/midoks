@@ -5,5 +5,5 @@ defineOptions({ name: 'About' });
 </script>
 
 <template>
-  <About />
+    <About />
 </template>

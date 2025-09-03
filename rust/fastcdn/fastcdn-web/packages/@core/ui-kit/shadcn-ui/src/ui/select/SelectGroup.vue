@@ -10,14 +10,14 @@ import { SelectGroup } from 'radix-vue';
 const props = defineProps<SelectGroupProps & { class?: any }>();
 
 const delegatedProps = computed(() => {
-  const { class: _, ...delegated } = props;
+    const { class: _, ...delegated } = props;
 
-  return delegated;
+    return delegated;
 });
 </script>
 
 <template>
-  <SelectGroup :class="cn('w-full p-1', props.class)" v-bind="delegatedProps">
-    <slot></slot>
-  </SelectGroup>
+    <SelectGroup :class="cn('w-full p-1', props.class)" v-bind="delegatedProps">
+        <slot></slot>
+    </SelectGroup>
 </template>

@@ -5,42 +5,42 @@ import { watch } from 'vue';
 import { useDebounceFn } from '@vueuse/core';
 
 interface UseMenuScrollOptions {
-  delay?: number;
-  enable?: boolean | Ref<boolean>;
+    delay?: number;
+    enable?: boolean | Ref<boolean>;
 }
 
 export function useMenuScroll(
-  activePath: Ref<string | undefined>,
-  options: UseMenuScrollOptions = {},
+    activePath: Ref<string | undefined>,
+    options: UseMenuScrollOptions = {},
 ) {
-  const { enable = true, delay = 320 } = options;
+    const { enable = true, delay = 320 } = options;
 
-  function scrollToActiveItem() {
-    const isEnabled = typeof enable === 'boolean' ? enable : enable.value;
-    if (!isEnabled) return;
+    function scrollToActiveItem() {
+        const isEnabled = typeof enable === 'boolean' ? enable : enable.value;
+        if (!isEnabled) return;
 
-    const activeElement = document.querySelector(
-      `aside li[role=menuitem].is-active`,
-    );
-    if (activeElement) {
-      activeElement.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center',
-        inline: 'center',
-      });
+        const activeElement = document.querySelector(
+            `aside li[role=menuitem].is-active`,
+        );
+        if (activeElement) {
+            activeElement.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center',
+                inline: 'center',
+            });
+        }
     }
-  }
 
-  const debouncedScroll = useDebounceFn(scrollToActiveItem, delay);
+    const debouncedScroll = useDebounceFn(scrollToActiveItem, delay);
 
-  watch(activePath, () => {
-    const isEnabled = typeof enable === 'boolean' ? enable : enable.value;
-    if (!isEnabled) return;
+    watch(activePath, () => {
+        const isEnabled = typeof enable === 'boolean' ? enable : enable.value;
+        if (!isEnabled) return;
 
-    debouncedScroll();
-  });
+        debouncedScroll();
+    });
 
-  return {
-    scrollToActiveItem,
-  };
+    return {
+        scrollToActiveItem,
+    };
 }

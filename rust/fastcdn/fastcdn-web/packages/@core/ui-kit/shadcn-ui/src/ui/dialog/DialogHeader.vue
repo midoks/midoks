@@ -2,14 +2,16 @@
 import { cn } from '@vben-core/shared/utils';
 
 const props = defineProps<{
-  class?: any;
+    class?: any;
 }>();
 </script>
 
 <template>
-  <div
-    :class="cn('flex flex-col gap-y-1.5 text-center sm:text-left', props.class)"
-  >
-    <slot></slot>
-  </div>
+    <div
+        :class="
+            cn('flex flex-col gap-y-1.5 text-center sm:text-left', props.class)
+        "
+    >
+        <slot></slot>
+    </div>
 </template>

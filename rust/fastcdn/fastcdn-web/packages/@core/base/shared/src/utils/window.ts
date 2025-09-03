@@ -1,7 +1,7 @@
 interface OpenWindowOptions {
-  noopener?: boolean;
-  noreferrer?: boolean;
-  target?: '_blank' | '_parent' | '_self' | '_top' | string;
+    noopener?: boolean;
+    noreferrer?: boolean;
+    target?: '_blank' | '_parent' | '_self' | '_top' | string;
 }
 
 /**
@@ -11,16 +11,19 @@ interface OpenWindowOptions {
  * @param options - 打开窗口的选项。
  */
 function openWindow(url: string, options: OpenWindowOptions = {}): void {
-  // 解构并设置默认值
-  const { noopener = true, noreferrer = true, target = '_blank' } = options;
+    // 解构并设置默认值
+    const { noopener = true, noreferrer = true, target = '_blank' } = options;
 
-  // 基于选项创建特性字符串
-  const features = [noopener && 'noopener=yes', noreferrer && 'noreferrer=yes']
-    .filter(Boolean)
-    .join(',');
+    // 基于选项创建特性字符串
+    const features = [
+        noopener && 'noopener=yes',
+        noreferrer && 'noreferrer=yes',
+    ]
+        .filter(Boolean)
+        .join(',');
 
-  // 打开窗口
-  window.open(url, target, features);
+    // 打开窗口
+    window.open(url, target, features);
 }
 
 /**
@@ -28,10 +31,10 @@ function openWindow(url: string, options: OpenWindowOptions = {}): void {
  * @param path
  */
 function openRouteInNewWindow(path: string) {
-  const { hash, origin } = location;
-  const fullPath = path.startsWith('/') ? path : `/${path}`;
-  const url = `${origin}${hash ? '/#' : ''}${fullPath}`;
-  openWindow(url, { target: '_blank' });
+    const { hash, origin } = location;
+    const fullPath = path.startsWith('/') ? path : `/${path}`;
+    const url = `${origin}${hash ? '/#' : ''}${fullPath}`;
+    openWindow(url, { target: '_blank' });
 }
 
 export { openRouteInNewWindow, openWindow };

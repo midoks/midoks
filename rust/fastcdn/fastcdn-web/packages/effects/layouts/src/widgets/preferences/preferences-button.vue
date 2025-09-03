@@ -8,13 +8,13 @@ import Preferences from './preferences.vue';
 const emit = defineEmits<{ clearPreferencesAndLogout: [] }>();
 
 function clearPreferencesAndLogout() {
-  emit('clearPreferencesAndLogout');
+    emit('clearPreferencesAndLogout');
 }
 </script>
 <template>
-  <Preferences @clear-preferences-and-logout="clearPreferencesAndLogout">
-    <VbenIconButton>
-      <Settings class="text-foreground size-4" />
-    </VbenIconButton>
-  </Preferences>
+    <Preferences @clear-preferences-and-logout="clearPreferencesAndLogout">
+        <VbenIconButton>
+            <Settings class="text-foreground size-4" />
+        </VbenIconButton>
+    </Preferences>
 </template>

@@ -2,12 +2,12 @@
 import { cn } from '@vben-core/shared/utils';
 
 const props = defineProps<{
-  class?: any;
+    class?: any;
 }>();
 </script>
 
 <template>
-  <p :class="cn('text-muted-foreground text-sm', props.class)">
-    <slot></slot>
-  </p>
+    <p :class="cn('text-muted-foreground text-sm', props.class)">
+        <slot></slot>
+    </p>
 </template>

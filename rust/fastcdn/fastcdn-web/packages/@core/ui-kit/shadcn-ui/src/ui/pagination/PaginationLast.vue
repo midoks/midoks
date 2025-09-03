@@ -11,25 +11,25 @@ import { PaginationLast } from 'radix-vue';
 import { Button } from '../button';
 
 const props = withDefaults(
-  defineProps<PaginationLastProps & { class?: any }>(),
-  {
-    asChild: true,
-  },
+    defineProps<PaginationLastProps & { class?: any }>(),
+    {
+        asChild: true,
+    },
 );
 
 const delegatedProps = computed(() => {
-  const { class: _, ...delegated } = props;
+    const { class: _, ...delegated } = props;
 
-  return delegated;
+    return delegated;
 });
 </script>
 
 <template>
-  <PaginationLast v-bind="delegatedProps">
-    <Button :class="cn('size-8 p-0', props.class)" variant="outline">
-      <slot>
-        <ChevronsRight class="size-4" />
-      </slot>
-    </Button>
-  </PaginationLast>
+    <PaginationLast v-bind="delegatedProps">
+        <Button :class="cn('size-8 p-0', props.class)" variant="outline">
+            <slot>
+                <ChevronsRight class="size-4" />
+            </slot>
+        </Button>
+    </PaginationLast>
 </template>

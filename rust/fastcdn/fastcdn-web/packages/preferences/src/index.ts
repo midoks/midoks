@@ -9,7 +9,7 @@ import type { DeepPartial } from '@vben-core/typings';
  */
 
 function defineOverridesPreferences(preferences: DeepPartial<Preferences>) {
-  return preferences;
+    return preferences;
 }
 
 export { defineOverridesPreferences };

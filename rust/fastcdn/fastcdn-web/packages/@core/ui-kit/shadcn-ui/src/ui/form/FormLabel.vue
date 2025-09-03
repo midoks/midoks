@@ -12,7 +12,7 @@ const { formItemId } = useFormField();
 </script>
 
 <template>
-  <Label :class="cn(props.class)" :for="formItemId">
-    <slot></slot>
-  </Label>
+    <Label :class="cn(props.class)" :for="formItemId">
+        <slot></slot>
+    </Label>
 </template>

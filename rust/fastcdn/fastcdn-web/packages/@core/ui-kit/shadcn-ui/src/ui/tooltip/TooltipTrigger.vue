@@ -7,7 +7,7 @@ const props = defineProps<TooltipTriggerProps>();
 </script>
 
 <template>
-  <TooltipTrigger v-bind="props">
-    <slot></slot>
-  </TooltipTrigger>
+    <TooltipTrigger v-bind="props">
+        <slot></slot>
+    </TooltipTrigger>
 </template>

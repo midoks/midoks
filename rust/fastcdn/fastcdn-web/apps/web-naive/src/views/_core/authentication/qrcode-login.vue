@@ -6,5 +6,5 @@ defineOptions({ name: 'QrCodeLogin' });
 </script>
 
 <template>
-  <AuthenticationQrCodeLogin :login-path="LOGIN_PATH" />
+    <AuthenticationQrCodeLogin :login-path="LOGIN_PATH" />
 </template>

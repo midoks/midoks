@@ -14,7 +14,7 @@ interface Props extends MenuItemProps {}
 defineOptions({ name: 'MenuItem' });
 
 const props = withDefaults(defineProps<Props>(), {
-  disabled: false,
+    disabled: false,
 });
 
 const emit = defineEmits<{ click: [MenuItemRegistered] }>();
@@ -28,95 +28,99 @@ const { parentMenu, parentPaths } = useMenu();
 
 const active = computed(() => props.path === rootMenu?.activePath);
 const menuIcon = computed(() =>
-  active.value ? props.activeIcon || props.icon : props.icon,
+    active.value ? props.activeIcon || props.icon : props.icon,
 );
 
 const isTopLevelMenuItem = computed(
-  () => parentMenu.value?.type.name === 'Menu',
+    () => parentMenu.value?.type.name === 'Menu',
 );
 
 const collapseShowTitle = computed(
-  () =>
-    rootMenu.props?.collapseShowTitle &&
-    isTopLevelMenuItem.value &&
-    rootMenu.props.collapse,
+    () =>
+        rootMenu.props?.collapseShowTitle &&
+        isTopLevelMenuItem.value &&
+        rootMenu.props.collapse,
 );
 
 const showTooltip = computed(
-  () =>
-    rootMenu.props.mode === 'vertical' &&
-    isTopLevelMenuItem.value &&
-    rootMenu.props?.collapse &&
-    slots.title,
+    () =>
+        rootMenu.props.mode === 'vertical' &&
+        isTopLevelMenuItem.value &&
+        rootMenu.props?.collapse &&
+        slots.title,
 );
 
 const item: MenuItemRegistered = reactive({
-  active,
-  parentPaths: parentPaths.value,
-  path: props.path || '',
+    active,
+    parentPaths: parentPaths.value,
+    path: props.path || '',
 });
 
 /**
  * 菜单项点击事件
  */
 function handleClick() {
-  if (props.disabled) {
-    return;
-  }
-  rootMenu?.handleMenuItemClick?.({
-    parentPaths: parentPaths.value,
-    path: props.path,
-  });
-  emit('click', item);
+    if (props.disabled) {
+        return;
+    }
+    rootMenu?.handleMenuItemClick?.({
+        parentPaths: parentPaths.value,
+        path: props.path,
+    });
+    emit('click', item);
 }
 
 onMounted(() => {
-  subMenu?.addSubMenu?.(item);
-  rootMenu?.addMenuItem?.(item);
+    subMenu?.addSubMenu?.(item);
+    rootMenu?.addMenuItem?.(item);
 });
 
 onBeforeUnmount(() => {
-  subMenu?.removeSubMenu?.(item);
-  rootMenu?.removeMenuItem?.(item);
+    subMenu?.removeSubMenu?.(item);
+    rootMenu?.removeMenuItem?.(item);
 });
 </script>
 <template>
-  <li
-    :class="[
-      rootMenu.theme,
-      b(),
-      is('active', active),
-      is('disabled', disabled),
-      is('collapse-show-title', collapseShowTitle),
-    ]"
-    role="menuitem"
-    @click.stop="handleClick"
-  >
-    <VbenTooltip
-      v-if="showTooltip"
-      :content-class="[rootMenu.theme]"
-      side="right"
+    <li
+        :class="[
+            rootMenu.theme,
+            b(),
+            is('active', active),
+            is('disabled', disabled),
+            is('collapse-show-title', collapseShowTitle),
+        ]"
+        role="menuitem"
+        @click.stop="handleClick"
     >
-      <template #trigger>
-        <div :class="[nsMenu.be('tooltip', 'trigger')]">
-          <VbenIcon :class="nsMenu.e('icon')" :icon="menuIcon" fallback />
-          <slot></slot>
-          <span v-if="collapseShowTitle" :class="nsMenu.e('name')">
+        <VbenTooltip
+            v-if="showTooltip"
+            :content-class="[rootMenu.theme]"
+            side="right"
+        >
+            <template #trigger>
+                <div :class="[nsMenu.be('tooltip', 'trigger')]">
+                    <VbenIcon
+                        :class="nsMenu.e('icon')"
+                        :icon="menuIcon"
+                        fallback
+                    />
+                    <slot></slot>
+                    <span v-if="collapseShowTitle" :class="nsMenu.e('name')">
+                        <slot name="title"></slot>
+                    </span>
+                </div>
+            </template>
             <slot name="title"></slot>
-          </span>
+        </VbenTooltip>
+        <div v-show="!showTooltip" :class="[e('content')]">
+            <MenuBadge
+                v-if="rootMenu.props.mode !== 'horizontal'"
+                class="right-2"
+                v-bind="props"
+            />
+            <VbenIcon :class="nsMenu.e('icon')" :icon="menuIcon" />
+            <slot></slot>
+            <slot name="title"></slot>
         </div>
-      </template>
-      <slot name="title"></slot>
-    </VbenTooltip>
-    <div v-show="!showTooltip" :class="[e('content')]">
-      <MenuBadge
-        v-if="rootMenu.props.mode !== 'horizontal'"
-        class="right-2"
-        v-bind="props"
-      />
-      <VbenIcon :class="nsMenu.e('icon')" :icon="menuIcon" />
-      <slot></slot>
-      <slot name="title"></slot>
-    </div>
-  </li>
+    </li>
 </template>

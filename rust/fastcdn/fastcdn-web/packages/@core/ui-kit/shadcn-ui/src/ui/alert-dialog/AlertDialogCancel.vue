@@ -7,7 +7,7 @@ const props = defineProps<AlertDialogCancelProps>();
 </script>
 
 <template>
-  <AlertDialogCancel v-bind="props">
-    <slot></slot>
-  </AlertDialogCancel>
+    <AlertDialogCancel v-bind="props">
+        <slot></slot>
+    </AlertDialogCancel>
 </template>

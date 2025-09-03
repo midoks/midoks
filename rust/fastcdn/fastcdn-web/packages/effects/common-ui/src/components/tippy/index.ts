@@ -19,49 +19,53 @@ import 'tippy.js/animations/perspective.css';
 
 const { isDark } = usePreferences();
 export type TippyProps = Partial<
-  Props & {
-    animation?:
-      | 'fade'
-      | 'perspective'
-      | 'scale'
-      | 'shift-away'
-      | 'shift-toward'
-      | boolean;
-    theme?: 'auto' | 'dark' | 'light';
-  }
+    Props & {
+        animation?:
+            | 'fade'
+            | 'perspective'
+            | 'scale'
+            | 'shift-away'
+            | 'shift-toward'
+            | boolean;
+        theme?: 'auto' | 'dark' | 'light';
+    }
 >;
 
 export function initTippy(app: App<Element>, options?: DefaultProps) {
-  setDefaultProps({
-    allowHTML: true,
-    delay: [500, 200],
-    theme: isDark.value ? '' : 'light',
-    ...options,
-  });
-  if (!options || !Reflect.has(options, 'theme') || options.theme === 'auto') {
-    watchEffect(() => {
-      setDefaultProps({ theme: isDark.value ? '' : 'light' });
+    setDefaultProps({
+        allowHTML: true,
+        delay: [500, 200],
+        theme: isDark.value ? '' : 'light',
+        ...options,
     });
-  }
+    if (
+        !options ||
+        !Reflect.has(options, 'theme') ||
+        options.theme === 'auto'
+    ) {
+        watchEffect(() => {
+            setDefaultProps({ theme: isDark.value ? '' : 'light' });
+        });
+    }
 
-  app.directive('tippy', useTippyDirective(isDark));
+    app.directive('tippy', useTippyDirective(isDark));
 }
 
 export const Tippy = (props: any, { attrs, slots }: SetupContext) => {
-  let theme: string = (attrs.theme as string) ?? 'auto';
-  if (theme === 'auto') {
-    theme = isDark.value ? '' : 'light';
-  }
-  if (theme === 'dark') {
-    theme = '';
-  }
-  return h(
-    TippyComponent,
-    {
-      ...props,
-      ...attrs,
-      theme,
-    },
-    slots,
-  );
+    let theme: string = (attrs.theme as string) ?? 'auto';
+    if (theme === 'auto') {
+        theme = isDark.value ? '' : 'light';
+    }
+    if (theme === 'dark') {
+        theme = '';
+    }
+    return h(
+        TippyComponent,
+        {
+            ...props,
+            ...attrs,
+            theme,
+        },
+        slots,
+    );
 };

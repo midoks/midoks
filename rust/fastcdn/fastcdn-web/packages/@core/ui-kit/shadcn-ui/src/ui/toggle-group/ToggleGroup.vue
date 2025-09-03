@@ -13,32 +13,32 @@ import { ToggleGroupRoot, useForwardPropsEmits } from 'radix-vue';
 type ToggleGroupVariants = VariantProps<typeof toggleVariants>;
 
 const props = defineProps<
-  ToggleGroupRootProps & {
-    class?: any;
-    size?: ToggleGroupVariants['size'];
-    variant?: ToggleGroupVariants['variant'];
-  }
+    ToggleGroupRootProps & {
+        class?: any;
+        size?: ToggleGroupVariants['size'];
+        variant?: ToggleGroupVariants['variant'];
+    }
 >();
 const emits = defineEmits<ToggleGroupRootEmits>();
 
 provide('toggleGroup', {
-  size: props.size,
-  variant: props.variant,
+    size: props.size,
+    variant: props.variant,
 });
 
 const delegatedProps = computed(() => {
-  const { class: _, ...delegated } = props;
-  return delegated;
+    const { class: _, ...delegated } = props;
+    return delegated;
 });
 
 const forwarded = useForwardPropsEmits(delegatedProps, emits);
 </script>
 
 <template>
-  <ToggleGroupRoot
-    v-bind="forwarded"
-    :class="cn('flex items-center justify-center gap-1', props.class)"
-  >
-    <slot></slot>
-  </ToggleGroupRoot>
+    <ToggleGroupRoot
+        v-bind="forwarded"
+        :class="cn('flex items-center justify-center gap-1', props.class)"
+    >
+        <slot></slot>
+    </ToggleGroupRoot>
 </template>

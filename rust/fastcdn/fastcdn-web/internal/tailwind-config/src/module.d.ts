@@ -1,3 +1,3 @@
 declare module '@tailwindcss/nesting' {
-  export default any;
+    export default any;
 }
