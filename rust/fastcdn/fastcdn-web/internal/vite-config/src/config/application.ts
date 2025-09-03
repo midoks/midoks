@@ -62,8 +62,8 @@ function defineApplicationConfig(userConfigPromise?: DefineApplicationOptions) {
                 rollupOptions: {
                     output: {
                         assetFileNames: '[ext]/[name]-[hash].[ext]',
-                        chunkFileNames: 'js/[name]-[hash].js',
-                        entryFileNames: 'jse/index-[name]-[hash].js',
+                        chunkFileNames: 'static/js/[name]-[hash].js',
+                        entryFileNames: 'static/jse/index-[name]-[hash].js',
                     },
                 },
                 target: 'es2015',

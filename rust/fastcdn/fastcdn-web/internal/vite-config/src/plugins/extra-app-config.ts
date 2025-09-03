@@ -42,7 +42,7 @@ async function viteExtraAppConfigPlugin({
         async generateBundle() {
             try {
                 this.emitFile({
-                    fileName: GLOBAL_CONFIG_FILE_NAME,
+                    fileName: `static/js/${GLOBAL_CONFIG_FILE_NAME}`,
                     source,
                     type: 'asset',
                 });
@@ -62,7 +62,7 @@ async function viteExtraAppConfigPlugin({
         async transformIndexHtml(html) {
             const hash = `v=${version}-${generatorContentHash(source, 8)}`;
 
-            const appConfigSrc = `${publicPath}${GLOBAL_CONFIG_FILE_NAME}?${hash}`;
+            const appConfigSrc = `${publicPath}static/js/${GLOBAL_CONFIG_FILE_NAME}?${hash}`;
 
             return {
                 html,
