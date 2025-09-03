@@ -32,7 +32,7 @@ impl HttpServerManager {
                 match service.run().await {
                     Ok(_) => Ok(()),
                     Err(e) => {
-                        eprintln!("服务器启动失败: {}", e);
+                        eprintln!("server startup failed: {}", e);
                         std::process::exit(1);
                     }
                 }
