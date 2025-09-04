@@ -47,3 +47,4 @@ target
 *.pid
 *.txt
 /rust/fastcdn/vue-vben-admin
+*.zip

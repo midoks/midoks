@@ -1,1 +1,0 @@
-const e="演示",t="Naive UI",n="Table",o="表单",s={title:"项目",about:"关于",document:"文档",antdv:"Ant Design Vue 版本","naive-ui":"Naive UI 版本","element-plus":"Element Plus 版本"},a={title:e,naive:t,table:n,form:o,vben:s};export{a as default,o as form,t as naive,n as table,e as title,s as vben};
