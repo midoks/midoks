@@ -48,3 +48,4 @@ target
 *.txt
 /rust/fastcdn/vue-vben-admin
 *.zip
+/rust/fastcdn/fastcdn/public
