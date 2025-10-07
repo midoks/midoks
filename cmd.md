@@ -374,7 +374,7 @@ iptables -A INPUT -s 45.177.192.0/24 -j DROP
 
 ### systemctl日志查看
 ```
-journalctl -u cps_api -f
+journalctl -u nginx -f
 ```
 
 ### pip
