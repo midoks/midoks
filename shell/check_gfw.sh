@@ -25,12 +25,20 @@ fi
 
 find_node=`ps -ef|grep 'cloud-node' | grep -v grep`
 echo ${find_node}
-
-find_node=`ps -ef|grep 'cloud-node' | grep -v grep`
 if [ "${find_gf}" != ""  ];then
     echo "cloud-node running"
 else
 	cloud-node restart
     echo "cloud-node restart"
+fi
+
+
+find_nezha=`ps -ef|grep 'nezha-agent' | grep -v grep`
+echo ${find_nezha}
+if [ "${find_nezha}" != ""  ];then
+    echo "nezha-agent running"
+else
+	service nezha-agent restart
+    echo "nezha-agent restart"
 fi
 
