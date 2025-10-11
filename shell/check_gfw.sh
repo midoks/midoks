@@ -18,8 +18,10 @@ fi
 ps -ef|grep xyjump
 cat /usr/local/xyjump/port.txt
 cat /tmp/check_gfw.log
-cat /tmp/check_gfw_restart.log
 
+if [ -f /tmp/check_gfw_restart.log ];then
+	cat /tmp/check_gfw_restart.log
+fi
 
 find_node=`ps -ef|grep 'cloud-node' | grep -v grep`
 echo ${find_node}
