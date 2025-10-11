@@ -3,7 +3,7 @@
 # cmd
 # curl -fsSL https://raw.githubusercontent.com/midoks/midoks/refs/heads/master/shell/check_gfw.sh | bash
 TZ='Asia/Shanghai'
-run_time=`date "+%Y-%m-%d %H:%M:%S"`
+run_time=$(TZ='Asia/Shanghai' date "+%Y-%m-%d %H:%M:%S")
 find_gf=`ps -ef|grep 'xyjump/site' | grep -v grep`
 echo ${find_gf}
 if [ "${find_gf}" != ""  ];then
