@@ -32,7 +32,6 @@ else
     echo "cloud-node restart"
 fi
 
-
 find_nezha=`ps -ef|grep 'nezha-agent' | grep -v grep`
 echo ${find_nezha}
 if [ "${find_nezha}" != ""  ];then
