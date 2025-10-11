@@ -16,4 +16,5 @@ fi
 
 ps -ef|grep xyjump
 cat /usr/local/xyjump/port.txt
+cat /tmp/check_gfw.log
 
