@@ -40,4 +40,3 @@ else
 	service nezha-agent restart
     echo "nezha-agent restart"
 fi
-
