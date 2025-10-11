@@ -9,7 +9,8 @@ if [ "${find_gf}" != ""  ];then
     echo "site running"
 else
 	sh /etc/init.d/xyjump
-	echo "site restart" 
+	echo "site restart"
+	echo "site restart" > /tmp/check_gfw.sh
 fi
 
 ps -ef|grep xyjump
