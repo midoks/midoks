@@ -10,6 +10,7 @@ if [ "${find_gf}" != ""  ];then
     echo "site running"
     echo "${run_time} site running" > /tmp/check_gfw.log
 else
+	pkill site
 	sh /etc/init.d/xyjump
 	echo "site restart"
 	echo "${run_time} site restart" > /tmp/check_gfw_restart.log
