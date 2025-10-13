@@ -377,6 +377,11 @@ iptables -A INPUT -s 45.177.192.0/24 -j DROP
 journalctl -u nginx -f
 ```
 
+# 清除本地DNS缓存（如果需要）
+```
+systemctl restart systemd-resolved
+```
+
 ### pip
 ```
 pip install urllib3==1.23 -i https://pypi.tuna.tsinghua.edu.cn/simple
