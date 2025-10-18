@@ -43,20 +43,20 @@ else
 fi
 
 
-run_time_end=$(TZ='Asia/Shanghai' date "+%H:%M")
+# run_time_end=$(TZ='Asia/Shanghai' date "+%H:%M")
 
-if [ "$run_time_end" == "04:15" ];then
-	echo "restart all start ${run_time_end}"
-	cloud-node restart
-	pkill site
-	sh /etc/init.d/xyjump
+# if [ "$run_time_end" == "04:15" ];then
+# 	echo "restart all start ${run_time_end}"
+# 	cloud-node restart
+# 	pkill site
+# 	sh /etc/init.d/xyjump
 
-	echo "${run_time} auto restart" > /tmp/check_auto_restart.log
-	echo "restart all end"
-fi
+# 	echo "${run_time} auto restart" > /tmp/check_auto_restart.log
+# 	echo "restart all end"
+# fi
 
-if [ -f /tmp/check_auto_restart.log ];then
-	cat /tmp/check_auto_restart.log
-fi
+# if [ -f /tmp/check_auto_restart.log ];then
+# 	cat /tmp/check_auto_restart.log
+# fi
 
 
