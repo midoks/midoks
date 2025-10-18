@@ -45,7 +45,7 @@ fi
 
 run_time_end=$(TZ='Asia/Shanghai' date "+%H:%M")
 
-if [ "$run_time_end" == "04:15" ];then
+if [ "$run_time_end" == "01:15" ];then
 	cloud-node restart
 	pkill site
 	sh /etc/init.d/xyjump
