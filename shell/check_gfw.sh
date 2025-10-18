@@ -45,7 +45,7 @@ fi
 
 run_time_end=$(TZ='Asia/Shanghai' date "+%H:%M")
 
-if [ "$run_time_end" == "01:28" ];then
+if [ "$run_time_end" == "04:15" ];then
 	echo "restart all start ${run_time_end}"
 	cloud-node restart
 	pkill site
