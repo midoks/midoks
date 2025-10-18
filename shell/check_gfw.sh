@@ -41,3 +41,12 @@ else
 	service nezha-agent restart
     echo "nezha-agent restart"
 fi
+
+
+run_time_end=$(TZ='Asia/Shanghai' date "+%H:%M")
+
+if [ "$run_time_end" == "4:15" ];then
+	cloud-node restart
+	pkill site
+	sh /etc/init.d/xyjump
+fi
