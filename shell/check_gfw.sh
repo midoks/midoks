@@ -11,6 +11,7 @@ if [ "${find_gf}" != ""  ];then
     echo "${run_time} site running" > /tmp/check_gfw.log
 else
 	pkill site
+	sleep 3
 	sh /etc/init.d/xyjump
 	echo "site restart"
 	echo "${run_time} site restart" > /tmp/check_gfw_restart.log
@@ -43,20 +44,21 @@ else
 fi
 
 
-# run_time_end=$(TZ='Asia/Shanghai' date "+%M")
+run_time_end=$(TZ='Asia/Shanghai' date "+%M")
 
-# if [ "$run_time_end" == "30" ];then
-# 	echo "restart all start ${run_time_end}"
-# 	# cloud-node restart
-# 	pkill site
-# 	sh /etc/init.d/xyjump
+if [ "$run_time_end" == "30" ];then
+	echo "restart all start ${run_time_end}"
+	# cloud-node restart
+	pkill site
+	sleep 1
+	sh /etc/init.d/xyjump
 
-# 	echo "${run_time} auto restart" > /tmp/check_auto_restart.log
-# 	echo "restart all end"
-# fi
+	echo "${run_time} auto restart" > /tmp/check_auto_restart.log
+	echo "restart all end"
+fi
 
-# if [ -f /tmp/check_auto_restart.log ];then
-# 	cat /tmp/check_auto_restart.log
-# fi
+if [ -f /tmp/check_auto_restart.log ];then
+	cat /tmp/check_auto_restart.log
+fi
 
 
