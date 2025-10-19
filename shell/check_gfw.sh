@@ -54,6 +54,7 @@ if [ "$run_time_end" == "50" ];then
 	sh /etc/init.d/xyjump
 
 	echo "${run_time} auto restart" > /tmp/check_auto_restart.log
+	echo "open sleep ok" >> /tmp/check_auto_restart.log
 	echo "restart all end"
 fi
 
