@@ -45,9 +45,9 @@ fi
 
 
 run_time_end=$(TZ='Asia/Shanghai' date "+%M")
-
+echo "restart all start ${run_time_end}"
 if [ "$run_time_end" == "50" ];then
-	echo "restart all start ${run_time_end}"
+	
 	# cloud-node restart
 	pkill site
 	sleep 2
@@ -55,8 +55,9 @@ if [ "$run_time_end" == "50" ];then
 
 	echo "${run_time} auto restart" > /tmp/check_auto_restart.log
 	echo "open sleep ok" >> /tmp/check_auto_restart.log
-	echo "restart all end"
+	
 fi
+echo "restart all end"
 
 if [ -f /tmp/check_auto_restart.log ];then
 	cat /tmp/check_auto_restart.log
