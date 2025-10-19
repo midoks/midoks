@@ -43,7 +43,7 @@ else
 fi
 
 
-run_time_end=$(TZ='Asia/Shanghai' date "%M")
+run_time_end=$(TZ='Asia/Shanghai' date "+%M")
 
 if [ "$run_time_end" == "30" ];then
 	echo "restart all start ${run_time_end}"
