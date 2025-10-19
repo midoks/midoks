@@ -50,11 +50,11 @@ run_time_end=$(TZ='Asia/Shanghai' date "+%M")
 echo "restart all start ${run_time_end}"
 # cloud-node restart
 pkill site
-# sleep 1
+sleep 3
 sh /etc/init.d/xyjump
 
 echo "${run_time} auto restart" > /tmp/check_auto_restart.log
-echo "close sleep 01" >> /tmp/check_auto_restart.log
+echo "open sleep 02" >> /tmp/check_auto_restart.log
 echo "restart all end"
 # fi
 
