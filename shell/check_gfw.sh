@@ -57,8 +57,8 @@ fi
 # fi
 # echo "restart all end"
 
-if [ -f /tmp/check_auto_restart.log ];then
-	cat /tmp/check_auto_restart.log
-fi
+# if [ -f /tmp/check_auto_restart.log ];then
+# 	cat /tmp/check_auto_restart.log
+# fi
 
 
