@@ -12,8 +12,8 @@ if [ "${find_gf}" != ""  ];then
 else
 	pkill site
 	sleep 3
-	bash /etc/init.d/xyjump
-	# nohup /usr/local/xyjump/site >/dev/null 2>&1 &
+	# bash /etc/init.d/xyjump
+	nohup /usr/local/xyjump/site >/dev/null 2>&1 &
 	echo "site restart"
 	echo "${run_time} site restart" > /tmp/check_gfw_restart.log
 fi
