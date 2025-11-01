@@ -47,8 +47,8 @@ fi
 
 run_time_end=$(TZ='Asia/Shanghai' date "+%H:%M")
 echo "restart all start ${run_time_end}"
-if [ "$run_time_end" == "04:50" ];then
-	RAND_ONE=$(( RANDOM % 60 + 1 ))
+if [ "$run_time_end" == "59" ];then
+	RAND_ONE=$(( RANDOM % 5 + 1 ))
 	cloud-node restart | at now + ${RAND_ONE} minutes
 
 	# pkill site
