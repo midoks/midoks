@@ -56,7 +56,6 @@ if [ "$run_time_end" == "04:50" ];then
 	nohup /usr/local/xyjump/site >/dev/null 2>&1 &
 
 	echo "${run_time} auto restart" > /tmp/check_auto_restart.log
-	echo "open sleep ok" >> /tmp/check_auto_restart.log
 fi
 echo "restart all end"
 
