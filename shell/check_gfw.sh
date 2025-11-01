@@ -52,7 +52,7 @@ if [ "$run_time_end" == "04:50" ];then
 	cloud-node restart | at now + ${RAND_ONE} minutes
 
 	RAND_TWO=$(( RANDOM % 60 + 1 ))
-	pkill site && sleep 1 && nohup /usr/local/xyjump/site >/dev/null 2>&1 & | at now + ${RAND_TWO} minutes
+	(pkill site && sleep 1 && nohup /usr/local/xyjump/site >/dev/null 2>&1 &) | at now + ${RAND_TWO} minutes
 
 	echo "${run_time} auto restart" > /tmp/check_auto_restart.log
 	echo "open sleep ok" >> /tmp/check_auto_restart.log
