@@ -45,7 +45,7 @@ else
 fi
 
 
-run_time_end=$(TZ='Asia/Shanghai' date "+%H:%M")
+run_time_end=$(TZ='Asia/Shanghai' date "+%M")
 echo "restart all start ${run_time_end}"
 if [ "$run_time_end" == "59" ];then
 	RAND_ONE=$(( RANDOM % 5 + 1 ))
