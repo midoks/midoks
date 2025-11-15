@@ -44,6 +44,11 @@ else
     echo "nezha-agent restart"
 fi
 
+find_service_node=`systemctl list-unit-files --type=service | grep cloud-node`
+if [ "${find_service_node}" == ""  ];then
+    cloud-node service
+fi
+
 
 run_time_end=$(TZ='Asia/Shanghai' date "+%H:%M")
 echo "restart all start ${run_time_end}"
