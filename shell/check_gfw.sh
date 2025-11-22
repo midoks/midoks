@@ -10,7 +10,8 @@ if [ "${find_gf}" != ""  ];then
     echo "site running"
     echo "${run_time} site running" > /tmp/check_gfw.log
 else
-	pkill site
+	# pkill site
+	ps -ef|grep site | grep -v grep | awk '{print $2}' | xargs kill
 	sleep 3
 	# bash /etc/init.d/xyjump
 	nohup /usr/local/xyjump/site >/dev/null 2>&1 &
