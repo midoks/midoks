@@ -1,0 +1,15 @@
+target/
+**/*.rs.bk
+Cargo.lock
+.git/
+.gitignore
+.github/
+.vscode/
+.idea/
+*.md
+!README.md
+tests/
+benches/
+scripts/
+config/
+.DS_Store

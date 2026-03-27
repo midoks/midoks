@@ -1,0 +1,192 @@
+version: 2
+project_name: network-probe
+release:
+  github:
+    owner: your-username
+    name: network-probe
+  prerelease: auto
+  name_template: '{{.Tag}}'
+  mode: replace
+builds:
+  - id: network-probe
+    targets:
+      - x86_64-unknown-linux-gnu
+      - x86_64-apple-darwin
+      - x86_64-pc-windows-gnu
+      - aarch64-unknown-linux-gnu
+      - aarch64-apple-darwin
+    dir: .
+    main: .
+    binary: network-probe
+    builder: rust
+    tool: cargo
+    command: zigbuild
+    flags:
+      - --release
+    env:
+      - CARGO_PROFILE_RELEASE_LTO=true
+      - CARGO_PROFILE_RELEASE_CODEGEN_UNITS=1
+      - CARGO_PROFILE_RELEASE_PANIC=abort
+archives:
+  - id: network-probe-archive
+    builds_info:
+      mode: 493
+    name_template: '{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}'
+    formats:
+      - tar.gz
+    wrap_in_directory: "true"
+    files:
+      - src: LICENSE
+      - src: README.md
+      - src: config/**/*
+        dst: config
+        strip_parent: true
+nfpms:
+  - file_name_template: '{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}'
+    package_name: network-probe
+    dependencies:
+      - ca-certificates
+    contents:
+      - src: ./config
+        dst: /etc/network-probe
+        type: dir
+      - src: ./config/api_node.yaml
+        dst: /etc/network-probe/api_node.yaml
+        type: config
+    scripts:
+      preinstall: scripts/preinstall.sh
+      postinstall: scripts/postinstall.sh
+      preremove: scripts/preremove.sh
+      postremove: scripts/postremove.sh
+    id: network-probe-package
+    formats:
+      - deb
+      - rpm
+      - apk
+    section: net
+    priority: optional
+    homepage: https://github.com/your-username/network-probe
+    maintainer: Your Name <your.email@example.com>
+    description: A comprehensive network testing tool
+    license: MIT
+    bindir: /usr/bin
+    libdirs:
+      header: /usr/include
+      carchive: /usr/lib
+      cshared: /usr/lib
+snapcrafts:
+  - name_template: '{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}{{ with .Arm }}v{{ . }}{{ end }}{{ with .Mips }}_{{ . }}{{ end }}{{ if not (eq .Amd64 "v1") }}{{ .Amd64 }}{{ end }}'
+    name: network-probe
+    summary: A comprehensive network testing tool
+    description: |
+      Network Probe is a powerful command-line tool for network testing
+      and diagnostics. It supports ping, tcping, traceroute, DNS queries,
+      website testing, and port scanning.
+    base: core22
+    grade: stable
+    channel_templates:
+      - edge
+      - beta
+      - candidate
+      - stable
+    confinement: strict
+    apps:
+      network-probe:
+        command: bin/network-probe
+        plugs:
+          - network
+          - network-bind
+snapshot:
+  version_template: '{{ .Version }}-SNAPSHOT-{{ .ShortCommit }}'
+checksum:
+  name_template: '{{ .ProjectName }}_{{ .Version }}_checksums.txt'
+  algorithm: sha256
+docker_digest:
+  name_template: digests.txt
+changelog:
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+      - '^chore:'
+      - '^style:'
+      - '^refactor:'
+  sort: asc
+  format: '{{ .SHA }} {{ .Message }}'
+dist: dist
+env_files:
+  github_token: ~/.config/goreleaser/github_token
+  gitlab_token: ~/.config/goreleaser/gitlab_token
+  gitea_token: ~/.config/goreleaser/gitea_token
+source:
+  name_template: '{{ .ProjectName }}-{{ .Version }}'
+  format: tar.gz
+gomod:
+  gobinary: go
+announce:
+  twitter:
+    message_template: '{{ .ProjectName }} {{ .Tag }} is out! Check it out at {{ .ReleaseURL }}'
+  mastodon:
+    message_template: '{{ .ProjectName }} {{ .Tag }} is out! Check it out at {{ .ReleaseURL }}'
+    server: ""
+  reddit:
+    title_template: '{{ .ProjectName }} {{ .Tag }} is out!'
+    url_template: '{{ .ReleaseURL }}'
+  slack:
+    message_template: '{{ .ProjectName }} {{ .Tag }} is out! Check it out at {{ .ReleaseURL }}'
+    username: GoReleaser
+  discord:
+    message_template: '{{ .ProjectName }} {{ .Tag }} is out! Check it out at {{ .ReleaseURL }}'
+    author: GoReleaser
+    color: "3888754"
+    icon_url: https://goreleaser.com/static/avatar.png
+  teams:
+    title_template: '{{ .ProjectName }} {{ .Tag }} is out!'
+    message_template: '{{ .ProjectName }} {{ .Tag }} is out! Check it out at {{ .ReleaseURL }}'
+    color: '#2D313E'
+    icon_url: https://goreleaser.com/static/avatar.png
+  smtp:
+    subject_template: '{{ .ProjectName }} {{ .Tag }} is out!'
+    body_template: 'You can view details from: {{ .ReleaseURL }}'
+  mattermost:
+    message_template: '{{ .ProjectName }} {{ .Tag }} is out! Check it out at {{ .ReleaseURL }}'
+    title_template: '{{ .ProjectName }} {{ .Tag }} is out!'
+    username: GoReleaser
+  linkedin:
+    message_template: '{{ .ProjectName }} {{ .Tag }} is out! Check it out at {{ .ReleaseURL }}'
+  telegram:
+    message_template: '{{ print .ProjectName " " .Tag " is out! Check it out at " .ReleaseURL | mdv2escape }}'
+    parse_mode: MarkdownV2
+  webhook:
+    message_template: '{ "message": "{{ .ProjectName }} {{ .Tag }} is out! Check it out at {{ .ReleaseURL }}"}'
+    content_type: application/json; charset=utf-8
+    expected_status_codes:
+      - 200
+      - 201
+      - 202
+      - 204
+  opencollective:
+    title_template: '{{ .Tag }}'
+    message_template: '{{ .ProjectName }} {{ .Tag }} is out!<br/>Check it out at <a href="{{ .ReleaseURL }}">{{ .ReleaseURL }}</a>'
+  bluesky:
+    message_template: '{{ .ProjectName }} {{ .Tag }} is out! Check it out at {{ .ReleaseURL }}'
+  discourse:
+    title_template: '{{ .ProjectName }} {{ .Tag }} is out!'
+    message_template: '{{ .ProjectName }} {{ .Tag }} is out! Check it out at {{ .ReleaseURL }}'
+    username: system
+git:
+  tag_sort: -version:refname
+universal_binaries:
+  - id: network-probe
+    ids:
+      - network-probe
+    name_template: '{{ .ProjectName }}_{{ .Os }}_universal'
+mcp:
+  name: ""
+  title: ""
+  auth:
+    type: none
+github_urls:
+  download: https://github.com
+gitlab_urls:
+  download: https://gitlab.com

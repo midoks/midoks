@@ -1,0 +1,96 @@
+project_name: network-probe
+version: 2
+builds:
+  - id: network-probe
+    binary: network-probe
+    builder: rust
+    flags:
+      - --release
+    env:
+      - CARGO_PROFILE_RELEASE_LTO=true
+      - CARGO_PROFILE_RELEASE_CODEGEN_UNITS=1
+      - CARGO_PROFILE_RELEASE_PANIC=abort
+
+archives:
+  - id: network-probe-archive
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    files:
+      - LICENSE
+      - README.md
+      - src: "config/**/*"
+        dst: config
+        strip_parent: true
+    wrap_in_directory: true
+
+checksum:
+  name_template: "{{ .ProjectName }}_{{ .Version }}_checksums.txt"
+  algorithm: sha256
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^chore:"
+      - "^style:"
+      - "^refactor:"
+
+release:
+  github:
+    owner: your-username
+    name: network-probe
+  draft: false
+  prerelease: auto
+  mode: replace
+
+nfpms:
+  - id: network-probe-package
+    package_name: network-probe
+    file_name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    maintainer: Your Name <your.email@example.com>
+    description: A comprehensive network testing tool
+    license: MIT
+    homepage: https://github.com/your-username/network-probe
+    bindir: /usr/bin
+    section: net
+    priority: optional
+    formats:
+      - deb
+      - rpm
+      - apk
+    contents:
+      - src: ./config
+        dst: /etc/network-probe
+        type: dir
+      - src: ./config/api_node.yaml
+        dst: /etc/network-probe/api_node.yaml
+        type: config
+    scripts:
+      preinstall: scripts/preinstall.sh
+      postinstall: scripts/postinstall.sh
+      preremove: scripts/preremove.sh
+      postremove: scripts/postremove.sh
+    dependencies:
+      - ca-certificates
+
+universal_binaries:
+  - replace: false
+    name_template: "{{ .ProjectName }}_{{ .Os }}_universal"
+
+snapcrafts:
+  - name: network-probe
+    summary: A comprehensive network testing tool
+    description: |
+      Network Probe is a powerful command-line tool for network testing
+      and diagnostics. It supports ping, tcping, traceroute, DNS queries,
+      website testing, and port scanning.
+    grade: stable
+    confinement: strict
+    base: core22
+    apps:
+      network-probe:
+        command: bin/network-probe
+        plugs:
+          - network
+          - network-bind

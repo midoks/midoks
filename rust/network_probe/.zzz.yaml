@@ -1,0 +1,25 @@
+dev: true
+title: zzz
+frequency: 3
+dirfilter:
+- tmp
+- .git
+- public
+- scripts
+- target
+- logs
+- templates
+ext:
+- rs
+lang: rust
+enablerun: true
+action:
+  before:
+  - find . -name ".DS_Store" -print -delete
+  after:
+  - chmod +s ./target/release/network_probe
+  - ./target/release/network_probe server --host 0.0.0.0 --port 8080 &
+  exit:
+  - ps -ef|grep 'network_probe server'| grep -v grep | awk '{print $2}' | xargs kill -9
+  # - rm -rf ./target/release/network_probe
+link: https://github.com/midoks/zzz

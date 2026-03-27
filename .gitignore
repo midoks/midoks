@@ -49,3 +49,6 @@ target
 /rust/fastcdn/vue-vben-admin
 *.zip
 /rust/fastcdn/fastcdn/public
+/python/woff2txt/output/char_images
+/python/woff2txt/output
+/python/woff2txt
