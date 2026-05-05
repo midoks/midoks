@@ -82,6 +82,17 @@
             .banner h1 { font-size: 24px; }
             .stats-container { flex-wrap: wrap; gap: 20px; }
         }
+
+        /* 广告位样式 */
+        .ad-container { max-width: 1200px; margin: 20px auto; }
+        .ad-placeholder { background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%); border: 2px dashed #ccc; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #999; font-size: 14px; text-align: center; position: relative; overflow: hidden; }
+        .ad-placeholder::before { content: '广告位'; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .ad-placeholder.top-banner { height: 80px; }
+        .ad-placeholder.middle-banner { height: 60px; }
+        .ad-placeholder.bottom-banner { height: 80px; }
+        .ad-placeholder.left-sidebar { width: 200px; min-height: 300px; float: left; margin-right: 20px; }
+        .ad-placeholder.right-sidebar { width: 200px; min-height: 300px; float: right; margin-left: 20px; }
+        .tools-wrapper { display: flow-root; }
     </style>
 </head>
 <body>
@@ -109,6 +120,11 @@
     <div class="banner">
         <h1>专业的在线网络诊断工具</h1>
         <p>提供Ping测试、Tcping测试、网站测速、路由追踪、DNS查询等多种网络诊断服务</p>
+    </div>
+
+    <!-- 顶部横幅广告位 -->
+    <div class="ad-container">
+        <div class="ad-placeholder top-banner" data-ad-position="index-top"></div>
     </div>
 
     <!-- 工具卡片区域 -->
@@ -177,6 +193,11 @@
             </div>
         </div>
 
+        <!-- 中间横幅广告位 -->
+        <div class="ad-container">
+            <div class="ad-placeholder middle-banner" data-ad-position="index-middle"></div>
+        </div>
+
         <!-- 快捷入口 -->
         <div class="quick-links">
             <h3>快捷入口</h3>
@@ -189,6 +210,11 @@
                 <div class="quick-item" onclick="location.href='/frontend/speedtest?url=https://www.baidu.com'">测速 百度</div>
             </div>
         </div>
+    </div>
+
+    <!-- 底部横幅广告位 -->
+    <div class="ad-container">
+        <div class="ad-placeholder bottom-banner" data-ad-position="index-bottom"></div>
     </div>
 
     <!-- 统计信息 -->
