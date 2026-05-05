@@ -1,0 +1,147 @@
+{[template "backend/common/header_nonav.tmpl" .]}
+
+<div class="layui-fluid">
+    <div class="layui-col-md12" style="padding: 5px;">
+        <div class="layui-card">
+            <div class="layui-card-body">
+
+                <div class="layui-tab layui-tab-brief">
+                    <ul class="layui-tab-title" id="status">
+                        {[range $menu := .submenu]}
+                            <li data-status="{[$menu.Number]}" {[if eq (print "/" $.admin_path "/" $menu.Link) $.CurrentPath]}class="layui-this"{[end]}><a href="/{[$.admin_path]}/{[$menu.Link]}">{[$menu.Name]}</a></li>
+                        {[end]}
+                    </ul>
+                </div>
+
+                <div class="layui-form toolbar" style="margin-top: 10px;margin-bottom: 10px;">
+                <form class="layui-form layui-form-pane" onclick="return false;">
+                    <table class="layui-table">
+                        <colgroup><col width="150"><col></colgroup>
+                        <tbody>
+                            <!-- <tr>
+                                <td colspan="2">
+                                    <button class="layui-btn" lay-filter="submit_log_setting" lay-submit>保存</button>
+                                </td>
+                            </tr> -->
+
+                            <tr>
+                                <td>允许手动删除日志</td>
+                                <td>
+                                    <input type="checkbox" name="allowed_manual_delete" {[if .Data]}{[if .Data.GetLogValue.AllowedManualDelete]}checked{[end]}{[end]}> 
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td>允许手动清理</td>
+                                <td>
+                                    <input type="checkbox" name="allowed_manual" {[if .Data]}{[if .Data.GetLogValue.AllowedManual]}checked{[end]}{[end]}> 
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td>日志保留天数</td>
+                                <td>
+                                    <div class="layui-inline">
+                                        <input type="number" name="save_day" autocomplete="off" class="layui-input" value="{[if .Data]}{[.Data.GetLogValue.SaveDay]}{[end]}" placeholder="">
+                                    </div>
+                                    <p class="layui-font-12">超过此天数的日志将会被自动清理，0表示不自动清理。</p>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td>最大容量限制</td>
+                                <td>
+                                    <div class="layui-inline">
+
+                                        <div class="layui-input-inline" style="float: left;">
+                                            <input type="number" name="max_capacity_limit" autocomplete="off" class="layui-input" placeholder="" value="{[if .Data]}{[.Data.GetLogValue.MaxCapacityLimit]}{[end]}">
+                                        </div>
+
+                                        <div class="layui-input-inline" style="float: left;">
+                                            <select name="max_capacity_unit" lay-verify="required">
+                                                <option value="byte" {[if eq .Data.GetLogValue.MaxCapacityUnit "byte" ]}selected{[end]}>字节</option>
+                                                <option value="kib" {[if eq .Data.GetLogValue.MaxCapacityUnit "kib" ]}selected{[end]}>KiB</option>
+                                                <option value="mib" {[if eq .Data.GetLogValue.MaxCapacityUnit "mib" ]}selected{[end]}>MiB</option>
+                                                <option value="gib" {[if eq .Data.GetLogValue.MaxCapacityUnit "gib" ]}selected{[end]}>GiB</option>
+                                                <option value="tib" {[if eq .Data.GetLogValue.MaxCapacityUnit "tib" ]}selected{[end]}>TiB</option>
+                                                <option value="pib" {[if eq .Data.GetLogValue.MaxCapacityUnit "pib" ]}selected{[end]}>PiB</option>
+                                                <option value="eib" {[if eq .Data.GetLogValue.MaxCapacityUnit "eib" ]}selected{[end]}>EiB</option>
+                                            </select>
+                                        </div>
+                                        
+                                    </div>
+                                    <p class="layui-font-12">超出此容量限制后将会发送提醒。</p>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td>允许修改清除配置</td>
+                                <td>
+                                    <input type="checkbox" name="allowed_mod_clear_config" {[if .Data]}{[if.Data.GetLogValue.AllowedModClearConfig]}checked{[end]}{[end]}>
+                                    <p class="layui-font-12">选中后，不能再次修改删除、清理等相关设置，防止攻击者用来擦除日志。</p>
+                                </td>
+                            </tr>
+
+
+                            <tr>
+                                <td colspan="2">
+                                    <button class="layui-btn" lay-filter="submit_log_setting" lay-submit>保存</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+layui.config({base: '/static/layuiadmin/'}).use(['table','jquery'], function(){
+///
+var admin = layui.admin
+,$ = layui.$
+,form = layui.form
+,table = layui.table;
+
+form.on("submit(submit_log_setting)", function(data){
+    var index = layer.load();
+    var field = data.field;
+
+    if (field['allowed_manual_delete'] == "on"){
+        field['allowed_manual_delete'] = true;
+    } else {
+        field['allowed_manual_delete'] = false;
+    }
+
+    if (field['allowed_manual'] == "on"){
+        field['allowed_manual'] = true;
+    } else {
+        field['allowed_manual'] = false;
+    }
+
+    if (field['allowed_mod_clear_config'] == "on"){
+        field['allowed_mod_clear_config'] = true;
+    } else {
+        field['allowed_mod_clear_config'] = false;
+    }
+
+
+    $.post("/{[$.admin_path]}/log/settings", field, function(res) {
+        showMsg(res.msg, function(){
+            layer.close(index);
+            if(res.code > -1){
+                parent.location.reload();
+            }
+        },{icon: res.code > -1 ? 1 : 2,shift:res.code>-1 ? 0 : 6});
+    },'json');
+    return false;
+});
+
+///
+});
+</script>
+
+{[template "backend/common/footer.tmpl" .]}

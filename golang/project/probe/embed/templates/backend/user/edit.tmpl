@@ -1,0 +1,143 @@
+{[template "/base/header_head" .]}
+
+
+<style type="text/css">
+.layui-form-item .layui-input-inline{
+    width: auto;
+    margin-left: 5px;
+}
+.type-input{
+    height:70px;
+    overflow-y: auto;
+}
+.type-input::-webkit-scrollbar {
+    /*滚动条整体样式*/
+    width : 10px;  /*高宽分别对应横竖滚动条的尺寸*/
+    height: 1px;
+}
+.type-input::-webkit-scrollbar-thumb {
+    /*滚动条里面小方块*/
+    border-radius: 10px;
+    box-shadow   : inset 0 0 5px rgba(0, 0, 0, 0.2);
+    background   : #666;
+}
+.type-input::-webkit-scrollbar-track {
+    /*滚动条里面轨道*/
+    box-shadow   : inset 0 0 5px rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    background   : #ededed;
+}
+.layui-form-radio{
+    margin: 0; 
+    padding-right: 0;
+}
+
+.layui-form-pane .layui-form-checkbox {
+    margin: 4px 0 4px 1px;
+}
+.layui-form-checkbox[lay-skin=primary] span {
+    padding-right: 4px;
+}
+.layui-form-checkbox[lay-skin=primary] i {
+    left: 6px;
+}
+.layui-form-item .layui-col-xs12{
+    margin-top: 10px;
+}
+@media screen and (max-width: 990px){
+    .layui-form-item .layui-col-xs12:first-child{
+        margin-top: 0px;
+    }
+    .layui-form-item{
+        margin-bottom: 10px; 
+    }
+}
+</style>
+<!-- start -->
+
+<div class="layui-fluid">
+    <form class="layui-form layui-form-pane" action="/user/edit">
+        <div class="layui-tab layui-tab-brief">
+            <div class="layui-tab-content">
+                <div class="layui-tab-item layui-show">
+                    <div class="layui-form-item">
+                        <div class="layui-col-xs12 layui-col-md4">
+                            <label class="layui-form-label">用户名</label>
+                            <div class="layui-input-block">
+                                <input type="text" name="username" autocomplete="off" required lay-verify="required" class="layui-input" value="{[if .Data]}{[.Data.Username]}{[end]}" placeholder="用户名">
+                            </div>
+                        </div>
+                        <div class="layui-col-xs12 layui-col-md4">
+                            <label class="layui-form-label">密码</label>
+                            <div class="layui-input-block">
+                                <input type="text" name="password" autocomplete="off" class="layui-input" value="{[if .Data]}{[.Data.Password]}{[end]}" placeholder="密码">
+                            </div>
+                        </div>
+
+                        <div class="layui-col-xs12 layui-col-md12">
+                            <label class="layui-form-label">服务器</label>
+                            <div class="layui-input-block">
+                                <div id='server_tag'></div>
+                                <input type="hidden" name="tags" value=""/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-form-item" style="text-align: center;">
+                        <input type="hidden" name="id" value="{[if .Id]}{[.Id]}{[end]}">
+                        <button class="layui-btn" lay-filter="submit_save" lay-submit>保存</button>
+                        <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- end -->
+
+<script type="text/javascript">
+layui.config({base: '{__STATIC__}/admin/layuiadmin/'}).use(['form','upload','laydate'], function(){
+///
+var form = layui.form,
+upload = layui.upload,
+laydate = layui.laydate;
+//VIP
+form.on('select(vip)', function(r){
+    console.log(r);
+    if(r.value == 1){
+        $('#viptime').show();
+    }else{
+        $('#viptime').hide();
+    }
+});
+//认证
+form.on('select(rz)', function(r){
+    if(r.value == 2){
+        $('#rz').show();
+    }else{
+        $('#rz').hide();
+    }
+});
+laydate.render({
+    elem: '#time',
+    type: 'datetime'
+});
+
+
+common_tags.url_add = "/server/edit?id={[.Id]}";
+common_tags.url_related_list = "/server/list";
+common_tags.url_tags_list = "/server/list";
+common_tags.initData('#server_tag', '{[if .Data]}{[.Data.Tags]}{[end]}', function(data){
+    console.log(data);
+    $('input[name="tags"]').val(data);
+});
+
+
+//
+});
+    
+</script>
+</body>
+</html>
+
+

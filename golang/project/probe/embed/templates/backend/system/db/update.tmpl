@@ -1,0 +1,79 @@
+{[template "backend/common/header_nonav.tmpl" .]}
+
+<div class="layui-fluid">
+    <div class="layui-col-md12" style="padding: 5px;">
+        <div class="layui-card">
+            <div class="layui-card-body">
+
+                <div class="layui-tab layui-tab-brief">
+                    <ul class="layui-tab-title" id="status">
+                        {[range $menu := .submenu]}
+                            <li data-status="{[$menu.Number]}" {[if IsSubOrEq $.CurrentPath (print "/" $.admin_path "/" $menu.Link)]}class="layui-this"{[end]}><a href="/{[$.admin_path]}/{[$menu.Link]}">{[$menu.Name]}</a></li>
+                        {[end]}
+                    </ul>
+                </div>
+
+                <div style="display:flex;align-items:center;gap:8px;margin-top: 1rem;">
+                    <a href="/{[.admin_path]}/system/db" style="display:flex;align-items:center;">
+                        <i class="layui-icon layui-icon-return"></i>  
+                    </a>
+
+                    <span style="margin:0;font-size:18px;">
+                        {[if .Data]}{[.Data.Name]}{[end]}
+                    </span>
+                </div>
+
+                <div class="layui-tab layui-tab-brief">
+                    <ul class="layui-tab-title" id="status">
+                        <li data-status="1"><a href="/{[.admin_path]}/system/db/details?id={[.id]}">详情</a></li>
+                        <li data-status="2"><a href="/{[.admin_path]}/system/db/clean?id={[.id]}">清理</a></li>
+                        <li data-status="3"><a href="/{[.admin_path]}/system/db/logs?id={[.id]}">运行日志</a></li>
+                        <li data-status="4" class="layui-this">修改</li>
+                    </ul>
+                </div>
+
+                {[template "backend/system/db/aou_table.tmpl" .]}
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+layui.use(['form', 'layer'], function(){
+//
+var form = layui.form;
+var layer = layui.layer;
+
+form.on('submit(submit_db)', function(data){
+    var field = data.field;
+    var index = layer.load(2);
+    
+    if (field['status'] == "on"){
+        field['status'] = 1;
+    } else {
+        field['status'] = 0;
+    }
+
+    $.ajax({
+        url: "/{[$.admin_path]}/system/db/add",
+        type: "POST",
+        data: field,
+        traditional: true,
+        dataType: "json",
+        success: function(res){
+            showMsg(res.msg, function(){
+                layer.close(index);
+                if(res.code > -1){
+                    parent.location.reload();
+                }
+            },{icon: res.code > -1 ? 1 : 2,shift:res.code>-1 ? 0 : 6});
+        }
+    });
+    return false;
+});
+///
+});
+</script>
+
+{[template "backend/common/footer.tmpl" .]}

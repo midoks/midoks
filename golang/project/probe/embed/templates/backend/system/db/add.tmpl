@@ -1,0 +1,99 @@
+{[template "backend/common/header_head.tmpl" .]}
+
+
+<style type="text/css">
+.layui-form-item .layui-input-inline{
+    width: auto;
+    margin-left: 5px;
+}
+.type-input{
+    height:70px;
+    overflow-y: auto;
+}
+.type-input::-webkit-scrollbar {
+    /*滚动条整体样式*/
+    width : 10px;  /*高宽分别对应横竖滚动条的尺寸*/
+    height: 1px;
+}
+.type-input::-webkit-scrollbar-thumb {
+    /*滚动条里面小方块*/
+    border-radius: 10px;
+    box-shadow   : inset 0 0 5px rgba(0, 0, 0, 0.2);
+    background   : #666;
+}
+.type-input::-webkit-scrollbar-track {
+    /*滚动条里面轨道*/
+    box-shadow   : inset 0 0 5px rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    background   : #ededed;
+}
+.layui-form-radio{
+    margin: 0; 
+    padding-right: 0;
+}
+
+.layui-form-pane .layui-form-checkbox {
+    margin: 4px 0 4px 1px;
+}
+.layui-form-checkbox[lay-skin=primary] span {
+    padding-right: 4px;
+}
+.layui-form-checkbox[lay-skin=primary] i {
+    left: 6px;
+}
+.layui-form-item .layui-col-xs12{
+    margin-top: 10px;
+}
+@media screen and (max-width: 990px){
+    .layui-form-item .layui-col-xs12:first-child{
+        margin-top: 0px;
+    }
+    .layui-form-item{
+        margin-bottom: 10px; 
+    }
+}
+</style>
+<!-- start -->
+
+<div class="layui-fluid">
+    <div style="padding: 15px;">
+    {[template "backend/system/db/aou_table.tmpl" .]}
+    </div>
+</div>
+
+<script type="text/javascript">
+layui.config({base: '/static/layuiadmin/'}).use(['table','jquery'], function(){
+///
+var admin = layui.admin
+,$ = layui.$
+,form = layui.form
+,table = layui.table;
+var layer = layui.layer;
+
+
+form.on("submit(submit_db)", function(data){
+    var index = layer.load();
+    var field = data.field;
+
+    if (field['status'] == "on"){
+        field['status'] = true;
+    } else {
+        field['status'] = false;
+    }
+
+    $.post("/{[$.admin_path]}/system/db/add", field, function(res) {
+        showMsg(res.msg, function(){
+            layer.close(index);
+            if(res.code > -1){
+                parent.location.reload();
+            }
+        },{icon: res.code > -1 ? 1 : 2,shift:res.code>-1 ? 0 : 6});
+    },'json');
+    return false;
+});
+
+///
+});
+</script>
+
+{[template "backend/common/footer.tmpl" .]}

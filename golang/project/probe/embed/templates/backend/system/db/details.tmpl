@@ -1,0 +1,110 @@
+{[template "backend/common/header_nonav.tmpl" .]}
+
+<div class="layui-fluid">
+
+    <div class="layui-col-md12" style="padding: 5px;">
+        <div class="layui-card">
+            <div class="layui-card-body">
+
+                <div class="layui-tab layui-tab-brief">
+                    <ul class="layui-tab-title" id="status">
+                        {[range $menu := .submenu]}
+                            <li data-status="{[$menu.Number]}" {[if IsSubOrEq $.CurrentPath (print "/" $.admin_path "/" $menu.Link)]}class="layui-this"{[end]}><a href="/{[$.admin_path]}/{[$menu.Link]}">{[$menu.Name]}</a></li>
+                        {[end]}
+                    </ul>
+                </div>
+
+                <div style="display:flex;align-items:center;gap:8px;margin-top: 1rem;">
+                    <a href="/{[.admin_path]}/system/db" style="display:flex;align-items:center;">
+                        <i class="layui-icon layui-icon-return"></i>  
+                    </a>
+
+                    <span style="margin:0;font-size:18px;">
+                        {[if .Data]}{[.Data.Name]}{[end]}
+                    </span>
+                </div>
+
+                <div class="layui-tab layui-tab-brief">
+                    <ul class="layui-tab-title" id="status">
+                        <li data-status="1" class="layui-this">详情</li>
+                        <li data-status="2"><a href="/{[.admin_path]}/system/db/clean?id={[.id]}">清理</a></li>
+                        <li data-status="3"><a href="/{[.admin_path]}/system/db/logs?id={[.id]}">运行日志</a></li>
+                        <li data-status="4"><a href="/{[.admin_path]}/system/db/update?id={[.id]}">修改</a></li>
+                    </ul>
+                </div>
+
+                <div class="cluster-boards bls_hover" style="margin-top: 10px;">
+                    <div class="layui-row layui-col-space10">
+                        <div class="layui-col-xs12 layui-col-sm4 layui-col-md3">
+                            <div class="ccc_hover">
+                                <div style="color: rgb(100, 116, 139); font-size: 14px; margin-bottom: 6px;">状态</div>
+                                <div style="font-size: 12px;">
+                                    {[if .Data]}
+                                        {[if .Data.Status]}<span style="color:#16b777;">已启用</span>
+                                        {[else]}<span style="color:#e2e2e2;">已停用</span>
+                                        {[end]}
+                                    {[end]}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="layui-col-xs12 layui-col-sm4 layui-col-md3">
+                            <div class="ccc_hover">
+                                <div style="color: rgb(100, 116, 139); font-size: 14px; margin-bottom: 6px;">节点名称</div>
+                                <div style="font-size: 12px; color: #333;">{[if .Data]}{[.Data.Name]}{[end]}</div>
+                            </div>
+                        </div>
+          
+                        <div class="layui-col-xs12 layui-col-sm4 layui-col-md3">
+                            <div class="ccc_hover">
+                                <div style="color: rgb(100, 116, 139); font-size: 14px; margin-bottom: 6px;">主机地址（Host）</div>
+                                <div style="font-size: 12px;">{[if .Data]}{[.Data.Host]}{[end]}</div>
+                            </div>
+                        </div>
+
+                        <div class="layui-col-xs12 layui-col-sm4 layui-col-md3">
+                            <div class="ccc_hover">
+                                <div style="color: rgb(100, 116, 139); font-size: 14px; margin-bottom: 6px;">数据库端口（Port）</div>
+                                <div style="font-size: 12px;">{[if .Data]}{[.Data.Port]}{[end]}</div>
+                            </div>
+                        </div>
+
+                        <div class="layui-col-xs12 layui-col-sm4 layui-col-md3">
+                            <div class="ccc_hover">
+                                <div style="color: rgb(100, 116, 139); font-size: 14px; margin-bottom: 6px;">数据库名称（Database）</div>
+                                <div style="font-size: 12px;">{[if .Data]}{[.Data.Dbname]}{[end]}</div>
+                            </div>
+                        </div>
+
+                        <div class="layui-col-xs12 layui-col-sm4 layui-col-md3">
+                            <div class="ccc_hover">
+                                <div style="color: rgb(100, 116, 139); font-size: 14px; margin-bottom: 6px;">用户名（Username）</div>
+                                <div style="font-size: 12px;">{[if .Data]}{[.Data.Username]}{[end]}</div>
+                            </div>
+                        </div>
+
+                        <div class="layui-col-xs12 layui-col-sm4 layui-col-md3">
+                            <div class="ccc_hover">
+                                <div style="color: rgb(100, 116, 139); font-size: 14px; margin-bottom: 6px;">密码（Password）</div>
+                                <div style="font-size: 12px;">****************</div>
+                            </div>
+                        </div>
+
+                        <div class="layui-col-xs12 layui-col-sm4 layui-col-md3">
+                            <div class="ccc_hover">
+                                <div style="color: rgb(100, 116, 139); font-size: 14px; margin-bottom: 6px;;">备注</div>
+                                <div style="font-size: 12px;">
+                                    {[if .Data]}{[if eq .Data.Mark "" ]}<span class="disabled">没有设置</span>{[else]}{[.Data.Mark]}{[end]}{[end]}
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+{[template "backend/common/footer.tmpl" .]}

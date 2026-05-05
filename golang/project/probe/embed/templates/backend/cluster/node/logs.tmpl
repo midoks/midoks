@@ -1,0 +1,109 @@
+{[template "backend/common/header.tmpl" .]}
+
+<div class="layui-fluid">
+    <div class="layui-col-md12" style="padding: 5px;">
+        <div class="layui-card">
+            <div class="layui-card-body">
+
+                <div class="layui-tab layui-tab-brief">
+                    <ul class="layui-tab-title" id="status">
+                        {[range $menu := .submenu]}
+                            <li data-status="{[$menu.Number]}" {[if eq (print "/" $.admin_path "/" $menu.Link) $.CurrentPath]}class="layui-this"{[end]}><a href="/{[$.admin_path]}/{[$menu.Link]}?cluster_id={[$.cluster_id]}&node_id={[$.node_id]}"><i class="layui-icon {[$menu.Icon]}"></i> {[$menu.Name]}</a></li>
+                        {[end]}
+                    </ul>
+                </div>
+
+                <div class="layui-form toolbar" style="margin-top: 10px;margin-bottom: 10px;">
+                <form class="layui-form" action="" id="log_form" onclick="return false;">
+
+                    <div class="layui-inline mr0">
+                        <div class="layui-input-inline h30">
+                            <input name="times" id="date_range" class="layui-input date-icon" type="text" placeholder="请选择日期范围" autocomplete="off">
+                        </div>
+                    </div>
+
+                    <div class="layui-inline mr0">
+                        <div class="layui-input-inline h30">
+                            <select name="level" id="level" class="layui-input">
+                                <option value="">[级别]</option>
+                                <option value="error">错误</option>
+                                <option value="warn">警告</option>
+                                <option value="info">信息</option>
+                                <option value="success">成功</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="layui-inline mr0">
+                        <div class="layui-input-inline h30">
+                            <select name="tag" id="tag" class="layui-input">
+                                <option value="">[标签]</option>
+                                <option value="logs">访问日志</option>
+                                <option value="port">端口监听</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="layui-inline mr0">
+                        <div class="layui-input-inline h30">
+                            <input type="text" name="key" placeholder="请输入关键字" autocomplete="off" class="layui-input" value="">
+                        </div>
+                    </div>
+
+                    <div class="layui-inline mr0">
+                        <button class="layui-btn layui-btn-sm" id="table-sreach" data-id="list" lay-submit lay-filter="table-sreach"><i class="layui-icon">&#xe615;</i>查询
+                        </button>
+                    </div>
+                </form>
+                </div>
+
+                <div id="list"></div>
+                <!-- end -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+layui.config({base: '/static/layuiadmin/'}).use(['table','jquery'], function(){
+///
+var admin = layui.admin
+,$ = layui.$
+,form = layui.form
+,table = layui.table;
+
+table.render({
+    elem: '#list',
+    url: '/{[.admin_path]}/clusters/node/logs/list',
+    title: '节点日志',
+    cols: [[
+        {field:'id', title:'ID', width:80}
+     ]],
+    page: true,
+    showHeader: false,
+    where: {
+        id: '{[.node_id]}'
+    },
+    done:function(res,curr,count){
+        $('th').hide();
+        $('.layui-table-header').css('border-bottom-width','0px');
+    }
+});
+
+
+table.on('tool(list)', function(obj){
+    switch(obj.event){
+    };
+});
+
+table.on('toolbar', function(obj){
+    switch(obj.event){
+    };
+});
+
+///
+});
+</script>
+
+{[template "backend/common/footer.tmpl" .]}

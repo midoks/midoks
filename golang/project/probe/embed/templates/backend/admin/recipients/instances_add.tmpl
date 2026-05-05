@@ -1,0 +1,306 @@
+{[template "backend/common/header_head.tmpl" .]}
+
+
+<style type="text/css">
+.layui-form-item .layui-input-inline{
+    width: auto;
+    margin-left: 5px;
+}
+.type-input{
+    height:70px;
+    overflow-y: auto;
+}
+.type-input::-webkit-scrollbar {
+    /*滚动条整体样式*/
+    width : 10px;  /*高宽分别对应横竖滚动条的尺寸*/
+    height: 1px;
+}
+.type-input::-webkit-scrollbar-thumb {
+    /*滚动条里面小方块*/
+    border-radius: 10px;
+    box-shadow   : inset 0 0 5px rgba(0, 0, 0, 0.2);
+    background   : #666;
+}
+.type-input::-webkit-scrollbar-track {
+    /*滚动条里面轨道*/
+    box-shadow   : inset 0 0 5px rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    background   : #ededed;
+}
+.layui-form-radio{
+    margin: 0; 
+    padding-right: 0;
+}
+
+.layui-form-pane .layui-form-checkbox {
+    margin: 4px 0 4px 1px;
+}
+.layui-form-checkbox[lay-skin=primary] span {
+    padding-right: 4px;
+}
+.layui-form-checkbox[lay-skin=primary] i {
+    left: 6px;
+}
+.layui-form-item .layui-col-xs12{
+    margin-top: 10px;
+}
+@media screen and (max-width: 990px){
+    .layui-form-item .layui-col-xs12:first-child{
+        margin-top: 0px;
+    }
+    .layui-form-item{
+        margin-bottom: 10px; 
+    }
+}
+</style>
+<!-- start -->
+
+<div class="layui-fluid">
+
+    <div class="layui-form toolbar layui-padding-3" style="margin-top: 10px;margin-bottom: 10px;">
+    <form class="layui-form layui-form-pane" onclick="return false;">
+        <table class="layui-table">
+            <colgroup><col width="150"><col></colgroup>
+            <tbody>
+                <tr>
+                    <td>媒介名称 *</td>
+                    <td>
+                        <div class="layui-input-inline">
+                            <input type="text" name="name" autocomplete="off" class="layui-input" value="" placeholder="媒介名称">
+                        </div>
+                        <br/>
+                        <p class="layui-font-12">给当前媒介填写一个容易识别的名称。</p>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>媒介类型 *</td>
+                    <td>
+                        <div class="layui-input-inline">
+                            <select name="media_type" lay-verify="required" lay-search lay-filter="media">
+                                <option value="">[选择媒介类型]</option>
+                                <option value="telegram">Telegram</option>
+                                <option value="email">邮件</option>
+                                <option value="webhook">WebHook</option>
+                            </select>
+                        </div>
+                        <br/>
+                        <p class="layui-font-12">通过HTTP请求发送通知。</p>
+                    </td>
+                </tr>
+
+                <div id="id_telegram">
+                    <tr class="id_telegram bls" style="display:none;">
+                        <td>机器人Token *</td>
+                        <td>
+                            <div class="layui-input-line">
+                                <input type="text" name="token" autocomplete="off" class="layui-input" placeholder="请输入Token">
+                            </div>
+                            <p class="layui-font-12">创建机器人的时候可以获得，类似于 123456:AAAA-BBBB ，可以向 @BotFather 发送 /newbot 指令创建新的机器人。</p>
+                        </td>
+                    </tr>
+
+                    <tr class="id_telegram bls" style="display:none;">
+                        <td>接收人标识</td>
+                        <td>
+                            <div class="layui-input-line">
+                                <input type="text" name="send_id" autocomplete="off" class="layui-input" placeholder="" value="{[if .Data]}{[.Data.GetTelegramParams.SendID]}{[end]}">
+                            </div>
+                            <p class="layui-font-12">群或用户的Chat ID,通常是一个数字,可以通过和@get_id_bot[/my_id]建立对话并发送任意消息获得。</p>
+                        </td>
+                    </tr>
+
+                    <tr class="id_telegram bls" style="display:none;">
+                        <td>代理服务</td>
+                        <td>
+                            <div class="layui-inline">
+                                <div class="layui-input-inline" style="float: left;">
+                                    <select name="telegram_proxy_scheme" lay-verify="required" lay-search lay-filter="telegram_proxy_scheme">
+                                        <option value="socket5" {[if .Data]}{[if eq .Data.GetTelegramParams.TelegramProxyScheme "socket5" ]}selected{[end]}{[end]}>socket5://</option>
+                                        <option value="https" {[if .Data]}{[if eq .Data.GetTelegramParams.TelegramProxyScheme "https" ]}selected{[end]}{[end]}>https://</option>
+                                        <option value="http" {[if .Data]}{[if eq .Data.GetTelegramParams.TelegramProxyScheme "http" ]}selected{[end]}{[end]}>http://</option>
+                                    </select>
+                                </div>
+                                <div class="layui-input-inline" style="float: left;">
+                                    <input type="text" name="telegram_proxy_value" autocomplete="off" class="layui-input" placeholder="" value="{[if .Data]}{[.Data.GetTelegramParams.TelegramProxyValue]}{[end]}">
+                                </div>
+                            </div>
+                            <p class="layui-font-12">可选项，仅当API节点所在服务器无法直接连接Telegram API时填写；测试是否能够连接Telegram API的方法： 
+curl https://api.telegram.org 出现2XX、3XX、4XX之类提示时说明能够直接连接；如果你设置了代理，请使用 
+curl -x "你的代理服务地址" https://api.telegram.org 来测试你的代理是否可用。</p>
+                        </td>
+                    </tr>
+                </div>
+
+                <div id="id_webhook">
+                    <tr class="id_webhook bls" style="display:none;">
+                        <td>URL *</td>
+                        <td>
+                            <div class="layui-input-line">
+                                <input type="text" name="webhook_url" autocomplete="off" class="layui-input" placeholder="http://">
+                            </div>
+                            <p class="layui-font-12">可以在URL中使用 ${MessageUser} 、 ${MessageSubject} 和 ${MessageBody} 来代表接收人标识、标题和内容。</p>
+                        </td>
+                    </tr>
+
+                    <tr class="id_webhook bls" style="display:none;">
+                        <td>请求方法 *</td>
+                        <td>
+                            <div class="layui-input-inline">
+                                <select name="webhook_method" lay-verify="required" lay-search>
+                                    <option value="get">GET</option>
+                                    <option value="post">POST</option>
+                                </select>
+                            </div>
+                        </td>
+                    </tr>
+                </div>
+
+                <div id="id_email">
+                    <tr class="id_email bls" style="display:none;">
+                        <td>SMTP *</td>
+                        <td>
+                            <div class="layui-input-line">
+                                <input type="text" name="email_smtp" autocomplete="off" class="layui-input" placeholder="类似于 smtp.example.com:465">
+                            </div>
+                            <p class="layui-font-12">只支持SSL（或TLS）连接，端口通常为：465或587。</p>
+                        </td>
+                    </tr>
+
+                    <tr class="id_email bls" style="display:none;">
+                        <td>账号 *</td>
+                        <td>
+                            <div class="layui-input-line">
+                                <input type="text" name="email_username" autocomplete="off" class="layui-input" placeholder="类似于 xxx@example.com">
+                            </div>
+                            <p class="layui-font-12">邮箱账号，比如 123456@qq.com。</p>
+                        </td>
+                    </tr>
+
+                    <tr class="id_email bls" style="display:none;">
+                        <td>密码 *</td>
+                        <td>
+                            <div class="layui-input-line">
+                                <input type="text" name="email_password" autocomplete="off" class="layui-input" placeholder="">
+                            </div>
+                            <p class="layui-font-12">账号对应的密码或者授权码（比如QQ邮箱就需要授权码）。</p>
+                        </td>
+                    </tr>
+
+                    <tr class="id_email bls" style="display:none;">
+                        <td>发送者Email</td>
+                        <td>
+                            <div class="layui-input-line">
+                                <input type="text" name="email_from" autocomplete="off" class="layui-input" placeholder="类似于 xxx@example.com">
+                            </div>
+                            <p class="layui-font-12">默认和账号一致</p>
+                        </td>
+                    </tr>
+                </div>
+
+                <tr>
+                    <td>发送频率 <br/>（次/分钟）</td>
+                    <td>
+                        <div>
+                            <div class="layui-inline">
+                                <div class="layui-input-inline">
+                                    <input style="width: 60px;" type="number" name="count" autocomplete="off" class="layui-input" value="100">
+                                </div>
+                                <label class="layui-form-label" style="width: 50px;float: right;">次</label>
+                            </div>
+                            <span>/</span>
+                            <div class="layui-inline">
+                                <div class="layui-input-inline">
+                                    <input style="width: 60px;" type="number" name="minutes" autocomplete="off" class="layui-input" value="1">
+                                </div>
+                                <label class="layui-form-label" style="width: 70px;float: right;">分钟</label>
+                            </div>
+                        </div>
+                        <p class="layui-font-12">用来限制此媒介的发送频率，防止短时间内消息数量过载。</p>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>忽略相似消息周期</td>
+                    <td>
+                        <div class="layui-inline">
+                            <div class="layui-input-inline">
+                                <input type="text" name="number" autocomplete="off" class="layui-input" value="60">
+                            </div>
+                            <label class="layui-form-label" style="float: right;">秒</label>
+                        </div>
+                        <br/>
+                        <p class="layui-font-12">可以在这个时间内忽略相似消息，防止短时间内消息数量过载。默认60秒。</p>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td colspan="2">
+                        <a class="table_more mlink" target_class="more_table">
+                            <cite>更多选项</cite>
+                            <i class="layui-icon layui-icon-down layui-nav-more"></i>
+                        </a>
+                    </td>
+                </tr>
+
+                <tr class="more_table hide">
+                    <td>备注</td>
+                    <td><textarea id="editor2" name="mark" class="layui-textarea" style="min-height:100px;" placeholder="">{[if .Data]}{[.Data.Mark]}{[end]}</textarea></td>
+                </tr>
+                
+            </tbody>
+        </table>
+
+
+        <div class="layui-form-item" style="text-align: center;">
+            <button class="layui-btn" lay-filter="submit_recipients" lay-submit>保存</button>
+        </div>
+    </form>
+    </div>
+
+</div>
+
+
+<script type="text/javascript">
+
+layui.config({base: '/static/layuiadmin/'}).use(['table','jquery'], function(){
+///
+var admin = layui.admin
+,$ = layui.$
+,form = layui.form
+,table = layui.table;
+
+
+form.on('select(media)', function(data){
+    $('.id_telegram,.id_webhook,.id_email').hide();
+    if (data.value === 'telegram') {
+        $('.id_telegram').show();
+    } else if (data.value === 'webhook') {
+        $('.id_webhook').show();
+    } else if (data.value === 'email') {
+        $('.id_email').show();
+    }
+});
+
+
+form.on("submit(submit_recipients)", function(data){
+    var index = layer.load();
+    var field = data.field;
+
+    $.post("/{[$.admin_path]}/admin/recipients/instances/add", field, function(res) {
+        showMsg(res.msg, function(){
+            layer.close(index);
+            if(res.code > -1){
+                parent.location.reload();
+            }
+        },{icon: res.code > -1 ? 1 : 2,shift:res.code>-1 ? 0 : 6});
+    },'json');
+    return false;
+});
+
+
+///
+});
+</script>
+
+{[template "backend/common/footer.tmpl" .]}

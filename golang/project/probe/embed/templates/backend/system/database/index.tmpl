@@ -1,0 +1,78 @@
+{[template "backend/common/header_nonav.tmpl" .]}
+
+<div class="layui-fluid">
+    <div class="layui-col-md12" style="padding: 5px;">
+        <div class="layui-card">
+            <div class="layui-card-body">
+
+                <div class="layui-tab layui-tab-brief">
+                    <ul class="layui-tab-title" id="status">
+                        {[range $menu := .submenu]}
+                            <li data-status="{[$menu.Number]}" {[if IsSubOrEq $.CurrentPath (print "/" $.admin_path "/" $menu.Link)]}class="layui-this"{[end]}><a href="/{[$.admin_path]}/{[$menu.Link]}">{[$menu.Name]}</a></li>
+                        {[end]}
+                    </ul>
+                </div>
+
+
+                 <div class="layui-tab layui-tab-brief">
+                    <ul class="layui-tab-title" id="status">
+                        {[range $db_menu := .database_submenu]}
+                            <li data-status="{[$db_menu.Number]}" {[if IsSubOrEq $.CurrentPath (print "/" $.admin_path "/" $db_menu.Link)]}class="layui-this"{[end]}><a href="/{[$.admin_path]}/{[$db_menu.Link]}">{[$db_menu.Name]}</a></li>
+                        {[end]}
+                    </ul>
+                </div>
+
+
+                <div class="cluster-boards bls_hover" style="margin-top: 10px;">
+                    <div class="layui-row layui-col-space10">
+
+                        <div class="layui-col-xs12 layui-col-sm4 layui-col-md3">
+                            <div class="ccc_hover">
+                                <div style="color: rgb(100, 116, 139); font-size: 14px; margin-bottom: 6px;">数据库类型</div>
+                                <div style="font-size: 12px; color: #333;">{[if .Data]}{[.Data.Type]}{[end]}</div>
+                            </div>
+                        </div>
+          
+                        <div class="layui-col-xs12 layui-col-sm4 layui-col-md3">
+                            <div class="ccc_hover">
+                                <div style="color: rgb(100, 116, 139); font-size: 14px; margin-bottom: 6px;">主机地址（Host）</div>
+                                <div style="font-size: 12px;">{[if .Data]}{[.Data.Hostname]}{[end]}</div>
+                            </div>
+                        </div>
+
+                        <div class="layui-col-xs12 layui-col-sm4 layui-col-md3">
+                            <div class="ccc_hover">
+                                <div style="color: rgb(100, 116, 139); font-size: 14px; margin-bottom: 6px;">数据库端口（Port）</div>
+                                <div style="font-size: 12px;">{[if .Data]}{[.Data.Hostport]}{[end]}</div>
+                            </div>
+                        </div>
+
+                        <div class="layui-col-xs12 layui-col-sm4 layui-col-md3">
+                            <div class="ccc_hover">
+                                <div style="color: rgb(100, 116, 139); font-size: 14px; margin-bottom: 6px;">数据库名称（Database）</div>
+                                <div style="font-size: 12px;">{[if .Data]}{[.Data.Name]}{[end]}</div>
+                            </div>
+                        </div>
+
+                        <div class="layui-col-xs12 layui-col-sm4 layui-col-md3">
+                            <div class="ccc_hover">
+                                <div style="color: rgb(100, 116, 139); font-size: 14px; margin-bottom: 6px;">用户名（Username）</div>
+                                <div style="font-size: 12px;">{[if .Data]}{[.Data.User]}{[end]}</div>
+                            </div>
+                        </div>
+
+                        <div class="layui-col-xs12 layui-col-sm4 layui-col-md3">
+                            <div class="ccc_hover">
+                                <div style="color: rgb(100, 116, 139); font-size: 14px; margin-bottom: 6px;">密码（Password）</div>
+                                <div style="font-size: 12px;">****************</div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{[template "backend/common/footer.tmpl" .]}

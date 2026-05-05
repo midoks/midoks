@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>服务器内部错误 - 在线管理系统</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <link rel="stylesheet" href="/static/layuiadmin/layui/css/layui.css?v={[BuildCommit]}" media="all">
+    <link rel="stylesheet" href="/static/layuiadmin/style/admin.css?v={[BuildCommit]}" media="all">
+</head>
+<body>
+
+<div class="layui-container" style="padding-top: 100px;">
+    <div class="layui-row">
+        <div class="layui-col-md6 layui-col-md-offset3">
+            <div class="layui-card">
+                <div class="layui-card-header" style="text-align: center;">
+                    <h1 style="color: #FF5722; font-size: 72px; margin: 20px 0;">500</h1>
+                </div>
+                <div class="layui-card-body" style="text-align: center;">
+                    <h2 style="color: #666; margin-bottom: 20px;">服务器内部错误</h2>
+                    <p style="color: #999; margin-bottom: 30px;">抱歉，服务器遇到了一个内部错误，无法完成您的请求。</p>
+                    
+                    {[if .ErrorMsg]}
+                    <div class="layui-card" style="margin: 20px 0; text-align: left;">
+                        <div class="layui-card-header">错误详情</div>
+                        <div class="layui-card-body">
+                            <pre style="background: #f8f8f8; padding: 15px; border-radius: 4px; overflow-x: auto; font-size: 12px;">{[.ErrorMsg]}</pre>
+                        </div>
+                    </div>
+                    {[end]}
+                    
+                    <div style="margin-top: 30px;">
+                        <a href="javascript:history.back()" class="layui-btn layui-btn-primary">
+                            <i class="layui-icon layui-icon-return"></i> 返回上一页
+                        </a>
+                        <a href="/" class="layui-btn layui-btn-normal">
+                            <i class="layui-icon layui-icon-home"></i> 返回首页
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/static/layuiadmin/layui/layui.js?v={[BuildCommit]}"></script>
+</body>
+</html>

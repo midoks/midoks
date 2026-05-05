@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>习惯设置 - AIProbe</title>
+    <link rel="stylesheet" href="/static/layuiadmin/layui/css/layui.css">
+    <link rel="stylesheet" href="/static/common/css/common.css">
+    <style>
+        .tool-container { max-width: 700px; margin: 0 auto; padding: 20px; }
+        .tool-header { text-align: center; margin-bottom: 30px; }
+        .tool-header h1 { font-size: 28px; color: #333; margin-bottom: 10px; }
+        .tool-header p { color: #666; }
+        .settings-form { background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .setting-item { padding: 20px 0; border-bottom: 1px solid #eee; }
+        .setting-item:last-child { border-bottom: none; }
+        .setting-item .setting-title { font-size: 16px; color: #333; margin-bottom: 8px; font-weight: 500; }
+        .setting-item .setting-desc { font-size: 13px; color: #999; margin-bottom: 15px; }
+        .setting-item select, .setting-item input[type="number"] { width: 100%; max-width: 300px; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; }
+        .btn-save { background: #1890ff; color: #fff; padding: 12px 40px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; margin-top: 20px; }
+        .btn-save:hover { background: #40a9ff; }
+        .nav-tools { background: #fff; padding: 15px 0; border-bottom: 1px solid #e8e8e8; margin-bottom: 20px; }
+        .nav-tools ul { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; }
+        .nav-tools li a { display: block; padding: 8px 20px; color: #666; text-decoration: none; border-radius: 4px; transition: all 0.3s; }
+        .nav-tools li a:hover, .nav-tools li a.active { background: #1890ff; color: #fff; }
+    </style>
+</head>
+<body>
+    <div class="nav-tools">
+        <ul>
+            <li><a href="/frontend/ping">在线Ping</a></li>
+            <li><a href="/frontend/tcping">在线Tcping</a></li>
+            <li><a href="/frontend/speedtest">网站测速</a></li>
+            <li><a href="/frontend/traceroute">路由追踪</a></li>
+            <li><a href="/frontend/dns">DNS查询</a></li>
+            <li><a href="/frontend/findping">FindPing</a></li>
+            <li><a href="/frontend/network">本地网络</a></li>
+            <li><a href="/frontend/batch">批量检测</a></li>
+            <li><a href="/frontend/help">帮助支持</a></li>
+            <li><a href="/frontend/settings" class="active">习惯设置</a></li>
+        </ul>
+    </div>
+
+    <div class="tool-container">
+        <div class="tool-header">
+            <h1>习惯设置</h1>
+            <p>自定义您的使用偏好</p>
+        </div>
+
+        <div class="settings-form">
+            <div class="setting-item">
+                <div class="setting-title">Ping超时时间</div>
+                <div class="setting-desc">设置Ping命令的超时时间（毫秒）</div>
+                <input type="number" id="pingTimeout" value="5000" min="1000" max="30000">
+            </div>
+
+            <div class="setting-item">
+                <div class="setting-title">Ping次数</div>
+                <div class="setting-desc">设置每次Ping测试发送的包数量</div>
+                <input type="number" id="pingCount" value="4" min="1" max="100">
+            </div>
+
+            <div class="setting-item">
+                <div class="setting-title">Tcping超时时间</div>
+                <div class="setting-desc">设置Tcping测试的超时时间（毫秒）</div>
+                <input type="number" id="tcpingTimeout" value="5000" min="1000" max="30000">
+            </div>
+
+            <div class="setting-item">
+                <div class="setting-title">默认DNS服务器</div>
+                <div class="setting-desc">选择DNS查询使用的服务器</div>
+                <select id="dnsServer">
+                    <option value="8.8.8.8">Google DNS (8.8.8.8)</option>
+                    <option value="114.114.114.114">114 DNS (114.114.114.114)</option>
+                    <option value="1.1.1.1">Cloudflare DNS (1.1.1.1)</option>
+                    <option value="223.5.5.5">阿里DNS (223.5.5.5)</option>
+                </select>
+            </div>
+
+            <div class="setting-item">
+                <div class="setting-title">结果显示数量</div>
+                <div class="setting-desc">批量检测时每页显示的结果数量</div>
+                <input type="number" id="pageSize" value="50" min="10" max="200">
+            </div>
+
+            <div class="setting-item">
+                <div class="setting-title">主题颜色</div>
+                <div class="setting-desc">选择界面主题</div>
+                <select id="themeColor">
+                    <option value="blue">蓝色</option>
+                    <option value="green">绿色</option>
+                    <option value="purple">紫色</option>
+                    <option value="red">红色</option>
+                </select>
+            </div>
+
+            <button class="btn-save" onclick="saveSettings()">保存设置</button>
+        </div>
+    </div>
+
+    <script src="/static/common/js/jquery-1.10.2.min.js"></script>
+    <script src="/static/layuiadmin/layui/layui.js"></script>
+    <script>
+    $(document).ready(function() {
+        loadSettings();
+    });
+
+    function loadSettings() {
+        var settings = JSON.parse(localStorage.getItem('aiprobe_settings') || '{}');
+        if (settings.pingTimeout) $('#pingTimeout').val(settings.pingTimeout);
+        if (settings.pingCount) $('#pingCount').val(settings.pingCount);
+        if (settings.tcpingTimeout) $('#tcpingTimeout').val(settings.tcpingTimeout);
+        if (settings.dnsServer) $('#dnsServer').val(settings.dnsServer);
+        if (settings.pageSize) $('#pageSize').val(settings.pageSize);
+        if (settings.themeColor) $('#themeColor').val(settings.themeColor);
+    }
+
+    function saveSettings() {
+        var settings = {
+            pingTimeout: parseInt($('#pingTimeout').val()),
+            pingCount: parseInt($('#pingCount').val()),
+            tcpingTimeout: parseInt($('#tcpingTimeout').val()),
+            dnsServer: $('#dnsServer').val(),
+            pageSize: parseInt($('#pageSize').val()),
+            themeColor: $('#themeColor').val()
+        };
+        localStorage.setItem('aiprobe_settings', JSON.stringify(settings));
+        layer.msg('设置已保存', {icon: 1});
+    }
+
+    layui.use('layer', function(){
+        window.layer = layui.layer;
+    });
+    </script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+// 打印请求头信息
+// fmt.Println("=== Request Headers ===")
+// for key, values := range c.Request.Header {
+// 	for _, value := range values {
+// 		fmt.Printf("header|%s: %s\n", key, value)
+// 	}
+// }
+//
+// fmt.Println("=======================")

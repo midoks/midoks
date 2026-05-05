@@ -1,0 +1,183 @@
+{[template "backend/common/header_head.tmpl" .]}
+
+
+<style type="text/css">
+.layui-form-item .layui-input-inline{
+    width: auto;
+    margin-left: 5px;
+}
+.type-input{
+    height:70px;
+    overflow-y: auto;
+}
+.type-input::-webkit-scrollbar {
+    /*滚动条整体样式*/
+    width : 10px;  /*高宽分别对应横竖滚动条的尺寸*/
+    height: 1px;
+}
+.type-input::-webkit-scrollbar-thumb {
+    /*滚动条里面小方块*/
+    border-radius: 10px;
+    box-shadow   : inset 0 0 5px rgba(0, 0, 0, 0.2);
+    background   : #666;
+}
+.type-input::-webkit-scrollbar-track {
+    /*滚动条里面轨道*/
+    box-shadow   : inset 0 0 5px rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    background   : #ededed;
+}
+.layui-form-radio{
+    margin: 0; 
+    padding-right: 0;
+}
+
+.layui-form-pane .layui-form-checkbox {
+    margin: 4px 0 4px 1px;
+}
+.layui-form-checkbox[lay-skin=primary] span {
+    padding-right: 4px;
+}
+.layui-form-checkbox[lay-skin=primary] i {
+    left: 6px;
+}
+.layui-form-item .layui-col-xs12{
+    margin-top: 10px;
+}
+@media screen and (max-width: 990px){
+    .layui-form-item .layui-col-xs12:first-child{
+        margin-top: 0px;
+    }
+    .layui-form-item{
+        margin-bottom: 10px; 
+    }
+}
+</style>
+<!-- start -->
+
+<div class="layui-fluid">
+
+    <div class="layui-form toolbar layui-padding-3">
+    <form class="layui-form layui-form-pane" onclick="return false;">
+        <table class="layui-table">
+            <colgroup><col width="150"><col></colgroup>
+            <tbody>
+                <tr>
+                    <td>登录用户名</td>
+                    <td><input type="text" name="username" autocomplete="off" class="layui-input" value="{[if .Data]}{[.Data.Username]}{[end]}" placeholder="登录用户名"></td>
+                </tr>
+
+                <tr>
+                    <td>登录密码</td>
+                    <td>
+                        <input type="password" name="password" autocomplete="off" class="layui-input" value="" placeholder="登录密码">
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>确认密码</td>
+                    <td>
+                        <input type="password" name="password2" autocomplete="off" class="layui-input" value="" placeholder="确认登录密码">
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>全名</td>
+                    <td>
+                        <input type="text" name="full_name" autocomplete="off" class="layui-input" value="{[if .Data]}{[.Data.FullName]}{[end]}" placeholder="全名">
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>允许登录</td>
+                    <td>
+                        <input type="checkbox" name="allow_login" {[if .Data]}{[if .Data.AllowLogin]}checked{[end]}{[end]}> 
+                        <p class="layui-font-12 pt5">选中后，当前管理员才可以登录当前的管理平台。</p>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>超级管理员</td>
+                    <td>
+                        <input type="checkbox" name="super_admin" lay-filter="super_admin" {[if .Data]}{[if .Data.SuperAdmin]}checked{[end]}{[end]}> 
+                        <p class="layui-font-12 pt5">选中后，表示当前管理员为超级管理员；超级管理员自动拥有所有的管理权限。</p>
+                    </td>
+                </tr>
+
+                <tr class="auth {[if .Data]}{[if .Data.SuperAdmin]}hide{[end]}{[end]}">
+                    <td>权限</td>
+                    <td>
+                        {[range $menu := .Menus]}
+                            {[if (index $.AuthMap $menu.Code)]}
+                                <input type="checkbox" name="auth[{[$menu.Code]}]" lay-text="{[$menu.Name]}" checked>
+                            {[else]}
+                                <input type="checkbox" name="auth[{[$menu.Code]}]" lay-text="{[$menu.Name]}">
+                            {[end]}
+                        {[end]}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="layui-form-item" style="text-align: center;">
+            <input type="hidden" name="status" value="true">
+            <input type="hidden" name="id" value="{[if .Data]}{[.Data.ID]}{[end]}">
+            <button class="layui-btn" lay-filter="submit_admin" lay-submit>保存</button>
+        </div>
+    </form>
+    </div>
+
+</div>
+
+<script type="text/javascript">
+layui.config({base: '/static/layuiadmin/'}).use(['table','jquery'], function(){
+///
+var admin = layui.admin
+,$ = layui.$
+,form = layui.form
+,table = layui.table;
+var layer = layui.layer;
+
+form.on('checkbox(super_admin)', function(data){
+    var checked = data.elem.checked;
+    $('.auth').toggleClass('hide', checked);
+});
+
+form.on("submit(submit_admin)", function(data){
+    var index = layer.load();
+    var field = data.field;
+
+    if (field['status'] == "on"){
+        field['status'] = true;
+    } else {
+        field['status'] = false;
+    }
+
+    if (field['allow_login'] == "on"){
+        field['allow_login'] = true;
+    } else {
+        field['allow_login'] = false;
+    }
+
+    if (field['super_admin'] == "on"){
+        field['super_admin'] = true;
+    } else {
+        field['super_admin'] = false;
+    }
+
+    $.post("/{[$.admin_path]}/admin/add", field, function(res) {
+        showMsg(res.msg, function(){
+            layer.close(index);
+            if(res.code > -1){
+                parent.location.reload();
+            }
+        },{icon: res.code > -1 ? 1 : 2,shift:res.code>-1 ? 0 : 6});
+    },'json');
+    return false;
+});
+
+///
+});
+</script>
+
+{[template "backend/common/footer.tmpl" .]}

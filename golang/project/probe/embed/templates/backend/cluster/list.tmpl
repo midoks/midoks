@@ -1,0 +1,134 @@
+{[template "backend/common/header.tmpl" .]}
+
+<div class="layui-fluid">
+    <div class="layui-col-md12" style="padding: 5px;">
+        <div class="layui-card">
+            <div class="layui-card-body">
+
+               <div class="layui-tab layui-tab-brief">
+                    <ul class="layui-tab-title" id="status">
+                        {[range $menu := .submenu]}
+                            <li data-status="{[$menu.Number]}" {[if eq (print "/" $.admin_path "/" $menu.Link) $.CurrentPath]}class="layui-this"{[end]}><a href="/{[$.admin_path]}/{[$menu.Link]}?cluster_id={[$.cluster_id]}"><i class="layui-icon {[$menu.Icon]}"></i> {[$menu.Name]}</a></li>
+                        {[end]}
+                    </ul>
+                </div>
+
+                <div class="layui-form toolbar" style="margin-top: 10px;margin-bottom: 10px;">
+                <form class="layui-form" action="" id="comic_form" onclick="return false;">
+
+                    <div class="layui-inline mr0">
+                        <div class="layui-input-inline mr0">
+                            <input type="text" name="key" placeholder="集群、节点关键词" autocomplete="off" class="layui-input h30" value="">
+                        </div>
+                    </div>
+                
+
+                    <div class="layui-inline mr0">
+                        <button class="layui-btn layui-btn-sm" id="table-sreach" data-id="list" lay-submit lay-filter="table-sreach"><i class="layui-icon">&#xe615;</i>搜索
+                        </button>
+                    </div>
+                </form>
+                </div>
+
+                <div id="list"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+layui.config({base: '/static/layuiadmin/'}).use(['table','jquery'], function(){
+///
+var admin = layui.admin
+,$ = layui.$
+,form = layui.form
+,table = layui.table;
+
+
+table.render({
+    elem: '#list',
+    url: '/{[.admin_path]}/clusters/node/list?cluster_id={[.cluster_id]}',
+    title: '数据表',
+    cols: [[
+        {field:'name', title:'节点名称', minWidth: 160, toolbar: '#nameTpl'},
+        {field:'ip', title:'IP地址', width: 160, templet: '#ipTpl'},
+        {field:'is_installed', title:'安装状态', width: 100, templet: '#installedTpl'},
+        {field:'status', title:'运行状态', width: 120, templet: '#statusTpl'},
+        {title:'操作', toolbar: '#cmdTpl', width: 240, fixed: 'right'}
+     ]],
+    page: true
+});
+
+
+table.on('tool(list)', function(obj){
+    switch(obj.event){
+    };
+});
+
+table.on('toolbar', function(obj){
+    switch(obj.event){
+    };
+});
+
+
+///
+});
+</script>
+
+
+<script type="text/html" id="nameTpl">
+    <div style="display:flex;align-items:center;">
+        <i class="layui-icon layui-icon-computer" style="font-size:18px;color:#1E9FFF;margin-right:8px;"></i>
+        <a class="mlink" href="/{[.admin_path]}/clusters/node/boards?cluster_id={[.cluster_id]}&node_id={{d.id}}" style="font-weight:500;">{{d.name}}</a>
+    </div>
+</script>
+
+<script type="text/html" id="ipTpl">
+    <div style="display:flex;align-items:center;">
+        <i class="layui-icon layui-icon-ip" style="font-size:16px;color:#666;margin-right:6px;"></i>
+        <span style="font-family:monospace;color:#333;">{{d.ip}}</span>
+    </div>
+</script>
+
+<script type="text/html" id="installedTpl">
+    {{# if (d.is_installed === true || d.is_installed === 1) { }}
+        <span class="layui-badge layui-bg-green" style="padding:3px 8px;">已安装</span>
+    {{# } else { }}
+        <span class="layui-badge layui-bg-orange" style="padding:3px 8px;">未安装</span>
+    {{# } }}
+</script>
+
+<script type="text/html" id="statusTpl">
+    {{# if (d.status == 1){ }}
+        <span style="display:flex;align-items:center;">
+            <span class="layui-badge-dot layui-bg-green" style="margin-right:6px;"></span>
+            <span style="color:#16b777;font-weight:500;">运行中</span>
+        </span>
+    {{# } else if (d.status == 0) { }}
+        <span style="display:flex;align-items:center;">
+            <span class="layui-badge-dot layui-bg-gray" style="margin-right:6px;"></span>
+            <span style="color:#999;">停止</span>
+        </span>
+    {{# } }}
+</script>
+
+<script type="text/html" id="cmdTpl">
+    <a class="layui-btn layui-btn-xs layui-btn-normal" href="/{[.admin_path]}/clusters/node/boards?cluster_id={[.cluster_id]}&node_id={{d.id}}">
+        <i class="layui-icon layui-icon-chart-screen"></i> 看板
+    </a>
+    {{# if (d.status == 1){ }}
+    <a class="layui-btn layui-btn-xs layui-btn-warm" lay-event="status">
+        <i class="layui-icon layui-icon-pause"></i> 停用
+    </a>
+    {{# } else if (d.status == 0) { }}
+    <a class="layui-btn layui-btn-xs layui-btn-normal" lay-event="status">
+        <i class="layui-icon layui-icon-play"></i> 启用
+    </a>
+    {{# } }}
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event='delete' onclick="Admin.del(this, 'delete_node','{{d.id}}')">
+        <i class="layui-icon layui-icon-delete"></i> 删除
+    </a>
+</script>
+
+{[template "backend/common/footer.tmpl" .]}

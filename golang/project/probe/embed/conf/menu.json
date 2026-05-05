@@ -1,0 +1,328 @@
+[
+    {
+        "code": "home",
+        "name": "数据看板",
+        "icon": "layui-icon-console",
+        "path": "/index",
+        "subapi":[
+            {
+                "code":"home",
+                "path": "/admin/list"
+            }
+        ]
+    },
+    {
+        "code": "node",
+        "name": "边缘节点",
+        "icon": "layui-icon-engine",
+        "path": "",
+        "children": [
+            {
+                "code": "clusters",
+                "name": "集群列表",
+                "path": "/clusters",
+                "subapi":[
+                    {
+                        "code":"clusters",
+                        "path": "/clusters/create"
+                    },
+                    {
+                        "code":"clusters",
+                        "path": "/clusters/update"
+                    },
+                    {
+                        "code":"clusters",
+                        "path": "/clusters/cluster/boards"
+                    },
+                    {
+                        "code":"clusters",
+                        "path": "/clusters/cluster/list"
+                    },
+                    {
+                        "code":"clusters",
+                        "path": "/clusters/cluster/create_node"
+                    },
+                    {
+                        "code":"clusters",
+                        "path": "/clusters/cluster/install"
+                    },
+                    {
+                        "code":"clusters",
+                        "path": "/clusters/cluster/upgrade"
+                    },
+                    {
+                        "code":"clusters",
+                        "path": "/clusters/cluster/settings"
+                    },
+                    {
+                        "code":"clusters",
+                        "path": "/clusters/cluster/settings/health"
+                    },
+                    {
+                        "code":"clusters",
+                        "path": "/clusters/cluster/delete"
+                    },
+                    {
+                        "code":"clusters",
+                        "path": "/clusters/cluster/groups"
+                    },
+                    {
+                        "code":"clusters",
+                        "path": "/clusters/cluster/settings"
+                    },
+                    {
+                        "code":"clusters",
+                        "path": "/clusters/node"
+                    },
+                    {
+                        "code":"clusters",
+                        "path": "/clusters/node/boards"
+                    },
+                    {
+                        "code":"clusters",
+                        "path": "/clusters/node/install"
+                    },
+                    {
+                        "code":"clusters",
+                        "path": "/clusters/node/details"
+                    },
+                    {
+                        "code":"clusters",
+                        "path": "/clusters/node/logs"
+                    },
+                    {
+                        "code":"clusters",
+                        "path": "/clusters/node/settings"
+                    },
+                    {
+                        "code":"clusters",
+                        "path": "/clusters/node/settings/ssh"
+                    }
+                    
+                ]
+            },
+            {
+                "code": "clusters_ipaddr",
+                "name": "节点IP",
+                "path": "/clusters/ipaddr"
+            },
+            {
+                "code": "clusters_region",
+                "name": "区域设置",
+                "path": "/clusters/regions"
+            },
+            {
+                "code": "ssh",
+                "name": "节点SSH",
+                "path": "/clusters/ssh",
+                "subapi":[
+                    {
+                        "code":"ssh",
+                        "path": "/clusters/ssh/create"
+                    },
+                    {
+                        "code":"ssh",
+                        "path": "/clusters/ssh/details"
+                    },
+                    {
+                        "code":"ssh",
+                        "path": "/clusters/ssh/update"
+                    },
+                    {
+                        "code":"ssh",
+                        "path": "/clusters/ssh/test"
+                    }
+                    
+                ]
+            }
+        ]
+    },
+    {
+        "code": "admin",
+        "name": "管理员",
+        "icon": "layui-icon-user",
+        "path": "",
+        "children": [
+            {
+                "code": "admin_list",
+                "name": "管理员列表",
+                "path": "/admin/index",
+                "subapi":[
+                    {
+                        "code":"admin_list",
+                        "path": "/admin/details"
+                    },
+                    {
+                        "code":"admin_list",
+                        "path": "/admin/update"
+                    }
+                ]
+            },
+            {
+                "code": "admin_recipients",
+                "name": "通知媒介",
+                "path": "/admin/recipients",
+                "subapi":[
+                    {
+                        "code":"admin_recipients",
+                        "path": "/admin/recipients/instances"
+                    },
+                    {
+                        "code":"admin_recipients",
+                        "path": "/admin/recipients/groups"
+                    },
+                    {
+                        "code":"admin_recipients",
+                        "path": "/admin/recipients/instances/details"
+                    },
+                    {
+                        "code":"admin_recipients",
+                        "path": "/admin/recipients/instances/test"
+                    },
+                    {
+                        "code":"admin_recipients",
+                        "path": "/admin/recipients/instances/update"
+                    },
+                    {
+                        "code":"admin_recipients",
+                        "path": "/admin/recipients/recipients/details"
+                    },
+                    {
+                        "code":"admin_recipients",
+                        "path": "/admin/recipients/recipients/update"
+                    },
+                    {
+                        "code":"admin_recipients",
+                        "path": "/admin/recipients/recipients/test"
+                    },
+                    {
+                        "code":"admin_recipients",
+                        "path": "/admin/recipients/logs"
+                    },
+                    {
+                        "code":"admin_recipients",
+                        "path": "/admin/recipients/tasks"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "code": "log",
+        "name": "日志审计",
+        "icon": "layui-icon-refresh-3",
+        "path": "/log",
+        "subapi":[
+            {
+                "code":"log",
+                "path": "/log/clean"
+            },
+            {
+                "code":"log",
+                "path": "/log/settings"
+            },
+            {
+                "code":"log",
+                "path": "/log/list"
+            }
+        ]
+    },
+    {
+        "code": "system",
+        "name": "系统设置",
+        "icon": "layui-icon-set",
+        "path": "",
+        "children": [
+            {
+                "code": "system_settings",
+                "name": "基础设置",
+                "path": "/system/settings",
+                "children":[
+                    {
+                        "code":"system_settings",
+                        "path": "/system/settings"
+                    },
+                    {
+                        "code":"system_settings",
+                        "path": "/system/settings/web"
+                    },
+                    {
+                        "code":"system_settings",
+                        "path": "/system/settings/profile"
+                    },
+                    {
+                        "code":"system_settings",
+                        "path": "/system/settings/login"
+                    },
+                    {
+                        "code":"system_settings",
+                        "path": "/system/settings/login/logs"
+                    }
+                ]
+            },
+            {
+                "code": "system_database",
+                "name": "高级设置",
+                "path": "/system/database",
+                "children":[
+                    {
+                        "code":"system_database",
+                        "path": "/system/settings"
+                    },
+                    {
+                        "code":"system_database",
+                        "path": "/system/settings/profile"
+                    },
+                    {
+                        "code":"system_database",
+                        "path": "/system/settings/login"
+                    },
+                    {
+                        "code":"system_database",
+                        "path": "/system/settings/login/logs"
+                    },
+                    {
+                        "code":"system_database",
+                        "path": "/system/database"
+                    },
+                    {
+                        "code":"system_database",
+                        "path": "/system/database/index"
+                    },
+                    {
+                        "code":"system_database",
+                        "path": "/system/database/cleans"
+                    },
+                    {
+                        "code":"system_database",
+                        "path": "/system/database/update"
+                    },
+                    {
+                        "code":"system_database",
+                        "path": "/system/database/clean_setting"
+                    },
+                    {
+                        "code":"system_database",
+                        "path": "/system/db"
+                    },
+                    {
+                        "code":"system_database",
+                        "path": "/system/db/details" 
+                    },
+                    {
+                        "code":"system_database",
+                        "path": "/system/db/clean" 
+                    },
+                    {
+                        "code":"system_database",
+                        "path": "/system/db/update" 
+                    },
+                    {
+                        "code":"system_database",
+                        "path": "/system/db/logs" 
+                    }
+                ]
+            }
+        ]
+    }
+]

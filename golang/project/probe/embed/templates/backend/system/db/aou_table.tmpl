@@ -1,0 +1,101 @@
+<div class="layui-form toolbar" style="margin-top: 10px;margin-bottom: 10px;">
+<form class="layui-form layui-form-pane" onclick="return false;">
+    <table class="layui-table">
+        <colgroup><col width="150"><col></colgroup>
+        <tbody>
+            <tr>
+                <td>节点名称 *</td>
+                <td>
+                    <input type="text" name="name" autocomplete="off" class="layui-input" value="{[if .Data]}{[.Data.Name]}{[end]}" placeholder="">
+                    <p class="layui-font-12 pt5">给节点起一个容易识别的名称。</p>
+                </td>
+            </tr>
+
+            <tr>
+                <td>数据库类型 *</td>
+                <td>
+                    <select name="db_type" lay-filter="db_type">
+                        <option value="mysql" {[if .Data]}{[if eq .Data.DbType "mysql"]}selected{[end]}{[end]}>MySQL</option>
+                        <option value="postgres" {[if .Data]}{[if eq .Data.DbType "postgres"]}selected{[end]}{[end]}>PostgreSQL</option>
+                        <option value="sqlite3" {[if .Data]}{[if eq .Data.DbType "sqlite3"]}selected{[end]}{[end]}>SQLite3</option>
+                    </select>
+                    <p class="layui-font-12 pt5">选择要使用的数据库类型。</p>
+                </td>
+            </tr>
+
+            <tr>
+                <td>主机地址 *</td>
+                <td>
+                    <input type="text" name="host" autocomplete="off" class="layui-input" value="{[if .Data]}{[.Data.Host]}{[end]}" placeholder="SQLite3时留空">
+                    <p class="layui-font-12 pt5">连接数据库的主机地址，SQLite3时留空。</p>
+                </td>
+            </tr>
+
+            <tr>
+                <td>数据库端口 *</td>
+                <td>
+                    <input type="number" name="port" autocomplete="off" class="layui-input" value="{[if .Data]}{[.Data.Port]}{[end]}" placeholder="SQLite3时留空">
+                    <p class="layui-font-12 pt5">连接数据库的端口，MySQL默认3306，PostgreSQL默认5432。</p>
+                </td>
+            </tr>
+
+            <tr>
+                <td>数据库名称/路径 *</td>
+                <td>
+                    <input type="text" name="dbname" autocomplete="off" class="layui-input" value="{[if .Data]}{[.Data.Dbname]}{[end]}" placeholder="">
+                    <p class="layui-font-12 pt5">MySQL/PostgreSQL时为数据库名称，SQLite3时为文件路径（如data/mgo.db）。</p>
+                </td>
+            </tr>
+
+            <tr>
+                <td>用户名</td>
+                <td>
+                    <input type="text" name="username" autocomplete="off" class="layui-input" value="{[if .Data]}{[.Data.Username]}{[end]}" placeholder="SQLite3时留空">
+                    <p class="layui-font-12 pt5">连接数据库的用户名，SQLite3时留空。</p>
+                </td>
+            </tr>
+
+            <tr>
+                <td>密码</td>
+                <td>
+                    <input type="password" name="password" autocomplete="off" class="layui-input" value="{[if .Data]}{[.Data.Password]}{[end]}" placeholder="SQLite3时留空">
+                    <p class="layui-font-12 pt5">连接数据库的密码，SQLite3时留空。</p>
+                </td>
+            </tr>
+
+           <tr>
+                <td colspan="2">
+                    <a class="table_more mlink" target_class="more_table">
+                        <cite>更多选项</cite>
+                        <i class="layui-icon layui-icon-down layui-nav-more"></i>
+                    </a>
+                </td>
+            </tr>
+
+            <tr class="more_table hide">
+                <td>启用当前数据库</td>
+                <td>
+                    <input type="checkbox" name="status"
+                    {[if $.Data]}{[if $.Data.Status]}checked{[end]}
+                    {[else]}checked
+                    {[end]}> 
+                </td>
+            </tr>
+
+            <tr class="more_table hide">
+                <td>备注</td>
+                <td><textarea id="editor2" name="mark" class="layui-textarea" style="min-height:100px;" placeholder="">{[if $.Data]}{[$.Data.Mark]}{[end]}</textarea></td>
+            </tr>
+
+
+            <tr>
+                <td colspan="2">
+                    <input type="hidden" name="id" value="{[if .Data]}{[.Data.ID]}{[end]}">
+                    <button class="layui-btn" lay-filter="submit_db" lay-submit>保存</button>
+                </td>
+            </tr>
+
+        </tbody>
+    </table>
+</form>
+</div>

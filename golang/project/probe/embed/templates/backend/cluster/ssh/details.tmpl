@@ -1,0 +1,112 @@
+{[template "backend/common/header_nonav.tmpl" .]}
+
+<div class="layui-fluid">
+
+
+    <div class="layui-col-md12" style="padding: 5px;">
+        <div class="layui-card">
+            <div class="layui-card-body">
+
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom: 1rem;">
+                    <a href="/{[.admin_path]}/clusters/ssh" style="display:flex;align-items:center;">
+                        <i class="layui-icon layui-icon-return"></i>  
+                    </a>
+                    <span style="margin:0;font-size:18px;">
+                        {[if .Data]}{[.Data.Name]}{[end]}
+                    </span>
+                </div>
+
+                <div class="layui-tab layui-tab-brief">
+                    <ul class="layui-tab-title" id="status">
+                        <li data-status="1" class="layui-this">概览</li>
+                        <li data-status="2"><a href="/{[.admin_path]}/clusters/ssh/update?ssh_id={[.ssh_id]}">修改</a></li>
+                        <li data-status="3"><a href="/{[.admin_path]}/clusters/ssh/test?ssh_id={[.ssh_id]}">测试</a></li>
+                    </ul>
+                </div>
+
+                <div class="cluster-boards bls_hover" style="margin-top: 10px;">
+                    <div class="layui-row layui-col-space10">
+                        <div class="layui-col-xs12 layui-col-sm4 layui-col-md3">
+                            <div class="ccc_hover">
+                                <div style="color: rgb(100, 116, 139); font-size: 14px; margin-bottom: 6px;">名称</div>
+                                <div style="font-size: 12px; color: #333;">{[if .Data]}{[.Data.Name]}{[end]}</div>
+                            </div>
+                        </div>
+
+                        <div class="layui-col-xs12 layui-col-sm4 layui-col-md3">
+                            <div class="ccc_hover">
+                                <div style="color: rgb(100, 116, 139); font-size: 14px; margin-bottom: 6px;">认证方式</div>
+                                <div style="font-size: 12px;">
+                                    {[if .Data]}
+                                        {[if eq .Data.Method "namepass" ]}用户名+密码
+                                        {[else if eq .Data.Method "privatekey" ]}私钥
+                                        {[end]}
+                                    {[end]}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="layui-col-xs12 layui-col-sm4 layui-col-md3">
+                            <div class="ccc_hover">
+                                <div style="color: rgb(100, 116, 139); font-size: 14px; margin-bottom: 6px;">SSH用户名</div>
+                                <div style="font-size: 12px;">{[if .Data]}{[.Data.Username]}{[end]}</div>
+                            </div>
+                        </div>
+
+                        {[if .Data]}
+                            {[if eq .Data.Method "namepass" ]}
+                            <div class="layui-col-xs12 layui-col-sm4 layui-col-md3">
+                                <div class="ccc_hover">
+                                    <div style="color: rgb(100, 116, 139); font-size: 14px; margin-bottom: 6px;">SSH密码</div>
+                                    <div style="font-size: 12px;">********************</div>
+                                </div>
+                            </div>
+                            {[else if eq .Data.Method "privatekey" ]}
+                            <div class="layui-col-xs12 layui-col-sm4 layui-col-md3">
+                                <div class="ccc_hover">
+                                    <div style="color: rgb(100, 116, 139); font-size: 14px; margin-bottom: 6px;">RSA私钥</div>
+                                    <div style="font-size: 12px;">********************</div>
+                                </div>
+                            </div>
+                            <div class="layui-col-xs12 layui-col-sm4 layui-col-md3">
+                                <div class="ccc_hover">
+                                    <div style="color: rgb(100, 116, 139); font-size: 14px; margin-bottom: 6px;">私钥密码</div>
+                                    <div style="font-size: 12px;">{[if .Data]}{[.Data.PrivatekeyPass]}{[end]}</div>
+                                </div>
+                            </div>
+                            {[end]}
+                        {[end]}
+
+
+                        <div class="layui-col-xs12 layui-col-sm4 layui-col-md3">
+                            <div class="ccc_hover">
+                                <div style="color: rgb(100, 116, 139); font-size: 14px; margin-bottom: 6px;;">备注</div>
+                                <div style="font-size: 12px;">
+                                    {[if .Data]}{[if eq .Data.Mark "" ]}<span class="disabled">-</span>{[else]}{[.Data.Mark]}{[end]}{[end]}
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+
+                <!-- ... -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+layui.config({base: '/static/layuiadmin/'}).use(['table','jquery'], function(){
+///
+var admin = layui.admin
+,$ = layui.$
+,form = layui.form
+,table = layui.table;
+
+///
+});
+</script>
+
+{[template "backend/common/footer.tmpl" .]}

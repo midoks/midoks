@@ -1,0 +1,65 @@
+{[template "backend/common/header.tmpl" .]}
+
+<div class="layui-fluid">
+    <div class="layui-col-md12" style="padding: 5px;">
+        <div class="layui-card">
+            <div class="layui-card-body">
+
+                <div class="layui-tab layui-tab-brief">
+                    <ul class="layui-tab-title" id="status">
+                        <li data-status="1"><a href="/{[.admin_path]}/clusters">集群</a></li>
+                        <li data-status="2"><a href="/{[.admin_path]}/clusters/node">节点</a></li>
+                        <li data-status="3" class="layui-this">创建集群</li>
+                    </ul>
+                </div>
+
+                <div class="layui-form toolbar layui-padding-3">
+                <form class="layui-form" action="" id="cluster_form" onclick="return false;">
+                    <table class="layui-table">
+                        <colgroup><col width="150"><col></colgroup>
+                        <tbody>
+                            <tr>
+                                <td>集群名称</td>
+                                <td>
+                                    <input type="text" name="name" lay-verify="required" placeholder="请输入集群名称" autocomplete="off" class="layui-input">
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td colspan="2" >
+                                    <button type="submit" class="layui-btn" lay-filter="submit" lay-submit>保存</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+layui.config({base: '/static/layuiadmin/'}).use(['table','jquery'], function(){
+///
+var admin = layui.admin
+,$ = layui.$
+,form = layui.form
+,table = layui.table;
+
+form.on('submit(submit)', function(data){
+    $.post('/{[.admin_path]}/clusters/create', data.field,function(rdata) {
+        showMsg(rdata.msg, function(){
+            if(rdata.code > -1){
+                location.href = "/{[.admin_path]}/clusters";
+            }
+        },{icon: rdata.code > -1 ? 1 : 2,shift:rdata.code ? 0 : 6});
+    },'json');
+    return false;
+});
+
+///
+});
+</script>
+{[template "backend/common/footer.tmpl" .]}

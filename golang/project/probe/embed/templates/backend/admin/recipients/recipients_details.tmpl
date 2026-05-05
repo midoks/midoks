@@ -1,0 +1,113 @@
+{[template "backend/common/header_nonav.tmpl" .]}
+
+<div class="layui-fluid">
+
+    <div class="layui-col-md12" style="padding: 5px;">
+        <div class="layui-card">
+            <div class="layui-card-body">
+
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom: 1rem;">
+                    <a href="/{[.admin_path]}/admin/recipients" style="display:flex;align-items:center;">
+                        <i class="layui-icon layui-icon-return"></i>  
+                    </a>
+
+                    <span style="margin:0;font-size:18px;">
+                        {[if .Data]}
+                        {[.Data.AdminName]} （{[.Data.MediaName]}）
+                        {[end]}
+                    </span>
+                </div>
+
+                <div class="layui-tab layui-tab-brief">
+                    <ul class="layui-tab-title" id="status">
+                        <li data-status="1" class="layui-this">概览</li>
+                        <li data-status="2"><a href="/{[.admin_path]}/admin/recipients/recipients/update?id={[.id]}">修改</a></li>
+                        <li data-status="3"><a href="/{[.admin_path]}/admin/recipients/recipients/test?id={[.id]}">测试</a></li>
+                    </ul>
+                </div>
+
+                <div class="cluster-boards bls_hover" style="margin-top: 10px;">
+                    <div class="layui-row layui-col-space10">
+                        <div class="layui-col-xs12 layui-col-sm4 layui-col-md3">
+                            <div class="ccc_hover">
+                                <div style="color: rgb(100, 116, 139); font-size: 14px; margin-bottom: 6px;">状态</div>
+                                <div style="font-size: 12px;">
+                                    {[if .Data]}
+                                        {[if .Data.Status]}<span style="color:#16b777;">已启用</span>
+                                        {[else]}<span style="color:#e2e2e2;">已停用</span>
+                                        {[end]}
+                                    {[end]}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="layui-col-xs12 layui-col-sm4 layui-col-md3">
+                            <div class="ccc_hover">
+                                <div style="color: rgb(100, 116, 139); font-size: 14px; margin-bottom: 6px;">媒介名称</div>
+                                <div style="font-size: 12px; color: #333;">{[if .Data]}{[.Data.AdminName]}{[end]}</div>
+                            </div>
+                        </div>
+                        <div class="layui-col-xs12 layui-col-sm4 layui-col-md3">
+                            <div class="ccc_hover">
+                                <div style="color: rgb(100, 116, 139); font-size: 14px; margin-bottom: 6px;">媒介</div>
+                                <div style="font-size: 12px;">
+                                    {[if .Data]}{[.Data.MediaName]}{[end]}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="layui-col-xs12 layui-col-sm4 layui-col-md3">
+                            <div class="ccc_hover">
+                                <div style="color: rgb(100, 116, 139); font-size: 14px; margin-bottom: 6px;">接收人标识</div>
+                                <div style="font-size: 12px;">{[if .Data]}{[.Data.RecipientID]}{[end]}</div>
+                            </div>
+                        </div>
+                        <div class="layui-col-xs12 layui-col-sm4 layui-col-md3">
+                            <div class="ccc_hover">
+                                <div style="color: rgb(100, 116, 139); font-size: 14px; margin-bottom: 6px;;">备注</div>
+                                <div style="font-size: 12px;">
+                                    {[if .Data]}{[if eq .Data.Mark "" ]}<span class="disabled">没有设置</span>{[else]}{[.Data.Mark]}{[end]}{[end]}
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="cluster-boards bls_hover" style="margin-top: 10px;">
+                    <div class="layui-row layui-col-space10">
+                        <div class="layui-col-xs12">
+                            <div class="ccc_hover">
+                                <div style="color: rgb(100, 116, 139); font-size: 14px; margin-bottom: 6px;">关联的CDN集群</div>
+                                <div style="font-size: 12px; color: #333;">
+                                    <table class="layui-table" style="width: 400px;margin-top: 10px;">
+                                        <thead>
+                                            <tr>
+                                                <th style="background-color: #f8f9fa;">集群名称</th>
+                                                <th style="background-color: #f8f9fa; width: 100px;">操作</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {[range $cluster := .ClusterList]}
+                                            <tr>
+                                                <td><a href="/{[.admin_path]}/clusters/cluster/details?cluster_id={[index $cluster "ID"]}" style="color: #1890ff;">{[index $cluster "Name"]}</a></td>
+                                                <td><a href="javascript:void(0);" onclick="cancelCluster({[index $cluster "ID"]})" style="color: #1890ff;">取消</a></td>
+                                            </tr>
+                                            {[end]}
+                                            {[if eq (len .ClusterList) 0]}
+                                            <tr>
+                                                <td colspan="2" style="text-align: center; color: #999;">暂无关联集群</td>
+                                            </tr>
+                                            {[end]}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+{[template "backend/common/footer.tmpl" .]}

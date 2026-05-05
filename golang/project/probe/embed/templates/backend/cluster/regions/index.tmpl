@@ -1,0 +1,95 @@
+{[template "backend/common/header.tmpl" .]}
+
+<div class="layui-fluid">
+    <div class="layui-col-md12" style="padding: 5px;">
+        <div class="layui-card">
+            <div class="layui-card-body">
+
+                <div class="layui-tab layui-tab-brief">
+                    <ul class="layui-tab-title" id="status">
+                        <li data-status="1" class="layui-this">区域</li>
+                        <li data-status="2"><a href="/{[.admin_path]}/clusters/regions/nodes">节点</a></li>
+                    </ul>
+                </div>
+
+                <div class="layui-form toolbar" style="margin-top: 10px;margin-bottom: 10px;">
+                <form class="layui-form" action="" id="region_form" onclick="return false;">
+
+                    <div class="layui-form toolbar" style="margin-top: 10px;margin-bottom: 10px;">
+                        <button type="button" class="layui-btn layui-btn-sm" onclick="Admin.open('添加区域','/{[$.admin_path]}/clusters/regions/add?id={[$.id]}',500,330)">
+                            <i class="layui-icon layui-icon-add-circle"></i> 添加区域
+                        </button>
+                    </div>
+
+                </form>
+                </div>
+
+                <div id="list"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+layui.config({base: '/static/layuiadmin/'}).use(['table','jquery'], function(){
+///
+var admin = layui.admin
+,$ = layui.$
+,form = layui.form
+,table = layui.table;
+
+
+table.render({
+    elem: '#list',
+    url: '/{[.admin_path]}/clusters/regions/list',
+    title: '数据表',
+    cols: [[
+        {field:'name', title:'区域名称'},
+        {field:'mark', title:'区域说明'},
+        {field:'num_online', title:'节点数'},
+        {field:'status', title:'区域状态', width:100, toolbar: '#statusTpl',},
+        {title:'操作', toolbar: '#cmdTpl', width:120, fixed: 'right'}
+     ]],
+    page: true
+});
+
+
+table.on('tool(list)', function(obj){
+    switch(obj.event){
+        case 'status':opStatus(obj);break;
+    };
+});
+
+function opStatus(obj){
+    layer.confirm('你真的更改状态吗?', { closeBtn: 2, icon: 3 }, function() {
+        $.post('/{[$.admin_path]}/clusters/regions/trigger_status', {'id':obj.data.id}, function(data) {
+            showMsg(data.msg,function(){
+                if (data.code>-1){
+                    location.reload();
+                }
+            },{icon:data.code>-1?1:2});
+        },'json');
+    });
+}
+
+
+///
+});
+</script>
+
+
+<script type="text/html" id="statusTpl">
+    {{# if (d.status == 1){ }}
+    <a class="layui-btn layui-btn-xs layui-btn-normal" lay-event="status">已启用</a>
+    {{# } else if (d.status == 0) { }}
+    <a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="status">已暂停</a>
+    {{# } }}
+</script>
+
+<script type="text/html" id="cmdTpl">
+<a class="layui-btn layui-btn-xs" lay-event='edit' onclick="Admin.open('修改','/{[$.admin_path]}/clusters/regions/add?id={{d.id}}',500,330)">修改</a>
+<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event='delete' onclick="Admin.del(this, '/{[$.admin_path]}/clusters/regions/delete','{{d.id}}')">删除</a>
+</script>
+
+{[template "backend/common/footer.tmpl" .]}

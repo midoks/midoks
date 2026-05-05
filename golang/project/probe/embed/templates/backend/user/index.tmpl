@@ -1,0 +1,102 @@
+{[template "/base/header" .]}
+
+<div class="layui-fluid">
+    <div class="layui-col-md12" style="padding: 5px;">
+        <div class="layui-card">
+            <div class="layui-card-body">
+                <div class="layui-form toolbar" style="margin-top: 10px;margin-bottom: 10px;">
+                <form class="layui-form" action="" id="comic_form" onclick="return false;">
+                    <div class="layui-inline mr0" >
+                        <button class="layui-btn layui-btn-sm layui-btn-normal" onclick="Admin.open('添加','/user/edit?id=0',800,480)">添加</button>
+                        <button class="layui-btn layui-btn-sm layui-btn-normal" id="install_node" lay-event="install_node">安装节点</button>
+                    </div>
+                </form>
+                </div>
+                <div id="list"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+layui.config({base: '/static/layuiadmin/'}).use(['table','jquery'], function(){
+///
+var admin = layui.admin
+,$ = layui.$
+,form = layui.form
+,table = layui.table;
+
+
+table.render({
+    elem: '#list',
+    url: '/user/list',
+    title: '数据表',
+    cols: [[
+        {field:'id', title:'ID',width:120},
+        {field:'username', title:'用户名'},
+        {title:'操作', toolbar: '#cmdTpl', width:200, fixed: 'right'}
+     ]],
+    page: true
+});
+
+
+table.on('tool(list)', function(obj){
+    switch(obj.event){
+        case 'install_node':install_node(obj);break;
+        case 'page':get_page(obj);break;
+    };
+});
+
+table.on('toolbar', function(obj){
+    // console.log(obj);
+    switch(obj.event){
+        case 'install_node':install_node(obj);break;
+    };
+});
+
+function get_page(obj){
+    console.log(obj);
+    var id = obj.data.id;
+    window.open("/page?id="+id);
+}
+
+
+$("#install_node").click(function(){
+    // console.log('install_node');
+    $.post("/ws/install_cmd", {}, function(res) {
+        // console.log(res);
+        layer.open({
+            title: "安装节点命令",
+            area: ['600px', '180px'],
+            type:1,
+            closeBtn: 1,
+            shadeClose: false,
+            btn:["复制","取消"],
+            content: '<div class="pd15">\
+                        <div class="divtable">\
+                            <pre class="layui-code">'+res.msg+'</pre>\
+                        </div>\
+                    </div>',
+            success:function(){
+                copyText(res.msg);
+            },
+            yes:function(){
+                copyText(res.msg);
+            }
+        });
+    },'json');
+});
+
+
+///
+});
+</script>
+
+
+<script type="text/html" id="cmdTpl">
+<a class="layui-btn layui-btn-xs" lay-event='edit' onclick="Admin.open('【{{d.username}}】'+'编辑','user/edit?id={{d.id}}',800,300)">编辑</a>
+<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event='delete' onclick="Admin.del(this, 'user/delete','{{d.id}}')">删除</a>
+<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event='page'>登陆页</a>
+</script>
+{[template "/base/footer" .]}

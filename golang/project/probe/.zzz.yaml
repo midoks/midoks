@@ -1,0 +1,31 @@
+
+dev: false
+title: zzz
+frequency: 2
+dirfilter:
+- tmp
+- .git
+- public
+- scripts
+- vendor
+- logs
+ext:
+- go
+- tmpl
+lang: go
+enablerun: true
+action:
+  before:
+  # - go mod tidy
+  # - go mod vendor
+  - find . -name ".DS_Store" -print -delete
+  - gofmt -w ./
+  - export GOFLAGS="-buildvcs=false"
+  - ps -ef|grep 'probe web'| grep -v grep | awk '{print $2}' | xargs kill -9
+  after:
+  - ps -ef|grep 'probe web'| grep -v grep | awk '{print $2}' | xargs kill -9
+  - ./probe web &
+  exit:
+  - ps -ef|grep 'probe web'| grep -v grep | awk '{print $2}' | xargs kill -9
+  - rm -rf ./probe
+link: https://github.com/midoks/zzz

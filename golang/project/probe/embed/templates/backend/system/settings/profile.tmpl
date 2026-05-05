@@ -1,0 +1,71 @@
+{[template "backend/common/header_nonav.tmpl" .]}
+
+<div class="layui-fluid">
+    <div class="layui-col-md12" style="padding: 5px;">
+        <div class="layui-card">
+            <div class="layui-card-body">
+
+                <div class="layui-tab layui-tab-brief">
+                    <ul class="layui-tab-title" id="status">
+                        {[range $menu := .submenu]}
+                            <li data-status="{[$menu.Number]}" {[if eq (print "/" $.admin_path "/" $menu.Link) $.CurrentPath]}class="layui-this"{[end]}><a href="/{[$.admin_path]}/{[$menu.Link]}">{[$menu.Name]}</a></li>
+                        {[end]}
+                    </ul>
+                </div>
+                
+                <div class="layui-form toolbar" style="margin-top: 10px;margin-bottom: 10px;">
+                <form class="layui-form layui-form-pane" onclick="return false;">
+                    <table class="layui-table">
+                        <colgroup><col width="150"><col></colgroup>
+                        <tbody>
+                            <tr>
+                                <td>登录用户名 *</td>
+                                <td>
+                                    <div class="layui-input-inline">
+                                        <input type="text" name="name" autocomplete="off" class="layui-input" value="{[if .login_data]}{[.login_data.FullName]}{[end]}" placeholder="">
+                                    </div>
+                                    <p class="layui-font-12 pt5">只能含有英文、数字或下划线。</p>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td colspan="2" >
+                                    <button class="layui-btn" lay-filter="submit_setting" lay-submit>保存</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+layui.config({base: '/static/layuiadmin/'}).use(['table','jquery'], function(){
+///
+var admin = layui.admin
+,$ = layui.$
+,form = layui.form
+,table = layui.table;
+
+form.on("submit(submit_setting)", function(data){
+    var field = data.field;
+    $.post("/{[$.admin_path]}/system/settings/profile", field, function(res) {
+        showMsg(res.msg, function(){
+            layer.close(index);
+            if(res.code > -1){
+                parent.location.reload();
+            }
+        },{icon: res.code > -1 ? 1 : 2,shift:res.code>-1 ? 0 : 6});
+    },'json');
+    return false;
+});
+
+///
+});
+</script>
+
+{[template "backend/common/footer.tmpl" .]}

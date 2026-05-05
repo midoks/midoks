@@ -1,0 +1,134 @@
+{[template "backend/common/header.tmpl" .]}
+
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-form layui-card-header layuiadmin-card-header-auto">
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label">位置</label>
+                    <div class="layui-input-inline">
+                        <select name="position" id="position">
+                            <option value="">全部</option>
+                            <option value="home_banner">首页横幅</option>
+                            <option value="sidebar">侧边栏</option>
+                            <option value="footer">底部</option>
+                            <option value="popup">弹窗</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <button class="layui-btn" lay-submit lay-filter="LAY-ad-search">
+                        <i class="layui-icon layui-icon-search"></i>搜索
+                    </button>
+                    <button class="layui-btn layui-btn-normal" lay-event="add">
+                        <i class="layui-icon layui-icon-add-1"></i>添加广告
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="layui-card-body">
+            <table id="LAY-ad-list" lay-filter="LAY-ad-list"></table>
+        </div>
+    </div>
+</div>
+
+<script type="text/html" id="statusTpl">
+    <input type="checkbox" name="status" lay-skin="switch" lay-text="启用|禁用" {[(if .Status)}checked{[(end)]} data-id="{{.ID}}" lay-filter="statusSwitch">
+</script>
+
+<script type="text/html" id="imgTpl">
+    {[(if .ImageURL)]}
+    <img src="{{.ImageURL}}" style="max-width:80px;max-height:40px;">
+    {[(end)]}
+</script>
+
+<script type="text/html" id="actionsTpl">
+    <a class="layui-btn layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>编辑</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="delete"><i class="layui-icon layui-icon-delete"></i>删除</a>
+</script>
+
+<script type="text/html" id="positionTpl">
+    {[(switch .Position)]}
+    {[(case "home_bannel"])}首页横幅{[(end)]}
+    {[(case "sidebar"])}侧边栏{[(end)]}
+    {[(case "footer"])}底部{[(end)]}
+    {[(case "popup"])}弹窗{[(end)]}
+    {[(default)]}{{ .Position }}{[(end)]}
+    {[(end)]}
+</script>
+
+<script>
+layui.use(['table', 'form'], function(){
+    var $ = layui.$,
+        table = layui.table,
+        form = layui.form;
+
+    table.render({
+        elem: '#LAY-ad-list',
+        url: '{[.admin_path]}/ad/list',
+        cols: [[
+            {field: 'id', width: 80, title: 'ID', sort: true},
+            {field: 'title', title: '标题', minWidth: 150},
+            {field: 'position', title: '位置', width: 100, templet: '#positionTpl'},
+            {field: 'image_url', title: '图片', width: 100, templet: '#imgTpl'},
+            {field: 'sort', title: '排序', width: 80},
+            {field: 'status', title: '状态', width: 100, templet: '#statusTpl'},
+            {field: 'create_time', title: '创建时间', width: 160, templet: function(d){
+                return layui.util.toDateString(d.create_time * 1000);
+            }},
+            {title: '操作', width: 150, align: 'center', toolbar: '#actionsTpl'}
+        ]],
+        page: true,
+        limit: 10,
+        limits: [10, 20, 30, 50]
+    });
+
+    form.on('submit(LAY-ad-search)', function(data){
+        var field = data.field;
+        table.reload('LAY-ad-list', {
+            where: field
+        });
+    });
+
+    form.on('switch(statusSwitch)', function(obj){
+        var id = this.getAttribute('data-id');
+        $.post('{[.admin_path]}/ad/trigger_status', {id: id}, function(res){
+            if (res.code === 0) {
+                layer.msg('状态已更新');
+            } else {
+                layer.msg(res.msg);
+                obj.elem.checked = !obj.elem.checked;
+                obj.update();
+            }
+        });
+    });
+
+    table.on('tool(LAY-ad-list)', function(obj){
+        var data = obj.data;
+        if(obj.event === 'edit'){
+            location.href = '{[.admin_path]}/ad/update?id=' + data.id;
+        } else if(obj.event === 'delete'){
+            layer.confirm('确定删除该广告?', function(index){
+                $.post('{[.admin_path]}/ad/delete', {id: data.id}, function(res){
+                    if (res.code === 0) {
+                        obj.del();
+                        layer.close(index);
+                    } else {
+                        layer.msg(res.msg);
+                    }
+                });
+            });
+        }
+    });
+
+    $('.layui-card-header .layui-btn').on('click', function(){
+        var event = this.getAttribute('lay-event');
+        if(event === 'add'){
+            location.href = '{[.admin_path]}/ad/add';
+        }
+    });
+});
+</script>
+
+{[template "backend/common/footer.tmpl"]}

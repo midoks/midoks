@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIProbe - 在线网络工具</title>
+    <link rel="stylesheet" href="/static/layuiadmin/layui/css/layui.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background: #f5f5f5; }
+        
+        /* 顶部导航 */
+        .header { background: #1e1e1e; padding: 10px 0; }
+        .header-container { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+        .logo { display: flex; align-items: center; color: #fff; text-decoration: none; }
+        .logo img { width: 40px; height: 40px; margin-right: 10px; }
+        .logo-text { font-size: 24px; font-weight: bold; }
+        .nav-links { display: flex; list-style: none; gap: 20px; }
+        .nav-links li a { color: #ccc; text-decoration: none; font-size: 14px; transition: color 0.3s; }
+        .nav-links li a:hover, .nav-links li a.active { color: #1890ff; }
+        
+        /* Banner广告 */
+        .banner { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center; color: #fff; }
+        .banner h1 { font-size: 36px; margin-bottom: 10px; }
+        .banner p { font-size: 16px; opacity: 0.9; }
+        
+        /* 工具卡片区域 */
+        .tools-section { max-width: 1200px; margin: 30px auto; }
+        .section-title { text-align: center; margin-bottom: 30px; }
+        .section-title h2 { font-size: 24px; color: #333; margin-bottom: 10px; }
+        .section-title p { color: #666; }
+        
+        .tools-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+        .tool-card { background: #fff; border-radius: 8px; padding: 25px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.08); transition: transform 0.3s, box-shadow 0.3s; }
+        .tool-card:hover { transform: translateY(-5px); box-shadow: 0 5px 20px rgba(0,0,0,0.15); }
+        .tool-icon { width: 60px; height: 60px; margin: 0 auto 15px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; }
+        .tool-icon.ping { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; }
+        .tool-icon.tcping { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: #fff; }
+        .tool-icon.speed { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: #fff; }
+        .tool-icon.traceroute { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: #fff; }
+        .tool-icon.dns { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); color: #fff; }
+        .tool-icon.findping { background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); color: #333; }
+        .tool-icon.network { background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%); color: #fff; }
+        .tool-icon.batch { background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%); color: #333; }
+        .tool-card h3 { font-size: 16px; color: #333; margin-bottom: 8px; }
+        .tool-card p { font-size: 13px; color: #999; line-height: 1.5; }
+        .tool-card a { text-decoration: none; color: inherit; display: block; height: 100%; }
+        
+        /* 快捷入口 */
+        .quick-links { background: #fff; padding: 30px; margin-top: 20px; border-radius: 8px; }
+        .quick-links h3 { font-size: 18px; color: #333; margin-bottom: 20px; }
+        .quick-grid { display: flex; flex-wrap: wrap; gap: 15px; }
+        .quick-item { padding: 10px 20px; background: #f5f5f5; border-radius: 20px; font-size: 14px; color: #666; cursor: pointer; transition: all 0.3s; }
+        .quick-item:hover { background: #1890ff; color: #fff; }
+        
+        /* 统计信息 */
+        .stats-section { background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); padding: 40px; margin-top: 30px; }
+        .stats-container { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-around; text-align: center; }
+        .stat-item { color: #fff; }
+        .stat-value { font-size: 36px; font-weight: bold; margin-bottom: 5px; }
+        .stat-label { font-size: 14px; opacity: 0.8; }
+        
+        /* 页脚 */
+        .footer { background: #1e1e1e; padding: 40px 0; margin-top: 30px; }
+        .footer-container { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; }
+        .footer-section { color: #999; }
+        .footer-section h4 { color: #fff; margin-bottom: 15px; font-size: 16px; }
+        .footer-section ul { list-style: none; }
+        .footer-section li { margin-bottom: 8px; }
+        .footer-section a { color: #999; text-decoration: none; font-size: 14px; }
+        .footer-section a:hover { color: #1890ff; }
+        .footer-copyright { text-align: center; padding-top: 20px; border-top: 1px solid #333; color: #666; font-size: 13px; }
+        
+        /* 响应式 */
+        @media (max-width: 992px) {
+            .tools-grid { grid-template-columns: repeat(2, 1fr); }
+            .header-container { padding: 0 15px; }
+            .nav-links { gap: 10px; }
+        }
+        @media (max-width: 768px) {
+            .tools-grid { grid-template-columns: 1fr; }
+            .banner h1 { font-size: 24px; }
+            .stats-container { flex-wrap: wrap; gap: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航 -->
+    <header class="header">
+        <div class="header-container">
+            <a href="/" class="logo">
+                <span style="font-size:36px;">🔧</span>
+                <span class="logo-text">AIProbe</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="/" class="active">首页</a></li>
+                <li><a href="/frontend/ping">在线Ping</a></li>
+                <li><a href="/frontend/tcping">在线Tcping</a></li>
+                <li><a href="/frontend/speedtest">网站测速</a></li>
+                <li><a href="/frontend/traceroute">路由追踪</a></li>
+                <li><a href="/frontend/dns">DNS查询</a></li>
+                <li><a href="/frontend/help">帮助支持</a></li>
+                <li><a href="/admin/login" style="color:#1890ff;">管理后台</a></li>
+            </ul>
+        </div>
+    </header>
+
+    <!-- Banner广告区域 -->
+    <div class="banner">
+        <h1>专业的在线网络诊断工具</h1>
+        <p>提供Ping测试、Tcping测试、网站测速、路由追踪、DNS查询等多种网络诊断服务</p>
+    </div>
+
+    <!-- 工具卡片区域 -->
+    <div class="tools-section">
+        <div class="section-title">
+            <h2>网络工具</h2>
+            <p>快速诊断网络问题，优化您的网络体验</p>
+        </div>
+        
+        <div class="tools-grid">
+            <div class="tool-card">
+                <a href="/frontend/ping">
+                    <div class="tool-icon ping">📡</div>
+                    <h3>在线Ping</h3>
+                    <p>测试服务器响应时间和网络连通性</p>
+                </a>
+            </div>
+            <div class="tool-card">
+                <a href="/frontend/tcping">
+                    <div class="tool-icon tcping">🔌</div>
+                    <h3>在线Tcping</h3>
+                    <p>测试TCP端口连通性和响应时间</p>
+                </a>
+            </div>
+            <div class="tool-card">
+                <a href="/frontend/speedtest">
+                    <div class="tool-icon speed">⚡</div>
+                    <h3>网站测速</h3>
+                    <p>分析网站加载速度和性能指标</p>
+                </a>
+            </div>
+            <div class="tool-card">
+                <a href="/frontend/traceroute">
+                    <div class="tool-icon traceroute">🛤️</div>
+                    <h3>路由追踪</h3>
+                    <p>追踪数据包经过的路由节点</p>
+                </a>
+            </div>
+            <div class="tool-card">
+                <a href="/frontend/dns">
+                    <div class="tool-icon dns">🌐</div>
+                    <h3>DNS查询</h3>
+                    <p>查询域名的DNS解析记录</p>
+                </a>
+            </div>
+            <div class="tool-card">
+                <a href="/frontend/findping">
+                    <div class="tool-icon findping">🔍</div>
+                    <h3>FindPing</h3>
+                    <p>批量Ping多个IP地址或域名</p>
+                </a>
+            </div>
+            <div class="tool-card">
+                <a href="/frontend/network">
+                    <div class="tool-icon network">🖧</div>
+                    <h3>本地网络</h3>
+                    <p>查看本地网络配置信息</p>
+                </a>
+            </div>
+            <div class="tool-card">
+                <a href="/frontend/batch">
+                    <div class="tool-icon batch">📊</div>
+                    <h3>批量检测</h3>
+                    <p>批量检测多个主机状态</p>
+                </a>
+            </div>
+        </div>
+
+        <!-- 快捷入口 -->
+        <div class="quick-links">
+            <h3>快捷入口</h3>
+            <div class="quick-grid">
+                <div class="quick-item" onclick="location.href='/frontend/ping?host=baidu.com'">Ping 百度</div>
+                <div class="quick-item" onclick="location.href='/frontend/ping?host=google.com'">Ping Google</div>
+                <div class="quick-item" onclick="location.href='/frontend/tcping?host=baidu.com&port=80'">Tcping 80端口</div>
+                <div class="quick-item" onclick="location.href='/frontend/tcping?host=baidu.com&port=443'">Tcping 443端口</div>
+                <div class="quick-item" onclick="location.href='/frontend/dns?domain=baidu.com'">DNS 百度</div>
+                <div class="quick-item" onclick="location.href='/frontend/speedtest?url=https://www.baidu.com'">测速 百度</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 统计信息 -->
+    <div class="stats-section">
+        <div class="stats-container">
+            <div class="stat-item">
+                <div class="stat-value">99.9%</div>
+                <div class="stat-label">服务可用性</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">50ms</div>
+                <div class="stat-label">平均响应时间</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">100万+</div>
+                <div class="stat-label">日均检测次数</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">100+</div>
+                <div class="stat-label">覆盖节点</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-section">
+                <h4>关于我们</h4>
+                <ul>
+                    <li><a href="/frontend/help">帮助中心</a></li>
+                    <li><a href="/frontend/help">使用说明</a></li>
+                    <li><a href="/frontend/help">常见问题</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>联系我们</h4>
+                <ul>
+                    <li><a href="#">问题反馈</a></li>
+                    <li><a href="#">技术支持</a></li>
+                    <li><a href="#">商务合作</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>法律声明</h4>
+                <ul>
+                    <li><a href="#">隐私政策</a></li>
+                    <li><a href="#">服务条款</a></li>
+                    <li><a href="#">免责声明</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-copyright">
+            © 2024 AIProbe. All rights reserved. | 京ICP备xxxxxxxx号
+        </div>
+    </footer>
+
+    <script src="/static/common/js/jquery-1.10.2.min.js"></script>
+    <script>
+    $(function() {
+        // 获取URL参数
+        function getParam(name) {
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+            var r = window.location.search.substr(1).match(reg);
+            if (r != null) return decodeURIComponent(r[2]);
+            return null;
+        }
+        
+        // 如果URL有参数，跳转到对应工具页
+        var host = getParam('host');
+        if (host) {
+            var url = window.location.pathname;
+            if (url === '/' || url === '/frontend') {
+                window.location.href = '/frontend/ping?host=' + host;
+            }
+        }
+    });
+    </script>
+</body>
+</html>

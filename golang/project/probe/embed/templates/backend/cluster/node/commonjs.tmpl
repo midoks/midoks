@@ -1,0 +1,63 @@
+//节点 
+window.loadIpBtn = function(){
+    $('#ip_origin').show();
+    $('#ip .line').css('display','block');
+
+    // 绑定编辑按钮事件
+    $('#ip_btn .edit').off('click').on('click', function(){
+        var ipData = $(this).data('ip');
+        if (typeof ipData === 'string') {
+            try {
+                ipData = JSON.parse(ipData);
+            } catch (e) {
+                console.error('解析IP数据失败', e);
+            }
+        }
+        if (ipData) {
+            Admin.open('修改IP地址','/{[$.admin_path]}/clusters/select/ip',700,450,false,ipData);
+        }
+    });
+
+    $('#ip_btn .remove').bind('click',function(){
+        // 从按钮组中获取IP地址
+        var delete_ip = $(this).parents('.layui-btn-group').find('button:first-child span').text().trim();
+
+        var ip_addr_data = $('input[name="ip_addresses_json"]').val();
+        var ip_array = [];
+        
+        if (ip_addr_data) {
+            try {
+                ip_array = JSON.parse(ip_addr_data);
+                if (!Array.isArray(ip_array)) {
+                    ip_array = [];
+                }
+            } catch (e) {
+                console.log(e);
+            }
+        }
+
+        if (ip_array.length>0){
+            var is_has = false;
+            for (var i = ip_array.length - 1; i >= 0; i--) {
+                if (ip_array[i] && ip_array[i].ip == delete_ip){
+                    is_has = true;
+                    ip_array.splice(i, 1);
+                }
+            }
+        }
+
+        var data = JSON.stringify(ip_array);
+        $('input[name="ip_addresses_json"]').val(data);
+
+        $(this).parents('.layui-btn-group').remove();
+        var len = $('#ip_btn .layui-btn-group').length;
+        if (len < 1){
+            $('#ip .line').css('display','none');
+        }
+    });
+}
+
+// 编辑 IP 时传递数据
+window.editIp = function(ipItem) {
+    Admin.open('修改IP地址','/{[$.admin_path]}/clusters/select/ip',700,450,false,ipItem);
+};

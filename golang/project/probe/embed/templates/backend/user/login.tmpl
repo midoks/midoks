@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>登入 - 在线管理系统</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <link rel="stylesheet" href="/static/layuiadmin/layui/css/layui.css?v={[BuildCommit]}" media="all">
+    <link rel="stylesheet" href="/static/layuiadmin/style/admin.css?v={[BuildCommit]}" media="all">
+    <link rel="stylesheet" href="/static/layuiadmin/style/login.css?v={[BuildCommit]}" media="all">
+</head>
+<body>
+
+<div class="layadmin-user-login layadmin-user-display-show" id="LAY-user-login" style="display: none;">
+
+    <div class="layadmin-user-login-main">
+        <div class="layadmin-user-login-box layadmin-user-login-header">
+            <h2>管理</h2>
+        </div>
+        
+        <div class="layadmin-user-login-box layadmin-user-login-body layui-form">
+            <div class="layui-form-item">
+                <label class="layadmin-user-login-icon layui-icon layui-icon-username" for="LAY-user-login-username"></label>
+                <input type="text" name="username" id="LAY-user-login-username" lay-verify="required" placeholder="用户名" class="layui-input" autocomplete="off"/>
+            </div>
+            
+            <div class="layui-form-item">
+                <label class="layadmin-user-login-icon layui-icon layui-icon-password" for="LAY-user-login-password"></label>
+                <input type="password" name="password" id="LAY-user-login-password" lay-verify="required" placeholder="密码" class="layui-input" autocomplete="off"/>
+            </div>
+            
+        
+            <div class="layui-form-item">
+                <button id="login" class="layui-btn layui-btn-fluid" lay-submit lay-filter="LAY-user-login-submit">登 入</button>
+            </div>
+
+        </div>
+    </div>
+    
+    <div class="layui-trans layadmin-user-login-footer">
+        <p>© 在线管理系统</p>
+    </div>
+    
+</div>
+
+<script src="/static/layuiadmin/layui/layui.js?v={[BuildCommit]}"></script>  
+<script>
+layui.config({
+    base: '/static/layuiadmin/'
+}).extend({
+    index: 'lib/index'
+}).use(['index', 'user'], function(){
+///
+var $ = layui.$
+,setter = layui.setter
+,admin = layui.admin
+,form = layui.form
+,router = layui.router()
+,search = router.search;
+
+form.render();
+
+$(document).keydown(function(event){
+    if(event.keyCode == 13){
+        $('#login').click();
+        return false;
+    }
+});
+
+//提交
+form.on('submit(LAY-user-login-submit)', function(d){
+    $.post("/login", d.field, function(rdata) {
+        // console.log(rdata);
+        if (rdata.code>-1){
+            layer.msg(rdata.msg, {icon: 1 ,time: 1000 }, function(){
+                location.href = "/";
+            });
+        } else {
+            layer.msg(rdata.msg, {icon: 2 ,time: 1000 });
+        }
+    },'json');
+});
+///
+});
+</script>
+</body>
+</html>

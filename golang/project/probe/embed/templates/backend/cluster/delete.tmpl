@@ -1,0 +1,55 @@
+{[template "backend/common/header.tmpl" .]}
+
+<div class="layui-fluid">
+    <div class="layui-col-md12" style="padding: 5px;">
+        <div class="layui-card">
+            <div class="layui-card-body">
+
+                <div class="layui-tab layui-tab-brief">
+                    <ul class="layui-tab-title" id="status">
+                        {[range $menu := .submenu]}
+                            <li data-status="{[$menu.Number]}" {[if eq (print "/" $.admin_path "/" $menu.Link) $.CurrentPath]}class="layui-this"{[end]}><a href="/{[$.admin_path]}/{[$menu.Link]}?cluster_id={[$.cluster_id]}"><i class="layui-icon {[$menu.Icon]}"></i> {[$menu.Name]}</a></li>
+                        {[end]}
+                    </ul>
+                </div>
+
+                <div class="layui-form toolbar" style="margin-top: 10px;margin-bottom: 10px;">
+                    <form class="layui-form" action="" id="cluster" onclick="return false;">
+                        <button type="submit" class="layui-btn layui-bg-red" lay-submit lay-filter="delete">删除当前集群</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+layui.config({base: '/static/layuiadmin/'}).use(['table','jquery'], function(){
+///
+var admin = layui.admin
+,$ = layui.$
+,form = layui.form
+,table = layui.table;
+
+form.on('submit(delete)', function(data){
+    layer.confirm('确定要删除吗?【谨慎操作】', { title:'删除提示', btn: ['确定', '取消'],shade:0.001}, function(index) {
+        $.post('/{[.admin_path]}/clusters/delete', {id:"{[$.cluster_id]}"}, function(rdata) {
+            showMsg(rdata.msg, function(){
+                if(rdata.code > -1){
+                    location.href = "/{[.admin_path]}/clusters";
+                }
+            },{icon: rdata.code > -1 ? 1 : 2,shift:rdata.code ? 0 : 6});
+        },'json');
+    }, function(index) {
+        layer.close(index);
+    });
+    return false;
+});
+
+
+///
+});
+</script>
+
+{[template "backend/common/footer.tmpl" .]}

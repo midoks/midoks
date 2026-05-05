@@ -1,0 +1,112 @@
+{[template "backend/common/header_head.tmpl" .]}
+
+<div class="layui-fluid">
+    <div class="ssh-select">
+        <input type="text" class="layui-input ssh-search" id="ssh_search" placeholder="搜索名称、用户名等">
+
+        <div class="ssh-section-title">推荐认证</div>
+        <div class="ssh-grid" id="ssh_grid_top"></div>
+
+        <div class="ssh-section-title">全部认证</div>
+        <div class="ssh-grid" id="ssh_grid_all"></div>
+
+        <p></p>
+    </div>
+
+</div>
+
+
+<script type="text/javascript">
+
+layui.config({base: '/static/layuiadmin/'}).use(['table','jquery'], function(){
+///
+var admin = layui.admin
+,$ = layui.$
+,form = layui.form
+,table = layui.table;
+
+function subtitleByMethod(m){
+    if(m === 'namepass'){ return '用户名+密码'; }
+    if(m === 'privatekey'){ return '私钥'; }
+    return '认证方式';
+}
+function cardTpl(item){
+    var title = $('<div class="title"></div>').append(
+        $('<span></span>').text(item.name),
+        $('<span class="meta"></span>').text('(' + (item.username||'root') + ')')
+    );
+    var sub = $('<div class="subtitle"></div>').text(subtitleByMethod(item.method));
+    var card = $('<div class="ssh-card"></div>').append(title, sub);
+    card.on('click', function(){
+        if (parent && parent.$) {
+
+            var ssh_id = '<input type="hidden" name="ssh_id" value="'+item.id+'">';
+
+            var content = "<span style='font-size:14px;'>"+item.name+"</span>";
+            content += "<span class='gray2 setting_smail'>(" + subtitleByMethod(item.method) + ")</span>";
+            content += "<span class='gray2 setting_smail'>(" + (item.username || 'root') + ")</span>";
+
+            content += '<a class="edit" onclick="Admin.open(\'修改认证\',\'/{[$.admin_path]}/clusters/ssh/add?ssh_id='+item.id+'\',700,550)" style="cursor:pointer;"><i class="layui-icon layui-icon-edit"></i></a>';
+            content += '<a class="remove" style="cursor:pointer;"><i class="layui-icon layui-icon-close"></i></a>';
+            
+
+            parent.$('.ssh_btn').html('<div>'+ssh_id+'<span class="layui-btn layui-btn-primary layui-btn-sm" \
+                    style="margin-right:8px;">'+ content +'</span></div>');
+            parent.$('.ssh_origin').hide();
+            if (parent.window.loadSshBtn) parent.window.loadSshBtn();
+            var idx = parent.layer.getFrameIndex(window.name);
+            parent.layer.close(idx);
+        }
+    });
+    return card;
+}
+function render(list){
+    var top = $('#ssh_grid_top').empty();
+    var all = $('#ssh_grid_all').empty();
+    var rec = list.slice(0, 3);
+    rec.forEach(function(it){ top.append(cardTpl(it)); });
+    list.forEach(function(it){ all.append(cardTpl(it)); });
+}
+
+function renderList(list){
+    var all = $('#ssh_grid_all').empty();
+    list.forEach(function(it){ all.append(cardTpl(it)); });
+}
+
+function renderSuggest(list){
+    var top = $('#ssh_grid_top').empty();
+    list.forEach(function(it){ top.append(cardTpl(it)); });
+}
+
+function filter(list, key){
+    if(!key) return list;
+    return list.filter(function(it){
+        return (it.name ||'').indexOf(key)>-1
+            || (it.username ||'').indexOf(key)>-1;
+    });
+}
+
+var allList = [];
+$.get('/{[.admin_path]}/clusters/ssh/select_list?cluster_id={[.cluster_id]}', function(data){
+    var option = data.data;
+    if (data.code > 0 && option && option.list){
+        renderList(option.list);
+        allList = option.list;
+        if (!option.sugguest || option.sugguest.length === 0) {
+            var topList = option.list.slice(0,3);
+            renderSuggest(topList);
+        } else{
+            renderSuggest(option.sugguest);
+        }
+    }
+}, 'json');
+
+$('#ssh_search').on('input', function(){
+    var title = $(this).val();
+    renderList(filter(allList, title));
+});
+
+///
+});
+</script>
+{[template "backend/common/footer.tmpl" .]}

@@ -1,0 +1,7 @@
+<div class="layui-tab layui-tab-brief">
+    <ul class="layui-tab-title" id="status">
+        {[range $menu := .submenu]}
+            <li data-status="{[$menu.Number]}" {[if eq (print "/" $.admin_path "/" $menu.Link) $.CurrentPath]}class="layui-this"{[end]}><a href="/{[$.admin_path]}/{[$menu.Link]}">{[$menu.Name]}</a></li>
+        {[end]}
+    </ul>
+</div>

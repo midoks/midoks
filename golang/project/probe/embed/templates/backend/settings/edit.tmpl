@@ -1,0 +1,104 @@
+{[template "backend/common/header_head.tmpl" .]}
+
+
+<style type="text/css">
+.layui-form-item .layui-input-inline{
+    width: auto;
+    margin-left: 5px;
+}
+.type-input{
+    height:70px;
+    overflow-y: auto;
+}
+.type-input::-webkit-scrollbar {
+    /*滚动条整体样式*/
+    width : 10px;  /*高宽分别对应横竖滚动条的尺寸*/
+    height: 1px;
+}
+.type-input::-webkit-scrollbar-thumb {
+    /*滚动条里面小方块*/
+    border-radius: 10px;
+    box-shadow   : inset 0 0 5px rgba(0, 0, 0, 0.2);
+    background   : #666;
+}
+.type-input::-webkit-scrollbar-track {
+    /*滚动条里面轨道*/
+    box-shadow   : inset 0 0 5px rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    background   : #ededed;
+}
+.layui-form-radio{
+    margin: 0; 
+    padding-right: 0;
+}
+
+.layui-form-pane .layui-form-checkbox {
+    margin: 4px 0 4px 1px;
+}
+.layui-form-checkbox[lay-skin=primary] span {
+    padding-right: 4px;
+}
+.layui-form-checkbox[lay-skin=primary] i {
+    left: 6px;
+}
+.layui-form-item .layui-col-xs12{
+    margin-top: 10px;
+}
+@media screen and (max-width: 990px){
+    .layui-form-item .layui-col-xs12:first-child{
+        margin-top: 0px;
+    }
+    .layui-form-item{
+        margin-bottom: 10px; 
+    }
+}
+</style>
+<!-- start -->
+
+<div class="layui-fluid">
+    <form class="layui-form layui-form-pane" action="edit">
+        <div class="layui-tab layui-tab-brief">
+            <div class="layui-tab-content">
+                <div class="layui-tab-item layui-show">
+                    <div class="layui-form-item">
+                        <div class="layui-col-xs12 layui-col-md4">
+                            <label class="layui-form-label">用户名</label>
+                            <div class="layui-input-block">
+                                <input type="text" name="username" autocomplete="off" class="layui-input" value="{[if .Data]}{[.Data.Username]}{[end]}" placeholder="用户名">
+                            </div>
+                        </div>
+
+                        <div class="layui-col-xs12 layui-col-md4">
+                            <label class="layui-form-label">手机</label>
+                            <div class="layui-input-block">
+                                <input type="text" name="tel" autocomplete="off" class="layui-input" value="{[if .Data]}{[.Data.Tel]}{[end]}" placeholder="用户名">
+                            </div>
+                        </div>
+
+                        <div class="layui-col-xs12 layui-col-md4">
+                            <label class="layui-form-label">邮件</label>
+                            <div class="layui-input-block">
+                                <input type="text" name="email" autocomplete="off" class="layui-input" value="{[if .Data]}{[.Data.Email]}{[end]}" placeholder="用户名">
+                            </div>
+                        </div>
+
+                        <div class="layui-col-xs12 layui-col-md4">
+                            <label class="layui-form-label">密码</label>
+                            <div class="layui-input-block">
+                                <input type="text" name="password" autocomplete="off" class="layui-input" value="" placeholder="密码">
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="layui-form-item" style="text-align: center;">
+                        <input type="hidden" name="id" value="{[if .Data]}{[.Data.ID]}{[end]}">
+                        <button class="layui-btn" lay-filter="submit_save" lay-submit>保存</button>
+                        <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+{[template "backend/common/footer.tmpl" .]}

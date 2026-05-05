@@ -1,0 +1,201 @@
+{[template "backend/common/header.tmpl" .]}
+
+<div class="layui-fluid">
+    <div class="layui-col-md12" style="padding: 5px;">
+        <div class="layui-card">
+            <div class="layui-card-body">
+
+                <div class="layui-tab layui-tab-brief">
+                    <ul class="layui-tab-title" id="status">
+                        {[range $menu := .submenu]}
+                            <li data-status="{[$menu.Number]}" {[if eq (print "/" $.admin_path "/" $menu.Link) $.CurrentPath]}class="layui-this"{[end]}><a href="/{[$.admin_path]}/{[$menu.Link]}?cluster_id={[$.cluster_id]}&node_id={[$.node_id]}"><i class="layui-icon {[$menu.Icon]}"></i> {[$menu.Name]}</a></li>
+                        {[end]}
+                    </ul>
+                </div>
+
+                <div class="layui-row" style="margin-top: 10px;font-size: 12px;">
+                    
+                    <div class="layui-col-md2 menu_list_left">
+                        <div class="bg" style="margin-top: 3px;">
+                            {[range $smenu := .setting_menu]}
+                                {[if eq $smenu.Type "line"]}
+                                <div class="line"></div>
+                                {[else]}
+                                <a href="/{[$.admin_path]}/{[$smenu.Link]}?cluster_id={[$.cluster_id]}&node_id={[$.node_id]}" {[if eq (print "/" $.admin_path "/" $smenu.Link) $.CurrentPath]}class="select"{[end]}>{[$smenu.Name]}</a>
+                                {[end]}
+                            {[end]}
+                        </div>
+                    </div>
+
+                    <div class="layui-col-md10">
+                        <div style="background: #fff; border-radius: 8px;margin-left: 8px;">
+                        <form class="layui-form layui-form-pane" onclick="return false;">
+                            <table class="layui-table">
+                                <colgroup><col width="150"><col></colgroup>
+                                <tbody>
+                                    <tr>
+                                        <td>节点名称 *</td>
+                                        <td>
+                                            <div class="layui-input-inline">
+                                                <input type="text" name="name" autocomplete="off" class="layui-input" value="{[if .Data]}{[.Data.Name]}{[end]}" placeholder="">
+                                            </div>
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>所属集群</td>
+                                        <td>
+                                            <div class="layui-input-inline">
+                                                <input type="text" name="cluster_id" autocomplete="off" class="layui-input" value="{[if .Data]}{[.Data.ClusterID]}{[end]}" placeholder="">
+                                            </div>
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>IP地址 *</td>
+                                        <td>
+                                            <div id="ip">
+                                                <input type="hidden" name="ip_addresses_json" value="[]">
+                                                <span id="ip_btn"></span>
+                                                <span class="line" style="display:none;margin: 8px 0px;"></span>
+                                                <span id="ip_origin">
+                                                    <button type="button" class="layui-btn layui-btn-sm layui-btn-primary" onclick="Admin.open('添加IP地址','/{[$.admin_path]}/clusters/select/ip',700,450)">
+                                                    <i class="layui-icon layui-icon-add-circle"></i>
+                                                    </button>
+                                                </span>
+                                            <div>
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>所属分组</td><td>
+                                        <div id="group">
+                                            <span id="group_btn"></span>
+                                            <span id="group_origin">
+                                                <a class="mlink" onclick="Admin.open('选择分组','/{[$.admin_path]}/clusters/select/groups',500,330)">[选择分组]</a>
+                                                <a class="mlink" onclick="Admin.open('添加分组','/{[$.admin_path]}/clusters/cluster/groups_add',500,330)">[添加分组]</a>
+                                            </span>
+                                        <div>
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>所属区域</td><td>
+                                        <div id="region">
+                                            <span id="region_btn"></span>
+                                            <span id="region_origin">
+                                                <a class="mlink" onclick="Admin.open('选择区域','/{[$.admin_path]}/clusters/select/region',500,330)">[选择区域]</a>
+                                                <a class="mlink" onclick="Admin.open('添加区域','/{[$.admin_path]}/clusters/regions/add',500,330)">[添加区域]</a>
+                                            </span>
+                                        <div>
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td colspan="2" >
+                                            <input type="hidden" name="id" value="{[if .node_id]}{[.node_id]}{[end]}">
+                                            <button class="layui-btn" lay-filter="submit_node_settings" lay-submit>保存</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </form>
+                        </div>
+                    </div>
+                </div>
+                <!-- end -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+layui.config({base: '/static/layuiadmin/'}).use(['table','jquery'], function(){
+///
+var admin = layui.admin
+,$ = layui.$
+,form = layui.form
+,table = layui.table;
+
+{[template "backend/cluster/node/commonjs.tmpl" .]}
+
+// 页面加载时初始化已有 IP 数据
+function initIpAddresses() {
+    var initIpData = '{[$.IpAddressesJson]}';
+    console.log("initIpData (raw):", initIpData);
+    try {
+        initIpData = JSON.parse(initIpData);
+    } catch (e) {
+        console.error("Failed to parse initIpData:", e);
+        initIpData = [];
+    }
+    console.log("initIpData (parsed):", initIpData);
+    if (Array.isArray(initIpData) && initIpData.length > 0) {
+        $('input[name="ip_addresses_json"]').val(JSON.stringify(initIpData));
+        for (var i = 0; i < initIpData.length; i++) {
+            var ipItem = initIpData[i];
+            
+            var content = '<div class="layui-btn-group" style="margin-bottom:6px;">';
+            content += '<button type="button" class="layui-btn layui-btn-sm layui-btn-primary" style="border-right-width:0;">';
+            content += '<i class="layui-icon layui-icon-ip" style="font-size:12px;margin-right:4px;"></i>';
+            content += '<span style="font-family:monospace;font-size:13px;">'+ ipItem.ip +'</span>';
+            content += '</button>';
+            content += '<button type="button" class="layui-btn layui-btn-sm layui-btn-warm edit" data-ip=\''+ JSON.stringify(ipItem) +'\' title="编辑" style="border-right-width:0;">';
+            content += '<i class="layui-icon layui-icon-edit" style="font-size:12px;"></i>';
+            content += '</button>';
+            content += '<button type="button" class="layui-btn layui-btn-sm layui-btn-danger remove" title="删除">';
+            content += '<i class="layui-icon layui-icon-close" style="font-size:12px;"></i>';
+            content += '</button>';
+            content += '</div>';
+            $('#ip_btn').append(content);
+        }
+        $('#ip_origin').show();
+        $('#ip .line').css('display','block');
+    }
+}
+
+window.loadRegionBtn = function(){
+    $('#region_btn .remove').bind('click',function(){
+        $(this).parent().parent().remove();
+        $('#region_origin').show();
+    });
+}
+
+window.loadGroupBtn = function(){
+    $('#group_btn .remove').bind('click',function(){
+        $(this).parent().parent().remove();
+        $('#group_origin').show();
+    });
+}
+
+// 编辑 IP 时传递数据
+window.editIp = function(ipItem) {
+    Admin.open('修改IP地址','/{[$.admin_path]}/clusters/select/ip',700,450,false,ipItem);
+};
+
+
+
+form.on('submit(submit_node_settings)', function(data){
+    var index = layer.load();
+
+
+    $.post("/{[$.admin_path]}/clusters/node/settings", data.field, function(res) {
+        showMsg(res.msg, function(){
+            layer.close(index);
+        },{icon: res.code > -1 ? 1 : 2,shift:res.code>-1 ? 0 : 6});
+    },'json');
+    return true;
+});
+
+// 初始化 IP 地址数据
+initIpAddresses();
+
+// 初始化 IP 按钮事件
+loadIpBtn();
+
+///
+});
+</script>
+
+{[template "backend/common/footer.tmpl" .]}

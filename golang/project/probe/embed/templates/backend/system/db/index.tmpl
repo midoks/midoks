@@ -1,0 +1,130 @@
+{[template "backend/common/header_nonav.tmpl" .]}
+
+<div class="layui-fluid">
+    <div class="layui-col-md12" style="padding: 5px;">
+        <div class="layui-card">
+            <div class="layui-card-body">
+
+                <div class="layui-tab layui-tab-brief">
+                    <ul class="layui-tab-title" id="status">
+                        {[range $menu := .submenu]}
+                            <li data-status="{[$menu.Number]}" {[if eq (print "/" $.admin_path "/" $menu.Link) $.CurrentPath]}class="layui-this"{[end]}><a href="/{[$.admin_path]}/{[$menu.Link]}">{[$menu.Name]}</a></li>
+                        {[end]}
+                    </ul>
+                </div>
+
+                <div class="layui-tab layui-tab-brief">
+                    <ul class="layui-tab-title" id="status">
+                        <li data-status="1" class="layui-this">数据库节点列表</li>
+                        <li data-status="2"><a onclick="Admin.open('添加节点','/{[$.admin_path]}/system/db/add',700,630)">添加数据库节点</a></li>
+                    </ul>
+                </div>
+
+                <div id="list" style="padding-top: 5px;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+layui.config({base: '/static/layuiadmin/'}).use(['table','jquery'], function(){
+///
+var admin = layui.admin
+,$ = layui.$
+,form = layui.form
+,table = layui.table;
+
+table.render({
+    elem: '#list',
+    url: '/{[$.admin_path]}/system/db/list',
+    title: '数据表',
+    cols: [[
+        {field:'name', title:'节点名称', minWidth: 150, templet: '#nameTpl'},
+        {field:'host', title:'连接地址', width: 180, templet:"#hostTpl"},
+        {field:'dbname', title:'数据库名', minWidth: 120, templet: '#dbnameTpl'},
+        {field:'db_version', title:'版本', width: 120, templet: '#versionTpl'},
+        {field:'db_usage', title:'用量', width: 120, templet: '#usageTpl'},
+        {field:'db_type', title:'类型', width: 100, templet: '#typeTpl'},
+        {field:'status', title:'状态', width: 100, templet:"#statusTpl"},
+        {title:'操作', toolbar: '#cmdTpl', width: 220, fixed: 'right'}
+     ]],
+    page: true
+});
+
+///
+});
+</script>
+
+<script type="text/html" id="nameTpl">
+    <div style="display:flex;align-items:center;">
+        <i class="layui-icon layui-icon-database" style="font-size:18px;color:#FF5722;margin-right:8px;"></i>
+        <span style="font-weight:500;">{{d.name}}</span>
+    </div>
+</script>
+
+<script type="text/html" id="hostTpl">
+    <div style="display:flex;align-items:center;">
+        <i class="layui-icon layui-icon-ip" style="font-size:14px;color:#666;margin-right:5px;"></i>
+        <span style="font-family:monospace;">{{d.host}}:{{d.port}}</span>
+    </div>
+</script>
+
+<script type="text/html" id="dbnameTpl">
+    <div style="display:flex;align-items:center;">
+        <i class="layui-icon layui-icon-folder" style="font-size:14px;color:#1E9FFF;margin-right:5px;"></i>
+        <span>{{d.dbname}}</span>
+    </div>
+</script>
+
+<script type="text/html" id="versionTpl">
+    <span style="font-family:monospace;font-size:13px;background:#f2f2f2;padding:3px 8px;border-radius:4px;">{{d.db_version || '未知'}}</span>
+</script>
+
+<script type="text/html" id="usageTpl">
+    {{# if (d.db_usage && d.db_usage !== '未知' && d.db_usage !== '获取失败') { }}
+        <span style="color:#16b777;font-weight:500;">{{d.db_usage}}</span>
+    {{# } else { }}
+        <span style="color:#999;">{{d.db_usage || '-'}}</span>
+    {{# } }}
+</script>
+
+<script type="text/html" id="typeTpl">
+    {{# if (d.db_type === 'mysql') { }}
+        <span class="layui-badge layui-bg-blue" style="padding:3px 8px;">MySQL</span>
+    {{# } else if (d.db_type === 'postgres') { }}
+        <span class="layui-badge layui-bg-cyan" style="padding:3px 8px;">PostgreSQL</span>
+    {{# } else if (d.db_type === 'sqlite') { }}
+        <span class="layui-badge layui-bg-orange" style="padding:3px 8px;">SQLite</span>
+    {{# } else { }}
+        <span class="layui-badge layui-bg-gray" style="padding:3px 8px;">{{d.db_type || '未知'}}</span>
+    {{# } }}
+</script>
+
+<script type="text/html" id="statusTpl">
+    {{# if (d.status == 1){ }}
+        <span style="display:flex;align-items:center;">
+            <span class="layui-badge-dot layui-bg-green" style="margin-right:6px;"></span>
+            <span style="color:#16b777;font-weight:500;">已启用</span>
+        </span>
+    {{# } else if (d.status == 0) { }}
+        <span style="display:flex;align-items:center;">
+            <span class="layui-badge-dot layui-bg-orange" style="margin-right:6px;"></span>
+            <span style="color:#FF5722;">已暂停</span>
+        </span>
+    {{# } }}
+</script>
+
+<script type="text/html" id="cmdTpl">
+    <a class="layui-btn layui-btn-xs layui-btn-normal" href="/{[$.admin_path]}/system/db/details?id={{d.id}}">
+        <i class="layui-icon layui-icon-chart-screen"></i> 详情
+    </a>
+    <a class="layui-btn layui-btn-xs layui-btn-primary" onclick="Admin.open('编辑节点','/{[$.admin_path]}/system/db/update?id={{d.id}}',700,630)">
+        <i class="layui-icon layui-icon-edit"></i> 编辑
+    </a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event='delete' onclick="Admin.del(this, 'delete','{{d.id}}')">
+        <i class="layui-icon layui-icon-delete"></i> 删除
+    </a>
+</script>
+
+{[template "backend/common/footer.tmpl" .]}

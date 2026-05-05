@@ -1,0 +1,82 @@
+{[template "backend/common/header.tmpl" .]}
+
+<div class="layui-fluid">
+    <div class="layui-col-md12" style="padding: 5px;">
+        <div class="layui-card">
+            <div class="layui-card-body">
+
+                <div class="layui-tab layui-tab-brief">
+                    <ul class="layui-tab-title" id="status">
+                        <li data-status="1" class="layui-this">区域</li>
+                        <li data-status="2"><a href="/{[.admin_path]}/clusters/regions/nodes">节点</a></li>
+                    </ul>
+                </div>
+
+                <div class="layui-form toolbar" style="margin-top: 10px;margin-bottom: 10px;">
+                <form class="layui-form" action="" id="comic_form" onclick="return false;">
+
+                    <div class="layui-form toolbar" style="margin-top: 10px;margin-bottom: 10px;">
+                        <button type="button" class="layui-btn layui-btn-sm" onclick="Admin.open('添加区域','/{[$.admin_path]}/clusters/cluster/groups_add?cluster_id={[$.cluster_id]}',500,250)">
+                            <i class="layui-icon layui-icon-add-circle"></i> 添加区域
+                        </button>
+                    </div>
+
+                </form>
+                </div>
+
+                <div id="list"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+layui.config({base: '/static/layuiadmin/'}).use(['table','jquery'], function(){
+///
+var admin = layui.admin
+,$ = layui.$
+,form = layui.form
+,table = layui.table;
+
+
+table.render({
+    elem: '#list',
+    url: '/{[.admin_path]}/clusters/list',
+    title: '数据表',
+    cols: [[
+        {field:'name', title:'集群名称', toolbar: '#nameTpl',},
+        {field:'num', title:'节点数'},
+        {field:'num_online', title:'在线节点数'},
+        {title:'操作', toolbar: '#cmdTpl', width:120, fixed: 'right'}
+     ]],
+    page: true
+});
+
+
+table.on('tool(list)', function(obj){
+    switch(obj.event){
+    };
+});
+
+table.on('toolbar', function(obj){
+    switch(obj.event){
+    };
+});
+
+
+///
+});
+</script>
+
+
+<script type="text/html" id="nameTpl">
+    <a class="mlink" href="/{[.admin_path]}/clusters/cluster/boards?cluster_id={{d.id}}">{{d.name}}</a>
+</script>
+
+<script type="text/html" id="cmdTpl">
+<a class="layui-btn layui-btn-xs" lay-event='edit' onclick="Admin.open('【{{d.username}}】'+'编辑','edit?id={{d.id}}',500,400)">详情</a>
+<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event='delete' onclick="Admin.del(this, 'delete','{{d.id}}')">设置</a>
+</script>
+
+{[template "backend/common/footer.tmpl" .]}

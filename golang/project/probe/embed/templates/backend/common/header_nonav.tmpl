@@ -1,0 +1,101 @@
+{[template "backend/common/header_head.tmpl" .]}
+
+
+<body class="layui-layout-body">
+<!-- start -->
+<div id="LAY_app">
+    <div class="layui-layout layui-layout-admin">
+        <div class="layui-header">
+            <!-- 头部区域 -->
+            <ul class="layui-nav layui-layout-left">
+                <li class="layui-nav-item layadmin-flexible" lay-unselect>
+                    <a href="javascript:;" layadmin-event="flexible" title="侧边伸缩">
+                        <i class="layui-icon layui-icon-shrink-right" id="LAY_app_flexible"></i>
+                    </a>
+                </li>
+
+                <!-- <li class="layui-nav-item layui-hide-xs" lay-unselect><a href="/">系统</a></li> -->
+            </ul>
+
+            <ul class="layui-nav layui-layout-right" lay-filter="layadmin-layout-right">
+
+                <li class="layui-nav-item layui-hide-xs" lay-unselect>
+                    <a href="javascript:;" layadmin-event="note">
+                        <i class="layui-icon layui-icon-note"></i>
+                    </a>
+                </li>
+
+                <li class="layui-nav-item layui-hide-xs" lay-unselect>
+                    <a href="javascript:;" layadmin-event="fullscreen">
+                        <i class="layui-icon layui-icon-screen-full"></i>
+                    </a>
+                </li>
+
+                <li class="layui-nav-item" lay-unselect>
+                    <a href="javascript:;">
+                        <cite>{[if .login_data]}{[.login_data.FullName]}{[end]}</cite>
+                    </a>
+                    <dl class="layui-nav-child">
+                        <dd style="text-align: center;"><a href="/{[.admin_path]}/logout">退出</a></dd>
+                    </dl>
+                </li>
+              
+                <li class="layui-nav-item layui-hide-xs" lay-unselect>
+                    <a href="javascript:;" layadmin-event="theme"><i class="layui-icon layui-icon-more-vertical"></i></a>
+                </li>
+                <li class="layui-nav-item layui-show-xs-inline-block layui-hide-sm" lay-unselect>
+                    <a href="javascript:;" layadmin-event="theme"><i class="layui-icon layui-icon-more-vertical"></i></a>
+                </li>
+            </ul>
+        </div>
+      
+        <!-- 侧边菜单 -->
+        <div class="layui-side layui-side-menu">
+            <div class="layui-side-scroll">
+                <div class="layui-logo layui-hide-xs layui-bg-black">
+                    <span>管理</span>
+                </div>
+
+                <ul class="layui-nav layui-nav-tree" lay-shrink="all" id="LAY-system-side-menu" lay-filter="layadmin-system-side-menu">
+
+                    {[range $menu := .Menus]}
+                        {[$isActive := false]}
+                        
+                        {[if eq $menu.Code $.ActiveMenu]}
+                            {[$isActive = true]}
+                        {[end]}
+
+                        {[range $child := $menu.Children]}
+                            {[if eq $child.Code $.ActiveMenu]}
+                                {[$isActive = true]}
+                            {[end]}
+                        {[end]}
+
+                        <li data-name="{[$menu.Code]}" class="layui-nav-item {[if $isActive]}layui-nav-itemed{[end]} {[if and (eq $menu.Code $.ActiveMenu) (not $menu.Children)]}layui-this{[end]}">
+                            <a href="{[if $menu.Children]}javascript:;{[else]}/{[$.admin_path]}{[$menu.Path]}{[end]}" lay-tips="{[$menu.Name]}" lay-direction="2">
+                                <i class="layui-icon {[$menu.Icon]}"></i>
+                                <cite>{[$menu.Name]}</cite>
+                            </a>
+                            {[if $menu.Children]}
+                            <dl class="layui-nav-child">
+                                {[range $child := $menu.Children]}
+                                    <dd class="{[if eq $child.Code $.ActiveMenu]}layui-this{[end]}">
+                                        <a href="/{[$.admin_path]}{[$child.Path]}">{[$child.Name]}</a>
+                                    </dd>
+                                {[end]}
+                            </dl>
+                            {[end]}
+                        </li>
+                    {[end]}
+
+                </ul>
+            </div>
+        </div>
+      
+        <!-- 主体内容 -->
+        <div class="layui-body" id="LAY_app_body" style="top: 50px;">
+            <div class="layadmin-tabsbody-item layui-show" style="overflow-y: auto;margin-bottom: 40px;">
+<!--     
+        </div>
+</div> 
+-->

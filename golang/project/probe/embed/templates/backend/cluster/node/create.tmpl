@@ -1,0 +1,274 @@
+{[template "backend/common/header.tmpl" .]}
+
+<div class="layui-fluid">
+    <div class="layui-col-md12" style="padding: 5px;">
+        <div class="layui-card">
+            <div class="layui-card-body">
+
+                <div class="layui-tab layui-tab-brief">
+                    <ul class="layui-tab-title" id="status">
+                        {[range $menu := .submenu]}
+                            <li data-status="{[$menu.Number]}" {[if eq (print "/" $.admin_path "/" $menu.Link) $.CurrentPath]}class="layui-this"{[end]}><a href="/{[$.admin_path]}/{[$menu.Link]}?cluster_id={[$.cluster_id]}&node_id={[$.node_id]}"><i class="layui-icon {[$menu.Icon]}"></i> {[$menu.Name]}</a></li>
+                        {[end]}
+                    </ul>
+                </div>
+
+                    
+                <div class="steps" style="padding:1em;">
+                    <div class="step active"><span class="num">1</span><span class="label mlink">填写节点信息</span><span class="line"></span></div>
+                    <div class="step"><span class="num">2</span><span class="label">安装节点</span><span class="line"></span></div>
+                    <div class="step"><span class="num">3</span><span class="label">完成</span></div>
+                </div>
+
+
+                <div class="layui-form toolbar install_node_step1">
+                <form class="layui-form layui-form-pane">
+                    <table class="layui-table">
+                        <colgroup><col width="150"><col></colgroup>
+                        <tbody>
+                            <tr>
+                                <td>节点名称</td>
+                                <td><input type="text" name="name" autocomplete="off" placeholder="" class="layui-input" lay-verify="required"></td>
+                            </tr>
+
+                            <tr>
+                                <td>IP地址</td>
+                                <td>
+                                    <div id="ip">
+                                        <input type="hidden" name="ip_addresses_json" value="[]">
+                                        <span id="ip_btn"></span>
+                                        <span class="line" style="display:none;margin: 8px 0px;"></span>
+                                        <span id="ip_origin">
+                                            <button type="button" class="layui-btn layui-btn-sm layui-btn-primary" onclick="Admin.open('添加IP地址','/{[$.admin_path]}/clusters/select/ip',700,450)">
+                                            <i class="layui-icon layui-icon-add-circle"></i>
+                                            </button>
+                                        </span>
+                                    <div>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td>所属分组</td><td>
+                                <div id="group">
+                                    <span id="group_btn"></span>
+                                    <span id="group_origin">
+                                        <a class="mlink" onclick="Admin.open('选择分组','/{[$.admin_path]}/clusters/select/groups',500,330)">[选择分组]</a>
+                                        <a class="mlink" onclick="Admin.open('添加分组','/{[$.admin_path]}/clusters/cluster/groups_add',500,330)">[添加分组]</a>
+                                    </span>
+                                <div>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td>所属区域</td><td>
+                                <div id="region">
+                                    <span id="region_btn"></span>
+                                    <span id="region_origin">
+                                        <a class="mlink" onclick="Admin.open('选择区域','/{[$.admin_path]}/clusters/select/region',500,330)">[选择区域]</a>
+                                        <a class="mlink" onclick="Admin.open('添加区域','/{[$.admin_path]}/clusters/regions/add',500,330)">[添加区域]</a>
+                                    </span>
+                                <div>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td colspan="2">
+                                    <a class="table_more mlink" target_class="more_table">
+                                        <cite>更多选项</cite>
+                                        <i class="layui-icon layui-icon-down layui-nav-more"></i>
+                                    </a>
+                                </td>
+                            </tr>
+
+                            <tr class="more_table hide">
+                                <td>SSH主机地址</td>
+                                <td><input type="text" name="ssh_host" autocomplete="off" value="127.0.0.1" class="layui-input"></td>
+                            </tr>
+
+                            <tr class="more_table hide">
+                                <td>SSH主机端口</td>
+                                <td><input type="number" name="ssh_port" autocomplete="off" placeholder="" class="layui-input" value="22"></td>
+                            </tr>
+
+                            <tr class="more_table hide">
+                                <td>SSH登录认证</td><td>
+                                <div class="ssh">
+                                    <span class="ssh_btn"></span>
+                                    <span class="ssh_origin">
+                                        <a class="mlink" onclick="Admin.open('选择已用认证','/{[$.admin_path]}/clusters/select/ssh',850,510)">[选择已用认证]</a>
+                                        <a class="mlink" onclick="Admin.open('添加新认证','/{[$.admin_path]}/clusters/ssh/add',750,510)">[添加新认证]</a>
+                                    </span>
+                                <div>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td colspan="2">
+                                    <input type="hidden" name="cluster_id" value="{[if .cluster_id]}{[.cluster_id]}{[end]}">
+                                    <input type="hidden" name="id" value="{[if .Data]}{[.Data.ID]}{[end]}">
+                                    <button class="layui-btn" lay-filter="submit_step1" lay-submit>保存</button>
+                                </td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+                </form>
+                </div>
+
+                <div class="layui-form toolbar install_node_step2" style="display:none;">
+                <form class="layui-form layui-form-pane">
+                    <table class="layui-table">
+                        <colgroup><col width="150"><col></colgroup>
+                        <tbody>
+
+                            <tr>
+                                <td>SSH主机地址</td>
+                                <td><input type="text" name="ssh_host" autocomplete="off" placeholder="" class="layui-input"></td>
+                            </tr>
+
+                            <tr>
+                                <td>SSH主机端口</td>
+                                <td><input type="number" name="ssh_port" value="22" autocomplete="off" placeholder="" class="layui-input"></td>
+                            </tr>
+
+                            <tr>
+                                <td>SSH登录认证</td><td>
+                                <div class="ssh">
+                                    <span class="ssh_btn"></span>
+                                    <span class="ssh_origin">
+                                        <a class="mlink" onclick="Admin.open('选择已用认证','/{[$.admin_path]}/clusters/select/ssh',700,500)">[选择已用认证]</a>
+                                        <a class="mlink" onclick="Admin.open('添加新认证','/{[$.admin_path]}/clusters/ssh/add',700,500)">[添加新认证]</a>
+                                    </span>
+                                <div>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td colspan="2">
+                                    <input type="hidden" name="cluster_id" value="{[if .cluster_id]}{[.cluster_id]}{[end]}">
+                                    <input type="hidden" name="node_id" value="">
+                                    <input type="hidden" name="id" value="{[if .Data]}{[.Data.ID]}{[end]}">
+                                    <button class="layui-btn" lay-filter="submit_step2" lay-submit>安装</button>
+                                </td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+                </form>
+                </div>
+
+                <div class="layui-form toolbar install_node_step3" style="display:none;">
+                    <div>
+                        <div style="text-align: center; font-size: 1.4em; margin-top: 2.4em;">
+                            <span class="green">"127.0.0.1"节点已被创建并安装成功。</span>
+                        </div>
+
+                         <div style="text-align: center; margin-top: 3em;">
+                            <a href="/clusters/cluster/node?nodeId=7&amp;clusterId=1" type="button" class="layui-btn">现在进入节点详情<i class="layui-icon layui-icon-right"></i></a>
+                        </div>
+
+                        <div style="text-align: center; margin-top: 1em;"><a class="mlink" href="">继续创建下一个节点</a></div>
+                    </div>
+                </div>
+            <!--  end  -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+layui.config({base: '/static/layuiadmin/'}).use(['table','jquery'], function(){
+///
+var admin = layui.admin
+,$ = layui.$
+,form = layui.form
+,table = layui.table;
+var util = layui.util;
+
+{[template "backend/cluster/node/commonjs.tmpl" .]}
+
+window.loadRegionBtn = function(){
+    $('#region_btn .remove').bind('click',function(){
+        $(this).parent().parent().remove();
+        $('#region_origin').show();
+    });
+}
+
+window.loadGroupBtn = function(){
+    $('#group_btn .remove').bind('click',function(){
+        $(this).parent().parent().remove();
+        $('#group_origin').show();
+    });
+}
+
+//安装节点第一步
+form.on('submit(submit_step1)', function(data){
+    var index = layer.load();
+    var field = data.field;
+    var ip = $('#ip_btn .ip').text();
+    field['ip'] = ip;
+
+    $.post("/{[$.admin_path]}/clusters/cluster/create_node", data.field, function(res) {
+        console.log("submit_step1:",res);
+        showMsg(res.msg, function(){
+            layer.close(index);
+            if (res.code > -1){
+                $('.install_node_step1').hide();
+                $('.install_node_step2').show();
+
+                // 将返回的 node_id 设置到第二步表单中
+                if (res.data && res.data.id) {
+                    $('.install_node_step2 input[name="node_id"]').val(res.data.id);
+                }
+
+                // 更新步骤指示器高亮
+                // $('.steps .step').removeClass('active');
+                $('.steps .step:nth-child(2)').addClass('active');
+
+                var ipAddressesJson = $('input[name="ip_addresses_json"]').val();
+                var firstIp = "";
+                try {
+                    var ipArray = JSON.parse(ipAddressesJson);
+                    if (Array.isArray(ipArray) && ipArray.length > 0) {
+                        firstIp = ipArray[0].ip || "";
+                    }
+                } catch (e) {
+                    firstIp = "127.0.0.1";
+                    console.error("failed to parse ip_addresses_json:", e);
+                }
+                $('input[name="ssh_host"]').val(firstIp);
+            }
+        },{icon: res.code > -1 ? 1 : 2,shift:res.code>-1 ? 0 : 6});
+    },'json');
+    return false;
+});
+
+
+form.on('submit(submit_step2)', function(data){
+    var index = layer.load();
+    var field = data.field;
+    $.post("/{[$.admin_path]}/clusters/node_login_add", data.field, function(res) {
+        console.log("submit_step2:",res);
+        showMsg(res.msg, function(){
+            layer.close(index);
+            if(res.code > -1){
+                $('.install_node_step1').hide();
+                $('.install_node_step2').hide();
+                $('.install_node_step3').show();
+
+                // 更新步骤指示器高亮
+                // $('.steps .step').removeClass('active');
+                $('.steps .step:nth-child(3)').addClass('active');
+            }
+        },{icon: res.code > -1 ? 1 : 2,shift:res.code>-1 ? 0 : 6});
+    },'json');
+    return false;
+});
+
+
+///
+});
+</script>
+
+{[template "backend/common/footer.tmpl" .]}

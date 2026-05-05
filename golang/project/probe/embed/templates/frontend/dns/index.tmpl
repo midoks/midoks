@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DNS查询 - AIProbe</title>
+    <link rel="stylesheet" href="/static/layuiadmin/layui/css/layui.css">
+    <link rel="stylesheet" href="/static/common/css/common.css">
+    <style>
+        .tool-container { max-width: 900px; margin: 0 auto; padding: 20px; }
+        .tool-header { text-align: center; margin-bottom: 30px; }
+        .tool-header h1 { font-size: 28px; color: #333; margin-bottom: 10px; }
+        .tool-header p { color: #666; }
+        .tool-form { background: #fff; padding: 25px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 500; color: #333; }
+        .form-group input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; }
+        .form-group input:focus { border-color: #1890ff; outline: none; }
+        .form-group select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; background: #fff; }
+        .btn-primary { background: #1890ff; color: #fff; padding: 12px 30px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; }
+        .btn-primary:hover { background: #40a9ff; }
+        .result-box { margin-top: 20px; background: #f5f5f5; padding: 15px; border-radius: 4px; min-height: 200px; max-height: 400px; overflow-y: auto; font-family: monospace; font-size: 13px; white-space: pre-wrap; word-break: break-all; }
+        .result-box:empty { display: none; }
+        .dns-record { padding: 10px; border-bottom: 1px solid #eee; }
+        .dns-record:last-child { border-bottom: none; }
+        .dns-type { color: #1890ff; font-weight: bold; }
+        .dns-value { color: #333; margin-top: 5px; }
+        .nav-tools { background: #fff; padding: 15px 0; border-bottom: 1px solid #e8e8e8; margin-bottom: 20px; }
+        .nav-tools ul { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; }
+        .nav-tools li a { display: block; padding: 8px 20px; color: #666; text-decoration: none; border-radius: 4px; transition: all 0.3s; }
+        .nav-tools li a:hover, .nav-tools li a.active { background: #1890ff; color: #fff; }
+    </style>
+</head>
+<body>
+    <div class="nav-tools">
+        <ul>
+            <li><a href="/frontend/ping">在线Ping</a></li>
+            <li><a href="/frontend/tcping">在线Tcping</a></li>
+            <li><a href="/frontend/speedtest">网站测速</a></li>
+            <li><a href="/frontend/traceroute">路由追踪</a></li>
+            <li><a href="/frontend/dns" class="active">DNS查询</a></li>
+            <li><a href="/frontend/findping">FindPing</a></li>
+            <li><a href="/frontend/network">本地网络</a></li>
+            <li><a href="/frontend/batch">批量检测</a></li>
+            <li><a href="/frontend/help">帮助支持</a></li>
+            <li><a href="/frontend/settings">习惯设置</a></li>
+        </ul>
+    </div>
+
+    <div class="tool-container">
+        <div class="tool-header">
+            <h1>DNS查询工具</h1>
+            <p>查询域名的DNS解析记录</p>
+        </div>
+
+        <div class="tool-form">
+            <div class="form-group">
+                <label for="domain">请输入域名</label>
+                <input type="text" id="domain" name="domain" placeholder="例如: baidu.com" value="">
+            </div>
+            <div class="form-group">
+                <label for="recordType">记录类型</label>
+                <select id="recordType" name="recordType">
+                    <option value="A">A记录</option>
+                    <option value="AAAA">AAAA记录</option>
+                    <option value="CNAME">CNAME记录</option>
+                    <option value="MX">MX记录</option>
+                    <option value="TXT">TXT记录</option>
+                    <option value="NS">NS记录</option>
+                </select>
+            </div>
+            <button type="button" class="btn-primary" onclick="doDnsQuery()">查询</button>
+
+            <div id="result" class="result-box"></div>
+        </div>
+    </div>
+
+    <script src="/static/common/js/jquery-1.10.2.min.js"></script>
+    <script src="/static/layuiadmin/layui/layui.js"></script>
+    <script>
+    function doDnsQuery() {
+        var domain = $('#domain').val().trim();
+        var recordType = $('#recordType').val();
+
+        if (!domain) {
+            layer.msg('请输入域名', {icon: 2});
+            return;
+        }
+
+        $('#result').text('正在查询...');
+
+        $.ajax({
+            url: '/api/frontend/dns',
+            type: 'POST',
+            data: {domain: domain, type: recordType},
+            dataType: 'json',
+            success: function(res) {
+                if (res.code === 0) {
+                    var html = '';
+                    if (Array.isArray(res.data) && res.data.length > 0) {
+                        res.data.forEach(function(item) {
+                            html += '<div class="dns-record"><span class="dns-type">' + recordType + '</span><div class="dns-value">' + item + '</div></div>';
+                        });
+                    } else {
+                        html = '未找到相关记录';
+                    }
+                    $('#result').html(html);
+                } else {
+                    $('#result').text('错误: ' + res.msg);
+                }
+            },
+            error: function() {
+                $('#result').text('请求失败，请稍后重试');
+            }
+        });
+    }
+
+    layui.use('layer', function(){
+        window.layer = layui.layer;
+    });
+    </script>
+</body>
+</html>

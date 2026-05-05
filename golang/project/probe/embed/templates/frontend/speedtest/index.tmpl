@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>网站测速 - AIProbe</title>
+    <link rel="stylesheet" href="/static/layuiadmin/layui/css/layui.css">
+    <link rel="stylesheet" href="/static/common/css/common.css">
+    <style>
+        .tool-container { max-width: 900px; margin: 0 auto; padding: 20px; }
+        .tool-header { text-align: center; margin-bottom: 30px; }
+        .tool-header h1 { font-size: 28px; color: #333; margin-bottom: 10px; }
+        .tool-header p { color: #666; }
+        .tool-form { background: #fff; padding: 25px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 500; color: #333; }
+        .form-group input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; }
+        .form-group input:focus { border-color: #1890ff; outline: none; }
+        .btn-primary { background: #1890ff; color: #fff; padding: 12px 30px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; }
+        .btn-primary:hover { background: #40a9ff; }
+        .btn-primary:disabled { background: #ccc; cursor: not-allowed; }
+        .result-box { margin-top: 20px; background: #f5f5f5; padding: 15px; border-radius: 4px; min-height: 200px; max-height: 500px; overflow-y: auto; font-family: monospace; font-size: 13px; }
+        .result-box:empty { display: none; }
+        .speed-result { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px; }
+        .speed-item { background: #fff; padding: 20px; border-radius: 8px; text-align: center; }
+        .speed-item .label { font-size: 14px; color: #666; margin-bottom: 10px; }
+        .speed-item .value { font-size: 24px; font-weight: bold; color: #1890ff; }
+        .speed-item .unit { font-size: 12px; color: #999; }
+        .nav-tools { background: #fff; padding: 15px 0; border-bottom: 1px solid #e8e8e8; margin-bottom: 20px; }
+        .nav-tools ul { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; }
+        .nav-tools li a { display: block; padding: 8px 20px; color: #666; text-decoration: none; border-radius: 4px; transition: all 0.3s; }
+        .nav-tools li a:hover, .nav-tools li a.active { background: #1890ff; color: #fff; }
+    </style>
+</head>
+<body>
+    <div class="nav-tools">
+        <ul>
+            <li><a href="/frontend/ping">在线Ping</a></li>
+            <li><a href="/frontend/tcping">在线Tcping</a></li>
+            <li><a href="/frontend/speedtest" class="active">网站测速</a></li>
+            <li><a href="/frontend/traceroute">路由追踪</a></li>
+            <li><a href="/frontend/dns">DNS查询</a></li>
+            <li><a href="/frontend/findping">FindPing</a></li>
+            <li><a href="/frontend/network">本地网络</a></li>
+            <li><a href="/frontend/batch">批量检测</a></li>
+            <li><a href="/frontend/help">帮助支持</a></li>
+            <li><a href="/frontend/settings">习惯设置</a></li>
+        </ul>
+    </div>
+
+    <div class="tool-container">
+        <div class="tool-header">
+            <h1>网站测速工具</h1>
+            <p>测试网站访问速度和性能</p>
+        </div>
+
+        <div class="tool-form">
+            <div class="form-group">
+                <label for="url">请输入网站URL</label>
+                <input type="text" id="url" name="url" placeholder="例如: https://www.baidu.com" value="">
+            </div>
+            <button type="button" id="btnSpeedtest" class="btn-primary" onclick="doSpeedtest()">开始测速</button>
+
+            <div id="speedResult" class="speed-result" style="display:none;"></div>
+            <div id="result" class="result-box"></div>
+        </div>
+    </div>
+
+    <script src="/static/common/js/jquery-1.10.2.min.js"></script>
+    <script src="/static/layuiadmin/layui/layui.js"></script>
+    <script>
+    function doSpeedtest() {
+        var url = $('#url').val().trim();
+        if (!url) {
+            layer.msg('请输入网站URL', {icon: 2});
+            return;
+        }
+
+        $('#result').text('正在测速...');
+        $('#speedResult').hide();
+        $('#btnSpeedtest').prop('disabled', true);
+
+        $.ajax({
+            url: '/api/frontend/speedtest',
+            type: 'POST',
+            data: {url: url},
+            dataType: 'json',
+            success: function(res) {
+                $('#btnSpeedtest').prop('disabled', false);
+                if (res.code === 0) {
+                    var data = res.data;
+                    $('#speedResult').html(
+                        '<div class="speed-item"><div class="label">DNS解析</div><div class="value">' + data.dns + '</div><div class="unit">ms</div></div>' +
+                        '<div class="speed-item"><div class="label">连接时间</div><div class="value">' + data.connect + '</div><div class="unit">ms</div></div>' +
+                        '<div class="speed-item"><div class="label">总耗时</div><div class="value">' + data.total + '</div><div class="unit">ms</div></div>'
+                    ).show();
+                    var details = '状态码: ' + data.status_code + '\n内容长度: ' + data.content_length + ' bytes\n服务器: ' + data.server;
+                    $('#result').text(details);
+                } else {
+                    $('#result').text('错误: ' + res.msg);
+                }
+            },
+            error: function() {
+                $('#result').text('请求失败，请稍后重试');
+                $('#btnSpeedtest').prop('disabled', false);
+            }
+        });
+    }
+
+    layui.use('layer', function(){
+        window.layer = layui.layer;
+    });
+    </script>
+</body>
+</html>

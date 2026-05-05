@@ -1,0 +1,125 @@
+{[template "backend/common/header.tmpl" .]}
+
+<div class="layui-fluid">
+    <div class="layui-col-md12" style="padding: 5px;">
+        <div class="layui-card">
+            <div class="layui-card-body">
+
+                <div class="layui-tab layui-tab-brief">
+                    <ul class="layui-tab-title" id="status">
+                        <li data-status="1" class="layui-this">集群</li>
+                        <li data-status="2" >
+                            <a href="/{[.admin_path]}/clusters/node">节点</a>
+                        </li>
+
+                        <li data-status="3"><a href="/{[.admin_path]}/clusters/create">创建集群</a></li>
+                    </ul>
+                </div>
+
+                <div class="layui-form toolbar" style="margin-top: 10px;margin-bottom: 10px;">
+                <form class="layui-form" action="" id="comic_form" onclick="return false;">
+
+                    <div class="layui-inline mr0">
+                        <div class="layui-input-inline mr0">
+                            <input type="text" name="key" placeholder="集群、节点关键词" autocomplete="off" class="layui-input h30" value="">
+                        </div>
+                    </div>
+                
+
+                    <div class="layui-inline mr0">
+                        <button class="layui-btn layui-btn-sm" id="table-sreach" data-id="list" lay-submit lay-filter="table-sreach"><i class="layui-icon">&#xe615;</i>搜索
+                        </button>
+                    </div>
+                </form>
+                </div>
+
+                <div id="list"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+layui.config({base: '/static/layuiadmin/'}).use(['table','jquery'], function(){
+///
+var admin = layui.admin
+,$ = layui.$
+,form = layui.form
+,table = layui.table;
+
+
+table.render({
+    elem: '#list',
+    url: '/{[.admin_path]}/clusters/list',
+    title: '数据表',
+    cols: [[
+        {field:'name', title:'集群名称', toolbar: '#nameTpl', minWidth: 150},
+        {field:'num', title:'节点总数', width: 100, templet: '#numTpl'},
+        {field:'num_online', title:'在线节点', width: 100, templet: '#onlineTpl'},
+        {title:'节点状态', width: 150, templet: '#statusTpl'},
+        {title:'操作', toolbar: '#cmdTpl', width: 160, fixed: 'right'}
+     ]],
+    page: true
+});
+
+
+table.on('tool(list)', function(obj){
+    switch(obj.event){
+    };
+});
+
+table.on('toolbar', function(obj){
+    switch(obj.event){
+    };
+});
+
+
+///
+});
+</script>
+
+
+<script type="text/html" id="nameTpl">
+    <div style="display:flex;align-items:center;">
+        <i class="layui-icon layui-icon-engine" style="font-size:18px;color:#1E9FFF;margin-right:8px;"></i>
+        <a class="mlink" href="/{[.admin_path]}/clusters/cluster/boards?cluster_id={{d.id}}" style="font-weight:500;">{{d.name}}</a>
+    </div>
+</script>
+
+<script type="text/html" id="numTpl">
+    <span style="font-weight:500;color:#666;">
+        <i class="layui-icon layui-icon-user" style="margin-right:4px;"></i>
+        {{d.num}}
+    </span>
+</script>
+
+<script type="text/html" id="onlineTpl">
+    <span style="font-weight:500;color:#5FB878;">
+        <i class="layui-icon layui-icon-cellphone" style="margin-right:4px;"></i>
+        {{d.num_online}}
+    </span>
+</script>
+
+<script type="text/html" id="statusTpl">
+    {{# if (d.num > 0 && d.num_online === d.num) { }}
+        <span class="layui-badge layui-bg-green" style="padding:4px 10px;">全部在线</span>
+    {{# } else if (d.num_online > 0) { }}
+        <span class="layui-badge layui-bg-orange" style="padding:4px 10px;">部分在线</span>
+    {{# } else if (d.num > 0) { }}
+        <span class="layui-badge layui-bg-red" style="padding:4px 10px;">全部离线</span>
+    {{# } else { }}
+        <span class="layui-badge layui-bg-gray" style="padding:4px 10px;">无节点</span>
+    {{# } }}
+</script>
+
+<script type="text/html" id="cmdTpl">
+    <a class="layui-btn layui-btn-xs layui-btn-normal" href="/{[.admin_path]}/clusters/cluster/boards?cluster_id={{d.id}}">
+        <i class="layui-icon layui-icon-template"></i> 看板
+    </a>
+    <a class="layui-btn layui-btn-xs layui-btn-primary" href="/{[.admin_path]}/clusters/cluster/settings?cluster_id={{d.id}}">
+        <i class="layui-icon layui-icon-set"></i> 设置
+    </a>
+</script>
+
+{[template "backend/common/footer.tmpl" .]}

@@ -1,0 +1,108 @@
+{[template "backend/common/header.tmpl" .]}
+
+<div class="layui-fluid">
+    <div class="layui-col-md12" style="padding: 5px;">
+        <div class="layui-card">
+            <div class="layui-card-body">
+
+                <div class="layui-tab layui-tab-brief">
+                    <ul class="layui-tab-title" id="status">
+                        {[range $menu := .submenu]}
+                            <li data-status="{[$menu.Number]}" {[if eq (print "/" $.admin_path "/" $menu.Link) $.CurrentPath]}class="layui-this"{[end]}><a href="/{[$.admin_path]}/{[$menu.Link]}?cluster_id={[$.cluster_id]}&node_id={[$.node_id]}"><i class="layui-icon {[$menu.Icon]}"></i> {[$menu.Name]}</a></li>
+                        {[end]}
+                    </ul>
+                </div>
+
+                <div class="cluster-boards" style="margin-top: 10px;">
+                    <!-- TCP端口状态 -->
+                    <div class="layui-card" style="margin-bottom: 15px;">
+                        <div class="layui-card-header">
+                            <div style="display: flex; align-items: center; justify-content: space-between;">
+                                <span>TCP端口状态 <i class="layui-icon layui-icon-refresh" style="cursor: pointer;"></i></span>
+                            </div>
+                        </div>
+                        <div class="layui-card-body">
+                            <div style="margin-bottom: 10px;">
+                                <span style="margin-right: 15px;"><span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background-color: #52c41a; margin-right: 5px;"></span>80</span>
+                                <span style="margin-right: 15px;"><span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background-color: #52c41a; margin-right: 5px;"></span>443</span>
+                                <span style="margin-right: 15px;"><span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background-color: #52c41a; margin-right: 5px;"></span>1234</span>
+                                <span style="margin-right: 15px;"><span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background-color: #52c41a; margin-right: 5px;"></span>1314</span>
+                                <span style="margin-right: 15px;"><span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background-color: #52c41a; margin-right: 5px;"></span>5860</span>
+                                <span style="margin-right: 15px;"><span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background-color: #52c41a; margin-right: 5px;"></span>8888</span>
+                                <span style="margin-right: 15px;"><span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background-color: #52c41a; margin-right: 5px;"></span>8899</span>
+                                <span style="margin-right: 15px;"><span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background-color: #52c41a; margin-right: 5px;"></span>9090</span>
+                            </div>
+                            <div style="padding: 10px; background-color: #f5f5f5; border-left: 4px solid #1890ff; margin-top: 10px;">
+                                <p style="margin: 0; font-size: 14px;">这些端口是当前节点上运行的网站所绑定的TCP端口；需要将这些端口在防火墙中设置为通过，网站才能正常访问。</p>
+                                <p style="margin: 5px 0 0 0; font-size: 14px;">显示的检测结果是通过当前管理系统发起的网络连接，<span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background-color: #52c41a; margin: 0 5px;"></span>表示检测成功，<span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background-color: #ff4d4f; margin: 0 5px;"></span>表示检测失败。</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 安装信息 -->
+                    <div class="layui-card">
+                        <div class="layui-card-header">
+                            安装信息
+                        </div>
+                        <div class="layui-card-body">
+                            <table class="layui-table" style="margin: 0;">
+                                <colgroup>
+                                    <col width="100">
+                                    <col width="300">
+                                    <col width="200">
+                                    <col>
+                                </colgroup>
+                                <tbody>
+                                    <tr>
+                                        <td>节点ID (id)</td>
+                                        <td>{[.Data.UniqueID]}</td>
+                                        <td>密钥 (secret)</td>
+                                        <td>{[.Data.Secret]}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>安装目录</td>
+                                        <td>使用集群设置</td>
+                                        <td>已安装</td>
+                                        <td>
+                                            {[if .Data.IsInstalled]}
+                                                <span style="color: #52c41a;">已安装</span>
+                                            {[else]}
+                                                <span style="color: #ff4d4f;">未安装</span>
+                                            {[end]}
+                                            <a href="#" style="color: #1890ff; margin-left: 10px;">[操作]</a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- end -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+layui.config({base: '/static/layuiadmin/'}).use(['table','jquery'], function(){
+///
+var admin = layui.admin
+,$ = layui.$
+,form = layui.form
+,table = layui.table;
+
+
+///
+});
+</script>
+
+
+<script type="text/html" id="cmdTpl">
+<a class="layui-btn layui-btn-xs" lay-event='edit' onclick="Admin.open('【{{d.username}}】'+'编辑','edit?id={{d.id}}',500,400)">详情</a>
+<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event='delete' onclick="Admin.del(this, 'delete','{{d.id}}')">设置</a>
+</script>
+
+{[template "backend/common/footer.tmpl" .]}

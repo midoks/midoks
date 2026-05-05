@@ -1,0 +1,223 @@
+/*layui-admin*/
+.layui-layout-admin .layui-side {
+    width: 168px;
+}
+
+.layadmin-side-shrink .layui-side {
+    left: 0;
+    width: 60px;
+}
+
+.layui-side-menu .layui-nav{
+    width: 168px;
+}
+
+.layui-side-menu .layui-side-scroll {
+    width: 168px;
+}
+
+.layui-layout-admin .layui-logo {
+    width: 168px;
+}
+.layui-layout-admin .layui-layout-left, .layadmin-pagetabs, .layui-layout-admin .layui-body, .layui-layout-admin .layui-footer {
+    left: 168px;
+}
+
+.layui-nav-tree .layui-nav-item>a .layui-nav-more {
+    padding: 0px;
+}
+
+.layadmin-side-spread-sm .layui-layout-admin .layui-layout-left, .layadmin-side-spread-sm .layadmin-pagetabs, .layadmin-side-spread-sm .layui-layout-admin .layui-body, .layadmin-side-spread-sm .layui-layout-admin .layui-footer {
+    left: 0px;
+    transform: translate3d(168px, 0, 0);
+    -webkit-transform: translate3d(168px, 0, 0);
+}
+
+@media screen and (max-width: 992px) {
+    .layui-layout-admin .layui-layout-left, .layadmin-pagetabs, .layui-layout-admin .layui-body, .layui-layout-admin .layui-footer {
+        left: 0;
+    }
+}
+
+.layui-tab-brief>.layui-tab-more li.layui-this:after, .layui-tab-brief>.layui-tab-title .layui-this:after {
+    border: none;
+    border-radius: 0;
+    border-bottom: 1px solid #16b777;
+}
+
+.no-thead .layui-table-view .layui-table-header{display:none;}
+/*layui-admin*/
+
+
+
+.steps{display:flex;align-items:center;gap:24px}
+.step{
+display:flex;align-items:center;gap:8px;color:#909399;
+flex: 1 1 0;
+}
+.steps .step:last-child{flex: none}
+.step .num{
+display:inline-flex;width:24px;height:24px;border-radius:50%;
+border:1px solid #c0c4cc;align-items:center;justify-content:center;
+font-size:12px;color:#606266;background:#fff
+}
+.step.active .num{border-color:#20a53a;color:#20a53a}
+.step .label{font-size:14px}
+.step .line{flex:2;height:2px;background:#e4e7ed;margin:0 12px}
+
+/* Layout */
+.ssh-select{padding:12px;}
+.ssh-search{height:40px;}
+.ssh-section-title{color:#64748b;font-size:16px;margin:16px 0 8px;}
+.ssh-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+
+/* Card */
+.ssh-card{border:1px solid #e5e7eb;border-radius:8px;padding:12px;background:#fff;cursor:pointer;transition:all .2s;}
+.ssh-card:hover{border-color:#d1d5db;background:#f8fafc;}
+.ssh-card .title{font-size:14px;color:#111827;margin-bottom:6px;}
+.ssh-card .title .meta{color:gray;font-size:12px;margin-left:6px;}
+.ssh-card .subtitle{font-size:12px;color:#374151;}
+
+/* Responsive */
+@media (max-width: 990px){ .ssh-grid{grid-template-columns:repeat(3,1fr);} }
+
+/*color*/
+span.green {
+    color: #21ba45;
+}
+
+.gray2{
+    color:rgb(107 114 128);
+}
+
+.setting_smail {
+    height: 30px;
+    line-height: 30px;
+    padding: 0 2px;
+    font-size: 10px;
+}
+
+.success{
+    border:1px solid #bbf7d0;
+    background:#ecfdf3;
+    color:#16a34a;
+    padding:10px 12px;
+    border-radius:6px;
+}
+
+.fail {
+    border:1px solid #fbd5d5;
+    background:#fee2e2;
+    color:#991b1b;
+    padding:10px 12px;
+    border-radius:6px;
+}
+/*color*/
+
+
+.line{
+    height:1px;
+    background:#e5e7eb;
+    margin:8px 12px;
+}
+
+.menu_list_left{
+}
+
+.menu_list_left .bg{
+    background:#fff;
+    border:1px solid #e5e7eb;
+    border-radius:12px;
+    padding:6px;
+}
+
+.menu_list_left a{
+    display:block;
+    padding:12px 16px;
+    font-size:13px;
+    color:#374151;
+    text-decoration:none;
+}
+
+.menu_list_left a.select{
+    display:block;
+    padding:12px 16px;
+    font-size:13px;
+    color:#1d4ed8;
+    text-decoration:none;
+}
+
+
+.h30, .h30 .layui-input {
+    height: 32px;
+}
+
+.layui-tab-content {
+    padding: 10px;
+}
+
+.mlink {
+    font-size: 12px;
+    color: #20a53a;
+    cursor: pointer;
+}
+
+.mlink:hover {
+    color: #20a53a;
+    cursor: pointer;
+}
+
+.bls{
+    border-left: 2px solid rgb(22, 183, 119);
+}
+
+.bls_hover{
+    padding: 7px;
+}
+
+.cluster-boards{
+    /*border: 1px solid rgb(238, 238, 238);*/
+    border-radius: 3px;
+    word-break: break-word;
+}
+
+/* 仅显示左侧高亮，不改变布局，避免影响其他元素 */
+.bls_hover{
+    position: relative;
+}
+.bls_hover::before{
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: rgb(22, 183, 119);
+    opacity: 0;
+}
+.bls_hover:hover::before{
+    opacity: 1;
+}
+
+.ccc_hover{
+    padding: 12px 16px;
+}
+/* 背景色变化不影响布局 */
+.ccc_hover:hover{
+    background: #f9fafb;
+}
+
+.hide {
+    display: none;
+}
+
+.show {
+}
+
+.pt5{
+    padding-top: 5px;
+}
+
+.table_more{
+    cursor: pointer;
+}

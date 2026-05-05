@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+    <title>{[if .setting_admin_ui]}{[.setting_admin_ui.GetAdminUIValue.SystemName]}{[else]}管理{[end]}</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <!-- <link rel="preload" href="/static/layuiadmin/layui/font/iconfont.woff2?v={[.version]}" as="font" type="font/woff2" crossorigin> -->
+    <link rel="stylesheet" href="/static/layuiadmin/layui/css/modules/laydate/default/laydate.css?v={[.version]}">
+    <link rel="stylesheet" href="/static/layuiadmin/layui/css/layui.css?v={[.version]}" media="all">
+    <link rel="stylesheet" href="/static/layuiadmin/style/template.css?v={[.version]}" media="all">
+    <link rel="stylesheet" href="/static/layuiadmin/style/admin.css?v={[.version]}" media="all">
+    <link rel="stylesheet" href="/static/common/css/common.css?v={[.version]}" media="all">
+    <script src="/static/layuiadmin/layui/layui.js?v={[.version]}"></script>
+    <script src="/static/common/js/jquery-1.10.2.min.js?v={[.version]}"></script>
+    <script src="/static/common/js/clipboard.min.js"></script>
+    <script src="/static/common/js/common.js?v={[.version]}"></script>
+    <script src="/static/common/js/xm-select.js?v={[.version]}"></script>
+    <script src="/static/common/js/tag.js?v={[.version]}"></script>
+    
+</head>
+
+<button style="display: none;" id="text_copy" class="text_copy" data-clipboard-text=""></button>

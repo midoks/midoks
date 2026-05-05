@@ -1,0 +1,142 @@
+{[template "backend/common/header_nonav.tmpl" .]}
+
+<div class="layui-fluid">
+    <div class="layui-col-md12" style="padding: 5px;">
+        <div class="layui-card">
+            <div class="layui-card-body">
+
+                <div class="layui-tab layui-tab-brief">
+                    <ul class="layui-tab-title" id="status">
+                        {[range $menu := .submenu]}
+                            <li data-status="{[$menu.Number]}" {[if eq (print "/" $.admin_path "/" $menu.Link) $.CurrentPath]}class="layui-this"{[end]}><a href="/{[$.admin_path]}/{[$menu.Link]}">{[$menu.Name]}</a></li>
+                        {[end]}
+                    </ul>
+                </div>
+
+                <div class="layui-form toolbar" style="margin-top: 10px;margin-bottom: 10px;">
+                <form class="layui-form layui-form-pane" onclick="return false;">
+                    <table class="layui-table">
+                        <colgroup><col width="150"><col></colgroup>
+                        <tbody>
+                            <tr>
+                                <td>名称 *</td>
+                                <td>
+                                    <div class="layui-input-inline">
+                                        <input type="text" name="name" autocomplete="off" class="layui-input" value="{[if .Data]}{[.Data.FullName]}{[end]}" placeholder="">
+                                    </div>
+                                    <p class="layui-font-12 pt5">为当前认证信息起一个容易识别的名称。</p>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td>认证方式 *</td>
+                                <td>
+                                    <div class="layui-input-inline">
+                                        <select name="method" lay-verify="required" lay-search lay-filter="method">
+                                            <option value="namepass">用户名+密码</option>
+                                            <option value="privatekey">私钥</option>
+                                        </select>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td>SSH用户名 *</td>
+                                <td>
+                                    <input type="text" name="username" autocomplete="off" class="layui-input" value="{[if .Data]}{[.Data.Username]}{[end]}" placeholder="">
+                                    <p class="layui-font-12 pt5">SSH登录用户名。</p>
+                                </td>
+                            </tr>
+
+                            <tr class="id_namepass bls">
+                                <td>SSH密码</td>
+                                <td>
+                                    <input type="password" name="password" autocomplete="off" class="layui-input" value="" placeholder="SSH密码">
+                                </td>
+                            </tr>
+
+                            <tr class="id_privatekey bls" style="display:none;">
+                                <td>RSA私钥 *</td>
+                                <td>
+
+                                    <textarea name="privatekey" class="layui-textarea" style="min-height:100px;" placeholder="填入RSA私钥内容或者拖动私钥文件到当前框中">{[if .Data]}{[.Data.Mark]}{[end]}</textarea>
+                                    <p class="layui-font-12 pt5">用来生成登录SSH公钥的私钥。<red>为了安全起见，此项数据保存后将不允许在界面查看完整明文，为避免忘记，请自行记录原始数据。</red></p>
+                                </td>
+                            </tr>
+
+                            <tr class="id_privatekey bls hide">
+                                <td>私钥密码</td>
+                                <td>
+                                    <input type="password" name="privatekey_pass" autocomplete="off" class="layui-input" value="" placeholder="">
+                                    <p class="layui-font-12 pt5">为私钥设置了密码（Passphrase）后需要填写。</p>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td colspan="2">
+                                    <a class="table_more mlink" target_class="more_table">
+                                        <cite>更多选项</cite>
+                                        <i class="layui-icon layui-icon-down layui-nav-more"></i>
+                                    </a>
+                                </td>
+                            </tr>
+
+                            <tr class="more_table hide" >
+                                <td>备注</td>
+                                <td><textarea id="editor2" name="mark" class="layui-textarea" style="min-height:100px;" placeholder="">{[if .Data]}{[.Data.Mark]}{[end]}</textarea></td>
+                            </tr>
+
+                            <tr>
+                                <td colspan="2" >
+                                    <input type="hidden" name="id" value="{[if .Data]}{[.Data.ID]}{[end]}">
+                                    <button class="layui-btn" lay-filter="submit_ssh" lay-submit>保存</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+layui.config({base: '/static/layuiadmin/'}).use(['table','jquery'], function(){
+///
+var admin = layui.admin
+,$ = layui.$
+,form = layui.form
+,table = layui.table;
+
+form.on('select(method)', function(data){
+    $('.id_namepass,.id_privatekey').hide();
+    if (data.value === 'namepass') {
+        $('.id_namepass').show();
+    } else if (data.value === 'privatekey') {
+        $('.id_privatekey').show();
+    }
+});
+
+form.on("submit(submit_ssh)", function(data){
+    var index = layer.load();
+    var field = data.field;
+
+    $.post("/{[$.admin_path]}/clusters/ssh/create", field, function(res) {
+        showMsg(res.msg, function(){
+            layer.close(index);
+            if(res.code > -1){
+                parent.location.reload();
+            }
+        },{icon: res.code > -1 ? 1 : 2,shift:res.code>-1 ? 0 : 6});
+    },'json');
+    return false;
+});
+
+
+///
+});
+</script>
+
+{[template "backend/common/footer.tmpl" .]}

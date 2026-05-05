@@ -1,0 +1,266 @@
+{[template "backend/common/header_head.tmpl" .]}
+
+
+<style type="text/css">
+.layui-form-item .layui-input-inline{
+    width: auto;
+    margin-left: 5px;
+}
+.type-input{
+    height:70px;
+    overflow-y: auto;
+}
+.type-input::-webkit-scrollbar {
+    /*滚动条整体样式*/
+    width : 10px;  /*高宽分别对应横竖滚动条的尺寸*/
+    height: 1px;
+}
+.type-input::-webkit-scrollbar-thumb {
+    /*滚动条里面小方块*/
+    border-radius: 10px;
+    box-shadow   : inset 0 0 5px rgba(0, 0, 0, 0.2);
+    background   : #666;
+}
+.type-input::-webkit-scrollbar-track {
+    /*滚动条里面轨道*/
+    box-shadow   : inset 0 0 5px rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    background   : #ededed;
+}
+.layui-form-radio{
+    margin: 0; 
+    padding-right: 0;
+}
+
+.layui-form-pane .layui-form-checkbox {
+    margin: 4px 0 4px 1px;
+}
+.layui-form-checkbox[lay-skin=primary] span {
+    padding-right: 4px;
+}
+.layui-form-checkbox[lay-skin=primary] i {
+    left: 6px;
+}
+.layui-form-item .layui-col-xs12{
+    margin-top: 10px;
+}
+@media screen and (max-width: 990px){
+    .layui-form-item .layui-col-xs12:first-child{
+        margin-top: 0px;
+    }
+    .layui-form-item{
+        margin-bottom: 10px; 
+    }
+}
+</style>
+<!-- start -->
+
+<div class="layui-fluid">
+
+    <div class="layui-form toolbar layui-padding-3" style="margin-top: 10px;margin-bottom: 10px;">
+    <form class="layui-form layui-form-pane" onclick="return false;">
+        <table class="layui-table">
+            <colgroup><col width="150"><col></colgroup>
+            <tbody>
+                <tr>
+                    <td>IP地址 *</td>
+                    <td>
+                        <div class="layui-input-inline">
+                            <input type="text" name="ip" autocomplete="off" class="layui-input" value="" placeholder="">
+                        </div>
+                        <p class="layui-font-12 pt5">支持单个IP、CIDR格式的一组IP（位数不能小于24）、IP范围（类似于x.x.x.x-x.x.x.x ，最多只取256个）等。</p>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>允许公开访问</td>
+                    <td>
+                        <input type="checkbox" name="can_access" checked> 
+                        <p class="layui-font-12 pt5">是否为可以公开访问的IP，如果选中表示当前IP可以被公开访问。</p>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td colspan="2">
+                        <a class="table_more mlink" target_class="more_table">
+                            <cite>更多选项</cite>
+                            <i class="layui-icon layui-icon-down layui-nav-more"></i>
+                        </a>
+                    </td>
+                </tr>
+
+                <tr class="more_table hide">
+                    <td>允许健康检查</td>
+                    <td>
+                        <input type="checkbox" name="can_health_check" checked> 
+                        <p class="layui-font-12 pt5">选中后，表示可以在集群的“健康检查”当中对当前IP进行健康检查。</p>
+                    </td>
+                </tr>
+
+                <tr class="more_table hide">
+                    <td>启用当前IP</td>
+                    <td>
+                        <input type="checkbox" name="is_on" checked> 
+                        <p class="layui-font-12 pt5">选中表示当前IP有效。</p>
+                    </td>
+                </tr>
+
+                <tr class="more_table hide">
+                    <td>备注</td>
+                    <td>
+                        <textarea id="editor2" name="description" class="layui-textarea" style="min-height:100px;" placeholder=""></textarea>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+
+        <div class="layui-form-item" style="text-align: center;">
+            <button class="layui-btn" lay-filter="select" lay-submit>保存</button>
+        </div>
+    </form>
+    </div>
+
+</div>
+
+
+<script type="text/javascript">
+
+layui.config({base: '/static/layuiadmin/'}).use(['table','jquery'], function(){
+///
+var admin = layui.admin
+,$ = layui.$
+,form = layui.form
+,table = layui.table;
+
+var editData = null;
+
+// 如果是编辑模式，从父页面读取数据填充表单
+if (parent && parent._tempOpenData) {
+    editData = parent._tempOpenData;
+    // 清理临时数据
+    delete parent._tempOpenData;
+
+    // 填充表单
+    $('input[name="ip"]').val(editData.ip || '');
+    
+    if (editData.can_access == 1) {
+        $('input[name="can_access"]').prop('checked', true);
+    }
+    if (editData.can_health_check == 1) {
+        $('input[name="can_health_check"]').prop('checked', true);
+    }
+    if (editData.is_on == 1) {
+        $('input[name="is_on"]').prop('checked', true);
+    }
+    $('textarea[name="description"]').val(editData.description || '');
+    
+    // 重新渲染表单
+    form.render();
+}
+
+//监听全局表单提交
+form.on('submit(select)', function(data){
+    var field = data.field;
+    
+
+    if (field['can_access'] == "on"){
+        field['can_access'] = true;
+    } else {
+        field['can_access'] = false;
+    }
+
+    if (field['can_health_check'] == "on"){
+        field['can_health_check'] = true;
+    } else {
+        field['can_health_check'] = false;
+    }
+
+    if (field['is_on'] == "on"){
+        field['is_on'] = true;
+    } else {
+        field['is_on'] = false;
+    }
+
+    console.log(field);
+
+    var val = $('input[name=ip]').val();
+    if (val && parent && parent.$) {
+
+        var ip_addr_data = parent.$('input[name="ip_addresses_json"]').val();
+        var ip_array = [];
+        
+        if (ip_addr_data) {
+            try {
+                ip_array = JSON.parse(ip_addr_data);
+                if (!Array.isArray(ip_array)) {
+                    ip_array = [];
+                }
+            } catch (e) {
+                console.log(e);
+            }
+        }
+
+        if (editData) {
+            // 编辑模式：更新现有记录
+            for (var i = 0; i < ip_array.length; i++) {
+                if (ip_array[i].ip == editData.ip) {
+                    ip_array[i] = field;
+                    break;
+                }
+            }
+        } else {
+            // 新增模式：添加新记录
+            var is_has = false;
+            for (var i = 0; i < ip_array.length; i++) {
+                if (ip_array[i].ip == field["ip"]){
+                    is_has = true;
+                }
+            }
+
+            if (!is_has){
+                ip_array.push(field);
+            }
+        }
+
+        // 重新渲染 IP 列表
+        parent.$('#ip_btn').empty();
+        for (var i = 0; i < ip_array.length; i++) {
+            var ipItem = ip_array[i];
+            
+            var content = '<div class="layui-btn-group" style="margin-bottom:6px;">';
+            content += '<button type="button" class="layui-btn layui-btn-sm layui-btn-primary" style="border-right-width:0;">';
+            content += '<i class="layui-icon layui-icon-ip" style="font-size:12px;margin-right:4px;"></i>';
+            content += '<span style="font-family:monospace;font-size:13px;">'+ ipItem.ip +'</span>';
+            content += '</button>';
+            content += '<button type="button" class="layui-btn layui-btn-sm layui-btn-warm edit" data-ip=\''+ JSON.stringify(ipItem) +'\' title="编辑" style="border-right-width:0;">';
+            content += '<i class="layui-icon layui-icon-edit" style="font-size:12px;"></i>';
+            content += '</button>';
+            content += '<button type="button" class="layui-btn layui-btn-sm layui-btn-danger remove" title="删除">';
+            content += '<i class="layui-icon layui-icon-close" style="font-size:12px;"></i>';
+            content += '</button>';
+            content += '</div>';
+            parent.$('#ip_btn').append(content);
+        }
+        
+        // 重新绑定编辑按钮事件
+        parent.window.loadIpBtn();
+
+        // 保存数据
+        var data = JSON.stringify(ip_array);
+        parent.$('input[name="ip_addresses_json"]').val(data);
+
+        parent.window.loadIpBtn();
+        var idx = parent.layer.getFrameIndex(window.name);
+        parent.layer.close(idx);
+    }
+    return false;
+});
+
+
+
+///
+});
+</script>
+
+{[template "backend/common/footer.tmpl" .]}

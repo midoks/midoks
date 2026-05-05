@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>批量检测 - AIProbe</title>
+    <link rel="stylesheet" href="/static/layuiadmin/layui/css/layui.css">
+    <link rel="stylesheet" href="/static/common/css/common.css">
+    <style>
+        .tool-container { max-width: 1100px; margin: 0 auto; padding: 20px; }
+        .tool-header { text-align: center; margin-bottom: 30px; }
+        .tool-header h1 { font-size: 28px; color: #333; margin-bottom: 10px; }
+        .tool-header p { color: #666; }
+        .tool-form { background: #fff; padding: 25px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 500; color: #333; }
+        .form-group textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; resize: vertical; font-family: monospace; }
+        .tool-options { display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 20px; }
+        .tool-options label { display: flex; align-items: center; gap: 5px; cursor: pointer; }
+        .btn-primary { background: #1890ff; color: #fff; padding: 12px 30px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; margin-right: 10px; }
+        .btn-primary:hover { background: #40a9ff; }
+        .btn-primary:disabled { background: #ccc; cursor: not-allowed; }
+        .result-table { margin-top: 20px; width: 100%; border-collapse: collapse; }
+        .result-table th, .result-table td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+        .result-table th { background: #f5f5f5; font-weight: 500; }
+        .result-table tr:hover { background: #fafafa; }
+        .status-ok { color: #52c41a; }
+        .status-fail { color: #f5222d; }
+        .nav-tools { background: #fff; padding: 15px 0; border-bottom: 1px solid #e8e8e8; margin-bottom: 20px; }
+        .nav-tools ul { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; }
+        .nav-tools li a { display: block; padding: 8px 20px; color: #666; text-decoration: none; border-radius: 4px; transition: all 0.3s; }
+        .nav-tools li a:hover, .nav-tools li a.active { background: #1890ff; color: #fff; }
+    </style>
+</head>
+<body>
+    <div class="nav-tools">
+        <ul>
+            <li><a href="/frontend/ping">在线Ping</a></li>
+            <li><a href="/frontend/tcping">在线Tcping</a></li>
+            <li><a href="/frontend/speedtest">网站测速</a></li>
+            <li><a href="/frontend/traceroute">路由追踪</a></li>
+            <li><a href="/frontend/dns">DNS查询</a></li>
+            <li><a href="/frontend/findping">FindPing</a></li>
+            <li><a href="/frontend/network">本地网络</a></li>
+            <li><a href="/frontend/batch" class="active">批量检测</a></li>
+            <li><a href="/frontend/help">帮助支持</a></li>
+            <li><a href="/frontend/settings">习惯设置</a></li>
+        </ul>
+    </div>
+
+    <div class="tool-container">
+        <div class="tool-header">
+            <h1>批量检测工具</h1>
+            <p>批量检测多个主机的Ping、Tcping、DNS等状态</p>
+        </div>
+
+        <div class="tool-form">
+            <div class="form-group">
+                <label for="hosts">请输入主机列表（每行一个，格式: IP:端口）</label>
+                <textarea id="hosts" name="hosts" rows="6" placeholder="例如:&#10;baidu.com:80&#10;8.8.8.8:53&#10;google.com:443"></textarea>
+            </div>
+
+            <div class="tool-options">
+                <label><input type="checkbox" id="optPing" checked> Ping</label>
+                <label><input type="checkbox" id="optTcping" checked> Tcping</label>
+                <label><input type="checkbox" id="optDns"> DNS查询</label>
+                <label><input type="checkbox" id="optHttp"> HTTP检测</label>
+            </div>
+
+            <div>
+                <button id="btnBatch" class="btn-primary" onclick="doBatchCheck()">开始检测</button>
+                <button class="btn-primary" style="background:#999;" onclick="stopBatch()">停止</button>
+            </div>
+
+            <table class="result-table" id="resultTable" style="display:none;">
+                <thead>
+                    <tr>
+                        <th>主机</th>
+                        <th>Ping</th>
+                        <th>Tcping</th>
+                        <th>DNS</th>
+                        <th>HTTP</th>
+                    </tr>
+                </thead>
+                <tbody id="resultBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="/static/common/js/jquery-1.10.2.min.js"></script>
+    <script src="/static/layuiadmin/layui/layui.js"></script>
+    <script>
+    var batchInterval = null;
+
+    function doBatchCheck() {
+        var hosts = $('#hosts').val().trim();
+        if (!hosts) {
+            layer.msg('请输入主机列表', {icon: 2});
+            return;
+        }
+
+        var options = {
+            ping: $('#optPing').is(':checked'),
+            tcping: $('#optTcping').is(':checked'),
+            dns: $('#optDns').is(':checked'),
+            http: $('#optHttp').is(':checked')
+        };
+
+        $('#resultBody').html('<tr><td colspan="5">正在检测...</td></tr>');
+        $('#resultTable').show();
+        $('#btnBatch').prop('disabled', true);
+
+        $.ajax({
+            url: '/api/frontend/batch',
+            type: 'POST',
+            data: {hosts: hosts, options: JSON.stringify(options)},
+            dataType: 'json',
+            success: function(res) {
+                $('#btnBatch').prop('disabled', false);
+                if (res.code === 0) {
+                    var html = '';
+                    res.data.forEach(function(item) {
+                        html += '<tr>';
+                        html += '<td>' + item.host + '</td>';
+                        html += '<td class="' + (item.ping_ok ? 'status-ok' : 'status-fail') + '">' + (item.ping || '-') + '</td>';
+                        html += '<td class="' + (item.tcping_ok ? 'status-ok' : 'status-fail') + '">' + (item.tcping || '-') + '</td>';
+                        html += '<td>' + (item.dns || '-') + '</td>';
+                        html += '<td class="' + (item.http_ok ? 'status-ok' : 'status-fail') + '">' + (item.http || '-') + '</td>';
+                        html += '</tr>';
+                    });
+                    $('#resultBody').html(html);
+                } else {
+                    $('#resultBody').html('<tr><td colspan="5">错误: ' + res.msg + '</td></tr>');
+                }
+            },
+            error: function() {
+                $('#resultBody').html('<tr><td colspan="5">请求失败</td></tr>');
+                $('#btnBatch').prop('disabled', false);
+            }
+        });
+    }
+
+    function stopBatch() {
+        if (batchInterval) {
+            clearInterval(batchInterval);
+            batchInterval = null;
+        }
+        $('#btnBatch').prop('disabled', false);
+    }
+
+    layui.use('layer', function(){
+        window.layer = layui.layer;
+    });
+    </script>
+</body>
+</html>

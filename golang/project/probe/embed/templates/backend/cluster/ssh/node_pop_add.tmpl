@@ -1,0 +1,162 @@
+{[template "backend/common/header_head.tmpl" .]}
+
+<style type="text/css">
+.layui-form-item .layui-input-inline{
+    width: auto;
+    margin-left: 5px;
+}
+.type-input{
+    height:70px;
+    overflow-y: auto;
+}
+.type-input::-webkit-scrollbar {
+    /*滚动条整体样式*/
+    width : 10px;  /*高宽分别对应横竖滚动条的尺寸*/
+    height: 1px;
+}
+.type-input::-webkit-scrollbar-thumb {
+    /*滚动条里面小方块*/
+    border-radius: 10px;
+    box-shadow   : inset 0 0 5px rgba(0, 0, 0, 0.2);
+    background   : #666;
+}
+.type-input::-webkit-scrollbar-track {
+    /*滚动条里面轨道*/
+    box-shadow   : inset 0 0 5px rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    background   : #ededed;
+}
+.layui-form-radio{
+    margin: 0; 
+    padding-right: 0;
+}
+
+.layui-form-pane .layui-form-checkbox {
+    margin: 4px 0 4px 1px;
+}
+.layui-form-checkbox[lay-skin=primary] span {
+    padding-right: 4px;
+}
+.layui-form-checkbox[lay-skin=primary] i {
+    left: 6px;
+}
+.layui-form-item .layui-col-xs12{
+    margin-top: 10px;
+}
+@media screen and (max-width: 990px){
+    .layui-form-item .layui-col-xs12:first-child{
+        margin-top: 0px;
+    }
+    .layui-form-item{
+        margin-bottom: 10px; 
+    }
+}
+</style>
+<!-- start -->
+
+<div class="layui-fluid">
+
+    <div class="layui-form toolbar layui-padding-3">
+    <form class="layui-form layui-form-pane" onclick="return false;">
+        <table class="layui-table">
+            <colgroup><col width="150"><col></colgroup>
+            <tbody>
+                <tr>
+                    <td>SSH主机地址 *</td>
+                    <td>
+                        <div class="layui-input-inline">
+                            <input type="text" name="host" autocomplete="off" class="layui-input" value="{[if .Data]}{[.Data.GetParams.Host]}{[end]}" placeholder="">
+                        </div>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>SSH主机端口 *</td>
+                    <td>
+                        <div class="layui-input-inline">
+                            <input type="number" name="port" autocomplete="off" class="layui-input" value="{[if .Data]}{[.Data.GetParams.Port]}{[end]}" placeholder="">
+                        </div>
+                        <p class="layui-font-12 pt5">比如22。</p>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>SSH登录认证</td><td>
+                    <div class="ssh">
+                        <span class="ssh_btn">
+                            {[if .SshData]}
+                                <div>
+                                    <input type="hidden" name="ssh_id" value="{[.SshData.ID]}">
+                                    <span class="layui-btn layui-btn-primary layui-btn-sm" style="margin-right:8px;">
+                                        <span style='font-size:14px;'>{[.SshData.Name]}</span>
+                                        <span class='gray2 setting_smail'>
+                                            {[if eq .SshData.Method "namepass"]}(用户名+密码){[else]}
+                                            {[if eq .SshData.Method "privatekey"]}(私钥}{[end]}
+                                            {[end]}
+                                        </span>
+                                        <span class='gray2 setting_smail'>({[.SshData.Username]})</span>
+                                        <a class="edit" onclick="Admin.open('修改认证','/{[$.admin_path]}/clusters/ssh/add?ssh_id={[.SshData.ID]}',700,550)" style="cursor:pointer;"><i class="layui-icon layui-icon-edit"></i></a>
+                                        <a class="remove" style="cursor:pointer;"><i class="layui-icon layui-icon-close"></i></a>
+                                    </span>
+                                </div>
+                            {[end]}
+                        </span>
+                        <span class="ssh_origin" {[if .SshData]}style="display:none;"{[end]}>
+                            <a class="mlink" onclick="Admin.open('选择已用认证','/{[$.admin_path]}/clusters/select/ssh',700,500)">[选择已用认证]</a>
+                            <a class="mlink" onclick="Admin.open('添加新认证','/{[$.admin_path]}/clusters/ssh/add',700,500)">[添加新认证]</a>
+                        </span>
+                    <div>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td colspan="2" >
+                        <input type="hidden" name="node_id" value="{[if .node_id]}{[.node_id]}{[end]}">
+                        <button class="layui-btn" lay-filter="submit_setting_ssh" lay-submit>保存</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </form>
+    </div>
+
+</div>
+
+<script type="text/javascript">
+
+layui.config({base: '/static/layuiadmin/'}).use(['table','jquery'], function(){
+///
+var admin = layui.admin
+,$ = layui.$
+,form = layui.form
+,table = layui.table;
+
+window.loadSshBtn = function(){
+    $('.ssh_btn .remove').bind('click',function(){
+        $(this).parent().parent().remove();
+        $('.ssh_origin').show();
+    });
+}
+
+window.loadSshBtn();
+
+form.on("submit(submit_setting_ssh)", function(data){
+    var index = layer.load();
+    var field = data.field;
+
+    $.post("/{[$.admin_path]}/clusters/node_login/add", field, function(res) {
+        showMsg(res.msg, function(){
+            layer.close(index);
+            if(res.code > -1){
+                parent.location.reload();
+            }
+        },{icon: res.code > -1 ? 1 : 2,shift:res.code>-1 ? 0 : 6});
+    },'json');
+    return false;
+});
+
+///
+});
+</script>
+
+{[template "backend/common/footer.tmpl" .]}

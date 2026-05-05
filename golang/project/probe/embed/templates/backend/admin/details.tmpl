@@ -1,0 +1,102 @@
+{[template "backend/common/header_nonav.tmpl" .]}
+
+<div class="layui-fluid">
+
+
+    <div class="layui-col-md12" style="padding: 5px;">
+        <div class="layui-card">
+            <div class="layui-card-body">
+
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom: 1rem;">
+                    <a href="/{[.admin_path]}/admin/index" style="display:flex;align-items:center;">
+                        <i class="layui-icon layui-icon-return"></i>  
+                    </a>
+
+                    <span style="margin:0;font-size:18px;">
+                        {[if .Data]}{[.Data.FullName]} ({[.Data.Username]}){[end]}
+                    </span>
+                </div>
+
+                <div class="layui-tab layui-tab-brief">
+                    <ul class="layui-tab-title" id="status">
+                        <li data-status="1" class="layui-this">概览</li>
+                        <li data-status="2"><a href="/{[.admin_path]}/admin/update?id={[.id]}">修改</a></li>
+                        <li data-status="3"><a href="/{[.admin_path]}/admin/api?id={[.id]}">API</a></li>
+                    </ul>
+                </div>
+
+                <div class="cluster-boards bls_hover" style="margin-top: 10px;">
+                    <div class="layui-row layui-col-space10">
+                        <div class="layui-col-xs12 layui-col-sm4 layui-col-md3">
+                            <div class="ccc_hover">
+                                <div style="color: rgb(100, 116, 139); font-size: 14px; margin-bottom: 6px;">全名</div>
+                                <div style="font-size: 12px; color: #333;">{[if .Data]}{[.Data.FullName]}{[end]}</div>
+                            </div>
+                        </div>
+                        <div class="layui-col-xs12 layui-col-sm4 layui-col-md3">
+                            <div class="ccc_hover">
+                                <div style="color: rgb(100, 116, 139); font-size: 14px; margin-bottom: 6px;">状态</div>
+                                <div style="font-size: 12px;">
+                                    {[if .Data]}
+                                        {[if .Data.Status]}<span style="color:#16b777;">已启用</span>
+                                        {[else]}<span style="color:#e2e2e2;">已停用</span>
+                                        {[end]}
+                                    {[end]}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="layui-col-xs12 layui-col-sm4 layui-col-md3">
+                            <div class="ccc_hover">
+                                <div style="color: rgb(100, 116, 139); font-size: 14px; margin-bottom: 6px;">登录用户名</div>
+                                <div style="font-size: 12px;">
+                                    {[if .Data]}{[.Data.Username]}{[end]}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="layui-col-xs12 layui-col-sm4 layui-col-md3">
+                            <div class="ccc_hover">
+                                <div style="color: rgb(100, 116, 139); font-size: 14px; margin-bottom: 6px;">允许登录</div>
+                                <div style="font-size: 12px;">
+                                    {[if .Data]}
+                                        {[if .Data.AllowLogin]}<span style="color:#16b777;">Y</span>
+                                        {[else]}<span style="color:#e2e2e2;">N</span>
+                                        {[end]}
+                                    {[end]}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="layui-col-xs12 layui-col-sm4 layui-col-md3">
+                            <div class="ccc_hover">
+                                <div style="color: rgb(100, 116, 139); font-size: 14px; margin-bottom: 6px;;">超级管理员</div>
+                                <div style="font-size: 12px;">
+                                    {[if .Data]}
+                                        {[if .Data.SuperAdmin]}<span style="color:#16b777;">Y</span>
+                                        {[else]}<span style="color:#e2e2e2;">N</span>
+                                        {[end]}
+                                    {[end]}
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- ... -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+layui.config({base: '/static/layuiadmin/'}).use(['table','jquery'], function(){
+///
+var admin = layui.admin
+,$ = layui.$
+,form = layui.form
+,table = layui.table;
+
+///
+});
+</script>
+
+{[template "backend/common/footer.tmpl" .]}

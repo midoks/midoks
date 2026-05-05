@@ -1,0 +1,96 @@
+{[template "backend/common/header_nonav.tmpl" .]}
+
+<div class="layui-fluid">
+    <div class="layui-col-md12" style="padding: 5px;">
+        <div class="layui-card">
+            <div class="layui-card-body">
+
+                <div class="layui-tab layui-tab-brief">
+                    <ul class="layui-tab-title" id="status">
+                        {[range $menu := .submenu]}
+                            <li data-status="{[$menu.Number]}" {[if eq (print "/" $.admin_path "/" $menu.Link) $.CurrentPath]}class="layui-this"{[end]}><a href="/{[$.admin_path]}/{[$menu.Link]}">{[$menu.Name]}</a></li>
+                        {[end]}
+                    </ul>
+                </div>
+
+                <div class="layui-form toolbar" style="margin-top: 10px;margin-bottom: 10px;">
+                <form class="layui-form" action="" id="admin_form" onclick="return false;">
+
+                    <div class="layui-inline mr0">
+                        <div class="layui-input-inline mr0">
+                            <input type="text" name="key" placeholder="用户名、全名 ..." autocomplete="off" class="layui-input h30" value="">
+                        </div>
+                    </div>
+                
+
+                    <div class="layui-inline mr0">
+                        <button class="layui-btn layui-btn-sm" id="table-sreach" data-id="list" lay-submit lay-filter="table-sreach"><i class="layui-icon">&#xe615;</i>搜索
+                        </button>
+                    </div>
+                </form>
+                </div>
+
+                <div id="list"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+layui.config({base: '/static/layuiadmin/'}).use(['table','jquery'], function(){
+///
+var admin = layui.admin
+,$ = layui.$
+,form = layui.form
+,table = layui.table;
+
+
+table.render({
+    elem: '#list',
+    url: '/{[.admin_path]}/clusters/ssh/list',
+    title: '数据表',
+    cols: [[
+        {field:'name', title:'名称', toolbar: '#nameTpl',},
+        {field:'method', title:'类型', toolbar: '#methodTpl'},
+        {field:'username', title:'用户名'},
+        {field:'username', title:'集群数'},
+        {field:'username', title:'节点数'},
+        {title:'操作', toolbar: '#cmdTpl', width:120, fixed: 'right'}
+     ]],
+    page: true
+});
+
+
+table.on('tool(list)', function(obj){
+    switch(obj.event){
+    };
+});
+
+table.on('toolbar', function(obj){
+    switch(obj.event){
+    };
+});
+
+
+///
+});
+</script>
+
+<script type="text/html" id="nameTpl">
+    <a class="mlink" href="/{[.admin_path]}/clusters/ssh/details?ssh_id={{d.id}}">{{d.name}}</a>
+</script>
+
+<script type="text/html" id="methodTpl">
+{{# if (d.method == "namepass"){ }}用户名+密码
+{{# } else if (d.method == "privatekey") { }}私钥
+{{# } else { }}未知
+{{# } }}
+</script>
+
+<script type="text/html" id="cmdTpl">
+<a class="layui-btn layui-btn-xs" href="/{[.admin_path]}/clusters/ssh/details?ssh_id={{d.id}}">详情</a>
+<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event='delete' onclick="Admin.del(this, 'delete','{{d.id}}')">删除</a>
+</script>
+
+{[template "backend/common/footer.tmpl" .]}

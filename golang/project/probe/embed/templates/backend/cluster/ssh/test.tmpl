@@ -1,0 +1,124 @@
+{[template "backend/common/header_nonav.tmpl" .]}
+
+<div class="layui-fluid">
+    <div class="layui-col-md12" style="padding: 5px;">
+        <div class="layui-card">
+            <div class="layui-card-body">
+
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom: 1rem;">
+                    <a href="/{[.admin_path]}/clusters/ssh" style="display:flex;align-items:center;">
+                        <i class="layui-icon layui-icon-return"></i>  
+                    </a>
+                    <span style="margin:0;font-size:18px;">
+                        {[if .Data]}{[.Data.Name]}{[end]}
+                    </span>
+                </div>
+
+
+                <div class="layui-tab layui-tab-brief">
+                    <ul class="layui-tab-title" id="status">
+                        <li data-status="1"><a href="/{[.admin_path]}/clusters/ssh/details?ssh_id={[.ssh_id]}">概览</a></li>
+                        <li data-status="2"><a href="/{[.admin_path]}/clusters/ssh/update?ssh_id={[.ssh_id]}">修改</a></li>
+                        <li data-status="3" class="layui-this">测试</li>
+                    </ul>
+                </div>
+
+                <div class="layui-form toolbar" style="margin-top: 10px;margin-bottom: 10px;">
+                <form class="layui-form layui-form-pane" onclick="return false;">
+                    <table class="layui-table">
+                        <colgroup><col width="150"><col></colgroup>
+                        <tbody>
+
+                            <tr>
+                                <td>节点主机地址 *</td>
+                                <td>
+                                    <input type="text" name="node_ip" autocomplete="off" class="layui-input" value="" placeholder="">
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td>节点主机端口 *</td>
+                                <td>
+                                    <input type="text" name="node_port" autocomplete="off" class="layui-input" value="" placeholder="">
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td>认证方式</td>
+                                <td>
+                                    {[if .Data]}
+                                        {[if eq .Data.Method "namepass" ]}用户名+密码{[end]}
+                                        {[if eq .Data.Method "privatekey" ]}私钥{[end]}
+                                    {[end]}
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td>SSH用户名</td>
+                                <td>{[if .Data]}{[.Data.Username]}{[end]}</td>
+                            </tr>
+
+                            {[if .Data]}
+                                {[if eq .Data.Method "namepass" ]}
+                                <tr class="id_namepass bls">
+                                    <td>SSH密码</td>
+                                    <td>
+                                        <input type="password" name="password" autocomplete="off" class="layui-input" value="{[if .Data]}{[.Data.Password]}{[end]}" placeholder="SSH密码">
+                                    </td>
+                                </tr>
+                                {[end]}
+                                {[if eq .Data.Method "privatekey" ]}
+                                <tr class="id_privatekey bls">
+                                    <td>RSA私钥 *</td>
+                                    <td>
+                                        <textarea name="privatekey" class="layui-textarea" readonly="readonly" style="min-height:100px;" placeholder="">{[if .Data]}{[.Data.Privatekey]}{[end]}</textarea>
+                                    </td>
+                                </tr>
+                                {[end]}
+                            {[end]}
+
+                            <tr>
+                                <td colspan="2" >
+                                    <input type="hidden" name="id" value="{[if .Data]}{[.Data.ID]}{[end]}">
+                                    <button class="layui-btn" lay-filter="submit_ssh" lay-submit>提交测试</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+layui.config({base: '/static/layuiadmin/'}).use(['table','jquery'], function(){
+///
+var admin = layui.admin
+,$ = layui.$
+,form = layui.form
+,table = layui.table;
+
+
+form.on("submit(submit_ssh)", function(data){
+    var index = layer.load();
+    var field = data.field;
+
+    $.post("/{[$.admin_path]}/clusters/ssh/test", field, function(res) {
+        showMsg(res.msg, function(){
+            layer.close(index);
+            if(res.code > -1){
+                parent.location.reload();
+            }
+        },{icon: res.code > -1 ? 1 : 2,shift:res.code>-1 ? 0 : 6});
+    },'json');
+    return false;
+});
+
+///
+});
+</script>
+
+{[template "backend/common/footer.tmpl" .]}

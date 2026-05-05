@@ -1,0 +1,127 @@
+{[template "backend/common/header_head.tmpl" .]}
+
+
+<style type="text/css">
+.layui-form-item .layui-input-inline{
+    width: auto;
+    margin-left: 5px;
+}
+.type-input{
+    height:70px;
+    overflow-y: auto;
+}
+.type-input::-webkit-scrollbar {
+    /*滚动条整体样式*/
+    width : 10px;  /*高宽分别对应横竖滚动条的尺寸*/
+    height: 1px;
+}
+.type-input::-webkit-scrollbar-thumb {
+    /*滚动条里面小方块*/
+    border-radius: 10px;
+    box-shadow   : inset 0 0 5px rgba(0, 0, 0, 0.2);
+    background   : #666;
+}
+.type-input::-webkit-scrollbar-track {
+    /*滚动条里面轨道*/
+    box-shadow   : inset 0 0 5px rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    background   : #ededed;
+}
+.layui-form-radio{
+    margin: 0; 
+    padding-right: 0;
+}
+
+.layui-form-pane .layui-form-checkbox {
+    margin: 4px 0 4px 1px;
+}
+.layui-form-checkbox[lay-skin=primary] span {
+    padding-right: 4px;
+}
+.layui-form-checkbox[lay-skin=primary] i {
+    left: 6px;
+}
+.layui-form-item .layui-col-xs12{
+    margin-top: 10px;
+}
+@media screen and (max-width: 990px){
+    .layui-form-item .layui-col-xs12:first-child{
+        margin-top: 0px;
+    }
+    .layui-form-item{
+        margin-bottom: 10px; 
+    }
+}
+
+</style>
+<!-- start -->
+
+<div class="layui-fluid">
+
+    <div class="layui-form toolbar layui-padding-3" style="margin-top: 10px;margin-bottom: 10px;">
+    <form class="layui-form layui-form-pane" onclick="return false;">
+        <table class="layui-table">
+            <colgroup><col width="150"><col></colgroup>
+            <tbody>
+                <tr>
+                    <td>选择分组</td>
+                    <td>
+                        <div id="select_btn">
+                            {[range $g_data := .groups_list]}
+                                <button data_id="{[$g_data.ID]}" type="button" class="layui-btn layui-btn-primary layui-btn-xs layui-border">{[$g_data.Name]}</button>
+                            {[end]}
+                        </div>
+                        <p style="margin-top: .5rem;margin-bottom: .5rem;">点击可已选中要使用的分组。</p>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+
+        <div class="layui-form-item" style="text-align: center;">
+            <button class="layui-btn" lay-filter="select" lay-submit>确定</button>
+        </div>
+    </form>
+    </div>
+
+</div>
+
+
+
+<script type="text/javascript">
+
+layui.config({base: '/static/layuiadmin/'}).use(['table','jquery'], function(){
+///
+var admin = layui.admin
+,$ = layui.$
+,form = layui.form
+,table = layui.table;
+
+$('#select_btn button').click(function(){
+    $('#select_btn button').removeClass("layui-border-green");
+    $(this).addClass("layui-border-green");
+});
+
+
+//监听全局表单提交
+form.on('submit(select)', function(data){
+    var val = $('#select_btn .layui-border-green').text();
+
+    if (val && parent && parent.$) {
+        parent.$('#groups_btn').html('<div><span id="group_selected" class="layui-btn layui-btn-primary layui-btn-sm" style="margin-right:8px;">'+ val +'<a  class="remove" style="padding-left:3px;cursor:pointer;">X</a></span></div>');
+
+        parent.$('#groups_origin').hide();
+        parent.window.loadGroupBtn();
+        var idx = parent.layer.getFrameIndex(window.name);
+        parent.layer.close(idx);
+    }
+    return false;
+});
+
+
+
+///
+});
+</script>
+
+{[template "backend/common/footer.tmpl" .]}

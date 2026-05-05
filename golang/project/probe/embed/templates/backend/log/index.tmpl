@@ -1,0 +1,149 @@
+{[template "backend/common/header_nonav.tmpl" .]}
+
+<div class="layui-fluid">
+    <div class="layui-col-md12" style="padding: 5px;">
+        <div class="layui-card">
+            <div class="layui-card-body">
+
+                <div class="layui-tab layui-tab-brief">
+                    <ul class="layui-tab-title" id="status">
+                        {[range $menu := .submenu]}
+                            <li data-status="{[$menu.Number]}" {[if eq (print "/" $.admin_path "/" $menu.Link) $.CurrentPath]}class="layui-this"{[end]}><a href="/{[$.admin_path]}/{[$menu.Link]}">{[$menu.Name]}</a></li>
+                        {[end]}
+                    </ul>
+                </div>
+
+                <div class="layui-form toolbar" style="margin-top: 10px;margin-bottom: 10px;">
+                <form class="layui-form" action="" id="log_form" onclick="return false;">
+
+                    <div class="layui-inline mr0">
+                        <div class="layui-input-inline mr0">
+                            <input name="times" id="date_range" class="layui-input date-icon" type="text" placeholder="请选择日期范围" autocomplete="off">
+                        </div>
+                    </div>
+
+                    <div class="layui-inline mr0">
+                        <div class="layui-input-inline mr0">
+                            <input type="text" name="key" placeholder="请输入关键字" autocomplete="off" class="layui-input" value="">
+                        </div>
+                    </div>
+
+                    <div class="layui-inline mr0">
+                        <div class="layui-input-inline mr0">
+                            <select name="level" id="level" class="layui-input h30">
+                                <option value="">级别</option>
+                                <option value="INFO">INFO</option>
+                                <option value="WARN">WARN</option>
+                                <option value="ERROR">ERROR</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="layui-inline mr0">
+                        <div class="layui-input-inline mr0">
+                            <select name="user_type" id="user_type" class="layui-input h30">
+                                <option value="">用户类型</option>
+                                <option value="user">用户</option>
+                                <option value="system">系统</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="layui-inline mr0">
+                        <button class="layui-btn layui-btn-sm" id="table-sreach" data-id="list" lay-submit lay-filter="table-sreach"><i class="layui-icon">&#xe615;</i>查询
+                        </button>
+                    </div>
+                </form>
+                </div>
+                <div id="list"></div>
+                <div id="pager" style="text-align:center;margin-top: 10px;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+layui.config({base: '/static/layuiadmin/'}).use(['jquery','form','laydate','laypage'], function(){
+///
+var $ = layui.$
+,form = layui.form
+,laydate = layui.laydate
+,laypage = layui.laypage;
+
+// date range
+laydate.render({
+    elem: '#date_range',
+    range: true
+});
+
+function renderItems(arr){
+    var html = '';
+    if (!arr || arr.length === 0){
+        html = '<div class="layui-text" style="color:#999;text-align:center;padding:20px;">暂无数据</div>';
+        $('#list').html(html);
+        return;
+    }
+    for (var i=0;i<arr.length;i++){
+        var d = arr[i] || {};
+        var time = d.create_time || d.CreateTime || d.time || '';
+        var ip = d.ip || '-';
+        var uid = d.uid || d.user_id || '-';
+        var content = d.content || d.msg || d.message || '';
+        var id = d.id || '';
+        html += [
+            '<div class="layui-card" style="border:1px solid #f2f2f2;margin-bottom:10px;">',
+              '<div class="layui-card-body" style="display:flex;align-items:center;gap:12px;">',
+                '<div style="white-space:nowrap;color:#666;">', time, '</div>',
+                '<div style="white-space:nowrap;color:#94a3b8;">',ip, '</div>',
+                '<div style="white-space:nowrap;color:#94a3b8;">UID: ', uid, '</div>',
+                '<div style="flex:1;color:#334155;">', content, '</div>',
+                (id?('<a class="layui-btn layui-btn-danger layui-btn-xs" onclick="Admin.del(this, \\\'log/delete\\\', \\\''+ id +'\\\')">删除</a>'):''),
+              '</div>',
+            '</div>'
+        ].join('');
+    }
+    $('#list').html(html);
+}
+
+function loadList(page, limit){
+    page = page || 1; limit = limit || 10;
+    var params = $('#log_form').serializeArray();
+    var data = {page: page, limit: limit};
+    for (var i=0;i<params.length;i++){
+        data[params[i].name] = params[i].value;
+    }
+    $.get('/{[.admin_path]}/log/list', data, function(res){
+        var list = (res && res.data) ? res.data : [];
+        renderItems(list);
+        var total = res && res.count ? res.count : 0;
+        laypage.render({
+            elem: 'pager',
+            count: total,
+            curr: page,
+            limit: limit,
+            layout: ['prev','page','next','skip'],
+            jump: function(obj, first){
+                if(!first){
+                    loadList(obj.curr, obj.limit);
+                }
+            }
+        });
+    }, 'json');
+}
+
+// initial
+loadList(1, 10);
+
+// search
+form.on('submit(table-sreach)', function(){
+    loadList(1, 10);
+    return false;
+});
+
+
+///
+});
+</script>
+
+{[template "backend/common/footer.tmpl" .]}

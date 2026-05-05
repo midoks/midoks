@@ -1,0 +1,1964 @@
+{[template "backend/common/header.tmpl" .]}
+
+<style>
+    .dashboard-stat-value {
+        font-size: 32px;
+        font-weight: bold;
+        color: #1890ff;
+        line-height: 1.2;
+    }
+    
+    .dashboard-stat-unit {
+        font-size: 14px;
+        color: #999;
+        margin-left: 5px;
+    }
+    
+    .dashboard-stat-label {
+        font-size: 14px;
+        color: #666;
+        margin-top: 8px;
+    }
+    
+    .dashboard-trend-up {
+        color: #52c41a;
+        font-size: 12px;
+        margin-top: 4px;
+    }
+    
+    .dashboard-trend-down {
+        color: #f5222d;
+        font-size: 12px;
+        margin-top: 4px;
+    }
+    
+    .stats-table {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 0;
+        margin-bottom: 15px;
+        border: 1px solid #e8e8e8;
+        border-radius: 4px;
+        overflow: hidden;
+        row-gap: 0;
+    }
+    
+    .stats-cell {
+        border: 1px solid #e8e8e8;
+        border-top: none;
+        border-left: none;
+        padding: 20px 15px;
+        position: relative;
+        min-height: 90px;
+        background: #fff;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .stats-cell:nth-child(-n+5) {
+        border-top: 1px solid #e8e8e8;
+    }
+    
+    .stats-cell:nth-child(5n+1) {
+        border-left: 1px solid #e8e8e8;
+    }
+    
+    .stats-cell .stat-label {
+        position: absolute;
+        top: 10px;
+        left: 15px;
+        font-size: 12px;
+        color: #999;
+    }
+    
+    .stats-cell .stat-value-wrap {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        margin-top: 15px;
+    }
+    
+    .stats-cell .stat-value {
+        font-size: 28px;
+        font-weight: bold;
+        color: #333;
+        display: flex;
+        align-items: baseline;
+        justify-content: center;
+        gap: 4px;
+    }
+    
+    .stats-cell .stat-value .stat-number {
+        color: #333;
+    }
+    
+    .stats-cell .stat-value .stat-unit {
+        font-size: 14px;
+        color: #999;
+        font-weight: normal;
+    }
+    
+    .stats-cell .stat-trend-wrap {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 4px;
+    }
+    
+    .stats-cell .stat-trend {
+        font-size: 12px;
+    }
+    
+    .stats-cell .stat-trend.up {
+        color: #52c41a;
+    }
+    
+    .stats-cell .stat-trend.down {
+        color: #f5222d;
+    }
+    
+    .stats-cell .stat-detail {
+        font-size: 11px;
+        color: #999;
+        margin-top: 4px;
+        text-align: center;
+    }
+    
+    .stats-cell .refresh-icon {
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        font-size: 14px;
+        color: #1890ff;
+        cursor: pointer;
+    }
+    
+    .stats-cell.login-cell .stat-value-wrap {
+        margin-top: 20px;
+    }
+    
+    .stats-cell.login-cell .login-content {
+        font-size: 13px;
+        color: #333;
+        font-weight: 500;
+        text-align: center;
+    }
+    
+    .stats-cell.login-cell .login-date {
+        font-size: 12px;
+        color: #999;
+        margin-top: 4px;
+    }
+    
+    @media screen and (max-width: 992px) {
+        .stats-table {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0;
+            border: 1px solid #e8e8e8;
+            border-radius: 4px;
+            overflow: hidden;
+            row-gap: 8px;
+        }
+        
+        .stats-row {
+            display: contents;
+        }
+        
+        .stats-cell {
+            border: 1px solid #e8e8e8;
+            border-top: none;
+            border-left: none;
+        }
+        
+        .stats-row:first-child .stats-cell {
+            border-top: 1px solid #e8e8e8;
+        }
+        
+        .stats-cell:first-child {
+            border-left: 1px solid #e8e8e8;
+        }
+        
+        .stats-cell .stat-value {
+            font-size: 24px;
+        }
+        
+        .stats-cell:last-child:nth-child(odd) {
+            grid-column: span 2;
+        }
+    }
+    
+    @media screen and (max-width: 480px) {
+        .stats-table {
+            grid-template-columns: 1fr;
+        }
+        
+        .stats-cell:last-child:nth-child(odd) {
+            grid-column: span 1;
+        }
+        
+        .stats-cell .stat-value {
+            font-size: 22px;
+        }
+    }
+    
+    .chart-container {
+        height: 260px;
+        width: 100%;
+    }
+    
+    .chart-table {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0;
+        margin-top: 15px;
+        border: 1px solid #e8e8e8;
+        border-radius: 4px;
+        overflow: hidden;
+        background: #fff;
+    }
+    
+    .chart-table.gauge-table {
+        grid-template-columns: repeat(4, 1fr);
+    }
+    
+    .chart-row {
+        display: contents;
+    }
+    
+    .chart-cell {
+        border-right: 1px solid #e8e8e8;
+        border-bottom: 1px solid #e8e8e8;
+        padding: 15px;
+        position: relative;
+    }
+    
+    .chart-cell:nth-child(2n) {
+        border-right: none;
+    }
+    
+    .gauge-table .chart-cell:nth-child(4n) {
+        border-right: none;
+    }
+    
+    .gauge-table .chart-cell:nth-child(4n-1),
+    .gauge-table .chart-cell:nth-child(4n-2),
+    .gauge-table .chart-cell:nth-child(4n-3) {
+        border-right: 1px solid #e8e8e8;
+    }
+    
+    .chart-row:last-child .chart-cell {
+        border-bottom: none;
+    }
+    
+    .chart-label {
+        font-size: 14px;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 10px;
+        display: block;
+    }
+    
+    .chart-value {
+        font-size: 16px;
+        font-weight: bold;
+        color: #333;
+        text-align: center;
+        margin-top: -20px;
+    }
+    
+    .chart-detail {
+        font-size: 12px;
+        color: #999;
+        text-align: center;
+        margin-top: 4px;
+    }
+    
+    .chart-cell.map-cell {
+        position: relative;
+    }
+    
+    .chart-cell.map-cell .map-container {
+        width: 100%;
+        height: 280px;
+    }
+    
+    .chart-cell.map-cell .floating-rank-card {
+        position: absolute;
+        bottom: 15px;
+        right: 15px;
+        width: 200px;
+        background: #fff;
+        border: 1px solid #e8e8e8;
+        border-radius: 4px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+    
+    .chart-cell.map-cell .rank-header {
+        padding: 10px;
+        font-size: 12px;
+        font-weight: 600;
+        color: #333;
+        background: #fafafa;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .chart-cell.map-cell .rank-help-icon {
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: #1890ff;
+        color: #fff;
+        font-size: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: help;
+    }
+    
+    .chart-cell.map-cell .rank-list {
+        padding: 10px;
+        max-height: 160px;
+        overflow-y: auto;
+    }
+    
+    .chart-cell.map-cell .rank-item {
+        margin-bottom: 8px;
+    }
+    
+    .chart-cell.map-cell .rank-item:last-child {
+        margin-bottom: 0;
+    }
+    
+    .chart-cell.map-cell .rank-progress-bar {
+        height: 4px;
+        background: #f0f0f0;
+        border-radius: 2px;
+        overflow: hidden;
+        margin-bottom: 4px;
+    }
+    
+    .chart-cell.map-cell .rank-progress-fill {
+        height: 100%;
+        background: linear-gradient(to right, #1890ff, #40a9ff);
+        border-radius: 2px;
+        transition: width 0.3s ease;
+    }
+    
+    .chart-cell.map-cell .rank-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .chart-cell.map-cell .rank-name {
+        font-size: 12px;
+        color: #333;
+    }
+    
+    .chart-cell.map-cell .rank-detail {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+    
+    .chart-cell.map-cell .rank-value {
+        font-size: 12px;
+        font-weight: 600;
+        color: #1890ff;
+    }
+    
+    .chart-cell.map-cell .rank-percent {
+        font-size: 11px;
+        color: #999;
+    }
+    
+    .pie-chart-container {
+        height: 200px;
+        width: 100%;
+    }
+    
+    .gauge-container {
+        height: 160px;
+        width: 100%;
+    }
+    
+    .map-container {
+        height: 280px;
+        width: 100%;
+    }
+    
+    .layui-card-body {
+        padding: 15px;
+    }
+    
+    .rank-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .rank-list li {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid #f0f0f0;
+        align-items: center;
+    }
+    
+    .rank-list li:last-child {
+        border-bottom: none;
+    }
+    
+    .rank-list .rank-name {
+        flex: 1;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-size: 13px;
+        color: #333;
+    }
+    
+    .rank-list .rank-value {
+        font-weight: bold;
+        color: #1890ff;
+        font-size: 14px;
+        margin-right: 10px;
+    }
+    
+    .rank-list .rank-percent {
+        color: #999;
+        font-size: 12px;
+    }
+    
+    .map-card-container {
+        position: relative;
+    }
+    
+    .floating-rank-card {
+        position: absolute;
+        top: 0px;
+        right: 0px;
+        width: 150px;
+        z-index: 10;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        max-height: 280px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .floating-rank-card .layui-card-body {
+        flex: 1;
+        overflow-y: auto;
+        overflow-x: hidden;
+        max-height: 160px;
+    }
+    
+    .floating-rank-card .layui-card-header {
+        padding: 8px 10px;
+        flex-shrink: 0;
+    }
+    
+    .floating-rank-card .rank-list li {
+        padding: 6px 0;
+    }
+    
+    .floating-rank-card .rank-name {
+        font-size: 12px;
+    }
+    
+    .floating-rank-card .rank-value {
+        font-size: 13px;
+        margin-right: 5px;
+    }
+    
+    .floating-rank-card .rank-percent {
+        font-size: 11px;
+    }
+    
+    .floating-rank-card .layui-card-body::-webkit-scrollbar {
+        width: 4px;
+    }
+    
+    .floating-rank-card .layui-card-body::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 2px;
+    }
+    
+    .floating-rank-card .layui-card-body::-webkit-scrollbar-thumb {
+        background: #c1c1c1;
+        border-radius: 2px;
+    }
+    
+    .floating-rank-card .layui-card-body::-webkit-scrollbar-thumb:hover {
+        background: #a8a8a8;
+    }
+    
+    .rank-help-icon {
+        float: right;
+        display: inline-block;
+        width: 18px;
+        height: 18px;
+        line-height: 18px;
+        text-align: center;
+        background: #e8f4fd;
+        color: #1890ff;
+        border-radius: 50%;
+        font-size: 12px;
+        font-weight: bold;
+        cursor: help;
+    }
+    
+    .rank-list-progress {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .rank-list-progress li {
+        padding: 10px 0;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .rank-list-progress li:last-child {
+        border-bottom: none;
+    }
+    
+    .rank-progress-bar {
+        height: 4px;
+        background: #f0f0f0;
+        border-radius: 2px;
+        margin-bottom: 8px;
+        overflow: hidden;
+    }
+    
+    .rank-progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #1890ff, #40a9ff);
+        border-radius: 2px;
+        transition: width 0.3s ease;
+    }
+    
+    .rank-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .rank-info .rank-name {
+        font-size: 11px;
+        color: #333;
+        font-weight: 500;
+    }
+    
+    .rank-detail {
+        display: flex;
+        align-items: baseline;
+        gap: 5px;
+    }
+    
+    .rank-detail .rank-value {
+        font-size: 10px;
+        font-weight: bold;
+        color: #666;
+    }
+    
+    .rank-detail .rank-percent {
+        font-size: 11px;
+        color: #999;
+    }
+</style>
+
+<!-- 标签页导航 -->
+<div class="layui-tab layui-tab-card" lay-filter="console-tabs">
+    <ul class="layui-tab-title" style="padding:0 15px 0;">
+        <li class="layui-this">概况</li>
+        <li>WAF</li>
+        <li>DNS</li>
+        <li>用户</li>
+        <li>事件</li>
+    </ul>
+    <div class="layui-tab-content" style="padding: 15px;">
+        <div class="layui-tab-item layui-show">
+            <!-- 统计卡片 - 表格布局 -->
+            <div class="stats-table">
+                <div class="stats-cell">
+                    <span class="stat-label">集群</span>
+                    <span class="refresh-icon">⟳</span>
+                    <div class="stat-value-wrap">
+                        <div class="stat-value"><span class="stat-number">13</span><span class="stat-unit">个</span></div>
+                    </div>
+                </div>
+                <div class="stats-cell">
+                    <span class="stat-label">边缘节点</span>
+                    <div class="stat-value-wrap">
+                        <div class="stat-value"><span class="stat-number">103</span><span class="stat-unit">个</span></div>
+                    </div>
+                </div>
+                <div class="stats-cell">
+                    <span class="stat-label">API节点</span>
+                    <div class="stat-value-wrap">
+                        <div class="stat-value"><span class="stat-number">1</span><span class="stat-unit">个</span></div>
+                    </div>
+                </div>
+                <div class="stats-cell">
+                    <span class="stat-label">用户</span>
+                    <div class="stat-value-wrap">
+                        <div class="stat-value"><span class="stat-number">8</span><span class="stat-unit">个</span></div>
+                    </div>
+                </div>
+                <div class="stats-cell">
+                    <span class="stat-label">网站</span>
+                    <div class="stat-value-wrap">
+                        <div class="stat-value"><span class="stat-number">267</span><span class="stat-unit">个</span></div>
+                    </div>
+                </div>
+                <div class="stats-cell">
+                    <span class="stat-label">本周流量</span>
+                    <div class="stat-value-wrap">
+                        <div class="stat-value"><span class="stat-number">9.74</span><span class="stat-unit">TiB</span></div>
+                    </div>
+                </div>
+                <div class="stats-cell">
+                    <span class="stat-label">昨日流量</span>
+                    <div class="stat-value-wrap">
+                        <div class="stat-value"><span class="stat-number">2.21</span><span class="stat-unit">TiB</span></div>
+                    </div>
+                </div>
+                <div class="stats-cell">
+                    <span class="stat-label">当天独立IP</span>
+                    <div class="stat-value-wrap">
+                        <div class="stat-value"><span class="stat-number">3,262,949</span></div>
+                    </div>
+                </div>
+                <div class="stats-cell">
+                    <span class="stat-label">当天流量</span>
+                    <div class="stat-value-wrap">
+                        <div class="stat-value"><span class="stat-number">1.11</span><span class="stat-unit">TiB</span></div>
+                        <div class="stat-trend-wrap">
+                            <span>/</span>
+                            <span class="stat-trend up">+22.76%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="stats-cell login-cell">
+                    <span class="stat-label">上次登录</span>
+                    <div class="stat-value-wrap">
+                        <div class="login-content">加拿大 魁北克 蒙特利尔</div>
+                        <div class="login-date">2026-04-26</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 仪表盘 - 表格风格 -->
+            <div class="chart-table gauge-table">
+                <div class="chart-row">
+                    <div class="chart-cell">
+                        <div class="chart-label">总流量</div>
+                        <div id="gauge-traffic" class="gauge-container"></div>
+                        <div class="chart-value">212.7637 Mbps</div>
+                    </div>
+                    <div class="chart-cell">
+                        <div class="chart-label">平均CPU用量</div>
+                        <div id="gauge-cpu" class="gauge-container"></div>
+                        <div class="chart-value">1.50%</div>
+                        <div class="chart-detail">共815核</div>
+                    </div>
+                    <div class="chart-cell">
+                        <div class="chart-label">平均内存用量</div>
+                        <div id="gauge-memory" class="gauge-container"></div>
+                        <div class="chart-value">23.84%</div>
+                        <div class="chart-detail">共1.24TiB</div>
+                    </div>
+                    <div class="chart-cell">
+                        <div class="chart-label">平均负载</div>
+                        <div id="gauge-load" class="gauge-container"></div>
+                        <div class="chart-value">0.13/min</div>
+                        <div class="chart-detail">0.12/5min</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 地图和排行 - 表格风格 -->
+            <div class="chart-table">
+                <div class="chart-row">
+                    <div class="chart-cell map-cell">
+                        <div class="chart-label">全球分布</div>
+                        <div id="world-map" class="map-container"></div>
+                        <div class="floating-rank-card">
+                            <div class="rank-header">
+                                <span>国家/地区排行</span>
+                                <span class="rank-help-icon">?</span>
+                            </div>
+                            <div class="rank-list">
+                                <div class="rank-item">
+                                    <div class="rank-progress-bar">
+                                        <div class="rank-progress-fill" style="width: 99.53%;"></div>
+                                    </div>
+                                    <div class="rank-info">
+                                        <span class="rank-name">中国</span>
+                                        <span class="rank-detail">
+                                            <span class="rank-value">99.53%</span>
+                                            <span class="rank-percent">(1012.1GiB)</span>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="rank-item">
+                                    <div class="rank-progress-bar">
+                                        <div class="rank-progress-fill" style="width: 0.12%;"></div>
+                                    </div>
+                                    <div class="rank-info">
+                                        <span class="rank-name">美国</span>
+                                        <span class="rank-detail">
+                                            <span class="rank-value">0.12%</span>
+                                            <span class="rank-percent">(1.22GiB)</span>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="rank-item">
+                                    <div class="rank-progress-bar">
+                                        <div class="rank-progress-fill" style="width: 0.10%;"></div>
+                                    </div>
+                                    <div class="rank-info">
+                                        <span class="rank-name">日本</span>
+                                        <span class="rank-detail">
+                                            <span class="rank-value">0.10%</span>
+                                            <span class="rank-percent">(1.02GiB)</span>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="rank-item">
+                                    <div class="rank-progress-bar">
+                                        <div class="rank-progress-fill" style="width: 0.08%;"></div>
+                                    </div>
+                                    <div class="rank-info">
+                                        <span class="rank-name">韩国</span>
+                                        <span class="rank-detail">
+                                            <span class="rank-value">0.08%</span>
+                                            <span class="rank-percent">(819MiB)</span>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="rank-item">
+                                    <div class="rank-progress-bar">
+                                        <div class="rank-progress-fill" style="width: 0.05%;"></div>
+                                    </div>
+                                    <div class="rank-info">
+                                        <span class="rank-name">新加坡</span>
+                                        <span class="rank-detail">
+                                            <span class="rank-value">0.05%</span>
+                                            <span class="rank-percent">(512MiB)</span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chart-cell">
+                        <div class="chart-label">24小时流量趋势</div>
+                        <div id="traffic-chart" class="chart-container"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 访问量趋势 - 表格风格 -->
+            <div class="chart-table">
+                <div class="chart-row">
+                    <div class="chart-cell">
+                        <div class="chart-label">24小时访问量趋势</div>
+                        <div id="access-chart" class="chart-container"></div>
+                    </div>
+                    <div class="chart-cell">
+                        <div class="chart-label">域名访问排行（24小时）</div>
+                        <div id="domain-chart" class="chart-container"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 节点和来源排行 - 表格风格 -->
+            <div class="chart-table">
+                <div class="chart-row">
+                    <div class="chart-cell">
+                        <div class="chart-label">节点访问排行（24小时）</div>
+                        <div id="node-chart" class="chart-container"></div>
+                    </div>
+                    <div class="chart-cell">
+                        <div class="chart-label">请求来源排行（请求数）</div>
+                        <div id="source-chart" class="chart-container"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 状态码和请求方法 - 表格风格 -->
+            <div class="chart-table">
+                <div class="chart-row">
+                    <div class="chart-cell">
+                        <div class="chart-label">状态码分布（请求数）</div>
+                        <div id="status-chart" class="pie-chart-container"></div>
+                    </div>
+                    <div class="chart-cell">
+                        <div class="chart-label">请求方法分布（请求数）</div>
+                        <div id="method-chart" class="pie-chart-container"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 请求路径和独立IP - 表格风格 -->
+            <div class="chart-table">
+                <div class="chart-row">
+                    <div class="chart-cell">
+                        <div class="chart-label">请求路径排行（请求数）</div>
+                        <div id="path-chart" class="chart-container"></div>
+                    </div>
+                    <div class="chart-cell">
+                        <div class="chart-label">独立IP排行（下行流量）</div>
+                        <div id="ip-chart" class="chart-container"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- WAF Tab -->
+        <div class="layui-tab-item">
+            <div class="layui-card">
+                <div class="layui-card-body" style="text-align: center; padding: 80px 0; color: #999;">
+                    <i class="layui-icon layui-icon-shield" style="font-size: 48px; margin-bottom: 20px;"></i>
+                    <div style="font-size: 16px;">WAF功能开发中...</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- DNS Tab -->
+        <div class="layui-tab-item">
+            <div class="layui-card">
+                <div class="layui-card-body" style="text-align: center; padding: 80px 0; color: #999;">
+                    <i class="layui-icon layui-icon-link" style="font-size: 48px; margin-bottom: 20px;"></i>
+                    <div style="font-size: 16px;">DNS功能开发中...</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 用户 Tab -->
+        <div class="layui-tab-item">
+            <div class="layui-card">
+                <div class="layui-card-body" style="text-align: center; padding: 80px 0; color: #999;">
+                    <i class="layui-icon layui-icon-user" style="font-size: 48px; margin-bottom: 20px;"></i>
+                    <div style="font-size: 16px;">用户功能开发中...</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 事件 Tab -->
+        <div class="layui-tab-item">
+            <div class="layui-card">
+                <div class="layui-card-body" style="text-align: center; padding: 80px 0; color: #999;">
+                    <i class="layui-icon layui-icon-bell" style="font-size: 48px; margin-bottom: 20px;"></i>
+                    <div style="font-size: 16px;">事件功能开发中...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/echarts/map/js/world.js"></script>
+<script>
+layui.use(['element'], function(){
+    var element = layui.element;
+    
+    // 初始化仪表盘
+    initGauge('gauge-traffic', 212, 1000);
+    initGauge('gauge-cpu', 1.5, 100);
+    initGauge('gauge-memory', 23.84, 100);
+    initGauge('gauge-load', 0.13, 1);
+    
+    // 初始化图表
+    initTrafficChart();
+    initAccessChart();
+    initDomainChart();
+    initNodeChart();
+    initSourceChart();
+    initStatusChart();
+    initMethodChart();
+    initPathChart();
+    initIPChart();
+    initWorldMap();
+});
+
+function initGauge(id, value, max) {
+    var chart = echarts.init(document.getElementById(id));
+    var option = {
+        series: [{
+            type: 'gauge',
+            radius: '90%',
+            startAngle: 200,
+            endAngle: -20,
+            min: 0,
+            max: max,
+            splitNumber: 5,
+            axisLine: {
+                lineStyle: {
+                    width: 10,
+                    color: [[0.3, '#E8F4FD'], [0.7, '#B8E0FF'], [1, '#1890ff']]
+                }
+            },
+            pointer: {
+                itemStyle: {
+                    color: '#1890ff'
+                },
+                length: '55%',
+                width: 3
+            },
+            axisTick: {
+                distance: -15,
+                length: 6,
+                lineStyle: {
+                    color: '#fff',
+                    width: 2
+                }
+            },
+            splitLine: {
+                distance: -20,
+                length: 12,
+                lineStyle: {
+                    color: '#fff',
+                    width: 2
+                }
+            },
+            axisLabel: {
+                color: '#666',
+                distance: 20,
+                fontSize: 10
+            },
+            detail: {
+                show: false
+            },
+            data: [{
+                value: value
+            }]
+        }]
+    };
+    chart.setOption(option);
+}
+
+function initTrafficChart() {
+    var chart = echarts.init(document.getElementById('traffic-chart'));
+    var option = {
+        grid: {
+            left: '3%',
+            right: '4%',
+            bottom: '3%',
+            top: '10%',
+            containLabel: true
+        },
+        xAxis: {
+            type: 'category',
+            data: ['12', '14', '16', '18', '20', '22', '00', '02', '04', '06', '08', '10'],
+            axisLabel: {
+                fontSize: 10,
+                color: '#666'
+            },
+            axisLine: {
+                lineStyle: {
+                    color: '#e0e0e0'
+                }
+            }
+        },
+        yAxis: {
+            type: 'value',
+            axisLabel: {
+                fontSize: 10,
+                color: '#666'
+            },
+            axisLine: {
+                lineStyle: {
+                    color: '#e0e0e0'
+                }
+            },
+            splitLine: {
+                lineStyle: {
+                    color: '#f0f0f0'
+                }
+            }
+        },
+        series: [{
+            type: 'line',
+            data: [60, 70, 80, 90, 110, 180, 150, 120, 90, 70, 80, 90],
+            smooth: true,
+            areaStyle: {
+                color: '#E8F4FD'
+            },
+            lineStyle: {
+                color: '#1890ff',
+                width: 2
+            },
+            itemStyle: {
+                color: '#1890ff'
+            }
+        }]
+    };
+    chart.setOption(option);
+}
+
+function initAccessChart() {
+    var chart = echarts.init(document.getElementById('access-chart'));
+    var option = {
+        grid: {
+            left: '3%',
+            right: '4%',
+            bottom: '8%',
+            top: '10%',
+            containLabel: true
+        },
+        tooltip: {
+            trigger: 'axis',
+            axisPointer: {
+                type: 'cross'
+            }
+        },
+        legend: {
+            data: ['请求数', '缓存请求数', '攻击请求数'],
+            bottom: 0,
+            textStyle: {
+                fontSize: 11,
+                color: '#666'
+            }
+        },
+        xAxis: {
+            type: 'category',
+            data: ['12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11'],
+            axisLabel: {
+                fontSize: 9,
+                color: '#666'
+            },
+            axisLine: {
+                lineStyle: {
+                    color: '#e0e0e0'
+                }
+            }
+        },
+        yAxis: {
+            type: 'value',
+            axisLabel: {
+                fontSize: 10,
+                color: '#666',
+                formatter: function(v) {
+                    return (v / 10000) + 'M';
+                }
+            },
+            axisLine: {
+                lineStyle: {
+                    color: '#e0e0e0'
+                }
+            },
+            splitLine: {
+                lineStyle: {
+                    color: '#f0f0f0'
+                }
+            }
+        },
+        series: [
+            {
+                name: '请求数',
+                type: 'line',
+                data: [5, 5.5, 5.2, 5.8, 6, 6.5, 7, 8.5, 12, 11, 10, 9, 8, 7, 6, 5, 4.5, 4, 4.5, 5, 6, 7, 8, 8.5],
+                smooth: true,
+                areaStyle: {
+                    color: '#E8F4FD'
+                },
+                lineStyle: {
+                    color: '#1890ff',
+                    width: 2
+                }
+            },
+            {
+                name: '缓存请求数',
+                type: 'line',
+                data: [2, 2.2, 2.1, 2.3, 2.4, 2.6, 3, 3.5, 5, 4.5, 4, 3.5, 3, 2.5, 2, 1.8, 1.5, 1.4, 1.5, 1.8, 2.2, 2.5, 3, 3.2],
+                smooth: true,
+                areaStyle: {
+                    color: '#E6F7E6'
+                },
+                lineStyle: {
+                    color: '#52c41a',
+                    width: 2
+                }
+            },
+            {
+                name: '攻击请求数',
+                type: 'line',
+                data: [0.1, 0.12, 0.08, 0.15, 0.1, 0.05, 0.1, 0.15, 0.2, 0.18, 0.15, 0.12, 0.1, 0.08, 0.05, 0.03, 0.02, 0.03, 0.05, 0.08, 0.1, 0.12, 0.15, 0.18],
+                smooth: true,
+                lineStyle: {
+                    color: '#f5222d',
+                    width: 2
+                }
+            }
+        ]
+    };
+    chart.setOption(option);
+}
+
+function initDomainChart() {
+    var chart = echarts.init(document.getElementById('domain-chart'));
+    var option = {
+        grid: {
+            left: '3%',
+            right: '4%',
+            bottom: '15%',
+            top: '10%',
+            containLabel: true
+        },
+        xAxis: {
+            type: 'category',
+            data: ['www.zjcdn.cc', 'www.hlj86.cc', 'www.tj37.cc', 'www.kmm72.cc', 'www.ha39.cc', 'www.cq50.cc', 'www.hna41.cc', 'www.jl84.cc', 'www.hna36.cc', 'www.hna37.cc'],
+            axisLabel: {
+                fontSize: 9,
+                color: '#666',
+                rotate: 45
+            },
+            axisLine: {
+                lineStyle: {
+                    color: '#e0e0e0'
+                }
+            }
+        },
+        yAxis: {
+            type: 'value',
+            axisLabel: {
+                fontSize: 10,
+                color: '#666',
+                formatter: function(v) {
+                    return (v / 1000000) + 'M';
+                }
+            },
+            axisLine: {
+                lineStyle: {
+                    color: '#e0e0e0'
+                }
+            },
+            splitLine: {
+                lineStyle: {
+                    color: '#f0f0f0'
+                }
+            }
+        },
+        series: [{
+            type: 'bar',
+            data: [10500000, 7500000, 6500000, 5500000, 4500000, 3500000, 2500000, 2500000, 2000000, 2000000],
+            itemStyle: {
+                color: '#1890ff',
+                borderRadius: [4, 4, 0, 0]
+            }
+        }]
+    };
+    chart.setOption(option);
+}
+
+function initNodeChart() {
+    var chart = echarts.init(document.getElementById('node-chart'));
+    var option = {
+        grid: {
+            left: '3%',
+            right: '4%',
+            bottom: '15%',
+            top: '10%',
+            containLabel: true
+        },
+        xAxis: {
+            type: 'category',
+            data: ['KM-CN2-17', 'lj-cn-1', 'lj-cn-14', 'lj-cn-11', 'KM-CN2-11', 'KM-CN2-13', 'df-cn-24', 'df-cn-11', 'df-cn-11', 'df-cn-38'],
+            axisLabel: {
+                fontSize: 9,
+                color: '#666',
+                rotate: 45
+            },
+            axisLine: {
+                lineStyle: {
+                    color: '#e0e0e0'
+                }
+            }
+        },
+        yAxis: {
+            type: 'value',
+            axisLabel: {
+                fontSize: 10,
+                color: '#666',
+                formatter: function(v) {
+                    return (v / 1000000) + 'M';
+                }
+            },
+            axisLine: {
+                lineStyle: {
+                    color: '#e0e0e0'
+                }
+            },
+            splitLine: {
+                lineStyle: {
+                    color: '#f0f0f0'
+                }
+            }
+        },
+        series: [{
+            type: 'bar',
+            data: [6500000, 3500000, 2500000, 2500000, 2200000, 2200000, 2000000, 2000000, 1800000, 1800000],
+            itemStyle: {
+                color: '#1890ff',
+                borderRadius: [4, 4, 0, 0]
+            }
+        }]
+    };
+    chart.setOption(option);
+}
+
+function initSourceChart() {
+    var chart = echarts.init(document.getElementById('source-chart'));
+    var option = {
+        grid: {
+            left: '3%',
+            right: '4%',
+            bottom: '15%',
+            top: '10%',
+            containLabel: true
+        },
+        xAxis: {
+            type: 'category',
+            data: ['www.xj86.cc', 'www.ha39.cc', 'www.hlj86.cc', 'www.kmm72.cc', 'www.ha36.cc', 'www.jl84.cc', 'www.cq50.cc', 'www.hna37.cc', 'www.xj84.cc', 'www.xj90.cc'],
+            axisLabel: {
+                fontSize: 9,
+                color: '#666',
+                rotate: 45
+            },
+            axisLine: {
+                lineStyle: {
+                    color: '#e0e0e0'
+                }
+            }
+        },
+        yAxis: {
+            type: 'value',
+            axisLabel: {
+                fontSize: 10,
+                color: '#666',
+                formatter: function(v) {
+                    return (v / 1000000) + 'M';
+                }
+            },
+            axisLine: {
+                lineStyle: {
+                    color: '#e0e0e0'
+                }
+            },
+            splitLine: {
+                lineStyle: {
+                    color: '#f0f0f0'
+                }
+            }
+        },
+        series: [{
+            type: 'bar',
+            data: [2600000, 2000000, 1800000, 1800000, 1500000, 1200000, 1000000, 1000000, 900000, 900000],
+            itemStyle: {
+                color: '#1890ff',
+                borderRadius: [4, 4, 0, 0]
+            }
+        }]
+    };
+    chart.setOption(option);
+}
+
+function initStatusChart() {
+    var chart = echarts.init(document.getElementById('status-chart'));
+    var option = {
+        tooltip: {
+            trigger: 'item',
+            formatter: '{b}: {c} ({d}%)'
+        },
+        legend: {
+            orient: 'vertical',
+            left: 'left',
+            top: 'center',
+            textStyle: {
+                fontSize: 10,
+                color: '#666'
+            }
+        },
+        series: [{
+            type: 'pie',
+            radius: ['45%', '70%'],
+            center: ['55%', '50%'],
+            avoidLabelOverlap: false,
+            itemStyle: {
+                borderRadius: 4,
+                borderColor: '#fff',
+                borderWidth: 2
+            },
+            label: {
+                show: false
+            },
+            emphasis: {
+                label: {
+                    show: true,
+                    fontSize: 12,
+                    fontWeight: 'bold'
+                }
+            },
+            data: [
+                {value: 85, name: '200', itemStyle: {color: '#52c41a'}},
+                {value: 8, name: '304', itemStyle: {color: '#1890ff'}},
+                {value: 3, name: '301', itemStyle: {color: '#722ed1'}},
+                {value: 2, name: '302', itemStyle: {color: '#13c2c2'}},
+                {value: 1, name: '403', itemStyle: {color: '#fa8c16'}},
+                {value: 0.5, name: '404', itemStyle: {color: '#f5222d'}},
+                {value: 0.3, name: '405', itemStyle: {color: '#eb2f96'}},
+                {value: 0.2, name: '206', itemStyle: {color: '#a0d911'}}
+            ]
+        }]
+    };
+    chart.setOption(option);
+}
+
+function initMethodChart() {
+    var chart = echarts.init(document.getElementById('method-chart'));
+    var option = {
+        tooltip: {
+            trigger: 'item',
+            formatter: '{b}: {c} ({d}%)'
+        },
+        legend: {
+            orient: 'vertical',
+            left: 'left',
+            top: 'center',
+            textStyle: {
+                fontSize: 10,
+                color: '#666'
+            }
+        },
+        series: [{
+            type: 'pie',
+            radius: ['45%', '70%'],
+            center: ['55%', '50%'],
+            avoidLabelOverlap: false,
+            itemStyle: {
+                borderRadius: 4,
+                borderColor: '#fff',
+                borderWidth: 2
+            },
+            label: {
+                show: false
+            },
+            emphasis: {
+                label: {
+                    show: true,
+                    fontSize: 12,
+                    fontWeight: 'bold'
+                }
+            },
+            data: [
+                {value: 85, name: 'GET', itemStyle: {color: '#1890ff'}},
+                {value: 10, name: 'POST', itemStyle: {color: '#52c41a'}},
+                {value: 2, name: 'HEAD', itemStyle: {color: '#722ed1'}},
+                {value: 1.5, name: 'OPTIONS', itemStyle: {color: '#13c2c2'}},
+                {value: 1, name: '其他', itemStyle: {color: '#999'}},
+                {value: 0.3, name: 'PRI', itemStyle: {color: '#eb2f96'}},
+                {value: 0.2, name: 'PROPFIND', itemStyle: {color: '#fa8c16'}}
+            ]
+        }]
+    };
+    chart.setOption(option);
+}
+
+function initPathChart() {
+    var chart = echarts.init(document.getElementById('path-chart'));
+    var option = {
+        grid: {
+            left: '3%',
+            right: '4%',
+            bottom: '15%',
+            top: '10%',
+            containLabel: true
+        },
+        xAxis: {
+            type: 'category',
+            data: ['/favicon.ico', '/v3/api/', '/v2/api/update/', '/v2/api/vodData/', '/assets/', '/v3/api/', '/v3/api/stat', '/api/get', '/api/app/search/', '/api/app/vodList/', '/api/app/common'],
+            axisLabel: {
+                fontSize: 8,
+                color: '#666',
+                rotate: 45
+            },
+            axisLine: {
+                lineStyle: {
+                    color: '#e0e0e0'
+                }
+            }
+        },
+        yAxis: {
+            type: 'value',
+            axisLabel: {
+                fontSize: 10,
+                color: '#666',
+                formatter: function(v) {
+                    return (v / 1000000) + 'M';
+                }
+            },
+            axisLine: {
+                lineStyle: {
+                    color: '#e0e0e0'
+                }
+            },
+            splitLine: {
+                lineStyle: {
+                    color: '#f0f0f0'
+                }
+            }
+        },
+        series: [{
+            type: 'bar',
+            data: [21000000, 5000000, 4500000, 4000000, 3500000, 3000000, 2500000, 2000000, 1500000, 1000000, 800000],
+            itemStyle: {
+                color: '#1890ff',
+                borderRadius: [4, 4, 0, 0]
+            }
+        }]
+    };
+    chart.setOption(option);
+}
+
+function initIPChart() {
+    var chart = echarts.init(document.getElementById('ip-chart'));
+    var option = {
+        grid: {
+            left: '3%',
+            right: '4%',
+            bottom: '15%',
+            top: '10%',
+            containLabel: true
+        },
+        xAxis: {
+            type: 'category',
+            data: ['113.25.122.45', '119.249.100.87', '119.249.100.86', '119.249.100.85', '119.249.100.84', '119.249.100.83', '119.249.100.82', '119.249.100.81', '119.249.100.80', '119.249.100.79'],
+            axisLabel: {
+                fontSize: 8,
+                color: '#666',
+                rotate: 45
+            },
+            axisLine: {
+                lineStyle: {
+                    color: '#e0e0e0'
+                }
+            }
+        },
+        yAxis: {
+            type: 'value',
+            axisLabel: {
+                fontSize: 10,
+                color: '#666',
+                formatter: function(v) {
+                    return (v) + 'M';
+                }
+            },
+            axisLine: {
+                lineStyle: {
+                    color: '#e0e0e0'
+                }
+            },
+            splitLine: {
+                lineStyle: {
+                    color: '#f0f0f0'
+                }
+            }
+        },
+        series: [{
+            type: 'bar',
+            data: [450, 350, 300, 280, 250, 220, 200, 180, 180, 160],
+            itemStyle: {
+                color: '#1890ff',
+                borderRadius: [4, 4, 0, 0]
+            }
+        }]
+    };
+    chart.setOption(option);
+}
+
+function initWorldMap() {
+    var chart = echarts.init(document.getElementById('world-map'));
+    
+    var countryNames = {
+        'China': '中国',
+        'United States': '美国',
+        'Japan': '日本',
+        'Korea': '韩国',
+        'South Korea': '韩国',
+        'North Korea': '朝鲜',
+        'Singapore': '新加坡',
+        'Germany': '德国',
+        'United Kingdom': '英国',
+        'France': '法国',
+        'Canada': '加拿大',
+        'Brazil': '巴西',
+        'Russia': '俄罗斯',
+        'India': '印度',
+        'Australia': '澳大利亚',
+        'Italy': '意大利',
+        'Spain': '西班牙',
+        'Netherlands': '荷兰',
+        'Sweden': '瑞典',
+        'Norway': '挪威',
+        'Denmark': '丹麦',
+        'Finland': '芬兰',
+        'Poland': '波兰',
+        'Czech Republic': '捷克',
+        'Austria': '奥地利',
+        'Switzerland': '瑞士',
+        'Belgium': '比利时',
+        'Luxembourg': '卢森堡',
+        'Ireland': '爱尔兰',
+        'Portugal': '葡萄牙',
+        'Greece': '希腊',
+        'Turkey': '土耳其',
+        'Israel': '以色列',
+        'United Arab Emirates': '阿联酋',
+        'Saudi Arabia': '沙特阿拉伯',
+        'Egypt': '埃及',
+        'South Africa': '南非',
+        'Mexico': '墨西哥',
+        'Argentina': '阿根廷',
+        'Chile': '智利',
+        'Peru': '秘鲁',
+        'Thailand': '泰国',
+        'Vietnam': '越南',
+        'Malaysia': '马来西亚',
+        'Indonesia': '印度尼西亚',
+        'Philippines': '菲律宾',
+        'New Zealand': '新西兰',
+        'Bangladesh': '孟加拉国',
+        'Pakistan': '巴基斯坦',
+        'Nigeria': '尼日利亚',
+        'Ethiopia': '埃塞俄比亚',
+        'Egypt': '埃及',
+        'Iran': '伊朗',
+        'Saudi Arabia': '沙特阿拉伯',
+        'Morocco': '摩洛哥',
+        'Algeria': '阿尔及利亚',
+        'Kenya': '肯尼亚',
+        'Uganda': '乌干达',
+        'Tanzania': '坦桑尼亚',
+        'Sudan': '苏丹',
+        'Somalia': '索马里',
+        'Iraq': '伊拉克',
+        'Syria': '叙利亚',
+        'Jordan': '约旦',
+        'Lebanon': '黎巴嫩',
+        'Kuwait': '科威特',
+        'Qatar': '卡塔尔',
+        'Oman': '阿曼',
+        'Yemen': '也门',
+        'Bahrain': '巴林',
+        'Kyrgyzstan': '吉尔吉斯斯坦',
+        'Uzbekistan': '乌兹别克斯坦',
+        'Kazakhstan': '哈萨克斯坦',
+        'Turkmenistan': '土库曼斯坦',
+        'Azerbaijan': '阿塞拜疆',
+        'Georgia': '格鲁吉亚',
+        'Armenia': '亚美尼亚',
+        'Mongolia': '蒙古',
+        'Cambodia': '柬埔寨',
+        'Laos': '老挝',
+        'Myanmar': '缅甸',
+        'Maldives': '马尔代夫',
+        'Sri Lanka': '斯里兰卡',
+        'Nepal': '尼泊尔',
+        'Bhutan': '不丹',
+        'Afghanistan': '阿富汗',
+        'Bangladesh': '孟加拉国',
+        'Sri Lanka': '斯里兰卡',
+        'Maldives': '马尔代夫',
+        'Brunei': '文莱',
+        'Cambodia': '柬埔寨',
+        'East Timor': '东帝汶',
+        'Papua New Guinea': '巴布亚新几内亚',
+        'Fiji': '斐济',
+        'Samoa': '萨摩亚',
+        'Tonga': '汤加',
+        'Vanuatu': '瓦努阿图',
+        'Solomon Islands': '所罗门群岛',
+        'Cook Islands': '库克群岛',
+        'New Caledonia': '新喀里多尼亚',
+        'French Polynesia': '法属波利尼西亚',
+        'American Samoa': '美属萨摩亚',
+        'Guam': '关岛',
+        'Northern Mariana Islands': '北马里亚纳群岛',
+        'Marshall Islands': '马绍尔群岛',
+        'Micronesia': '密克罗尼西亚',
+        'Palau': '帕劳',
+        'Nauru': '瑙鲁',
+        'Kiribati': '基里巴斯',
+        'Tuvalu': '图瓦卢',
+        'Benin': '贝宁',
+        'Burkina Faso': '布基纳法索',
+        'Burundi': '布隆迪',
+        'Cabo Verde': '佛得角',
+        'Cameroon': '喀麦隆',
+        'Central African Republic': '中非共和国',
+        'Central African Rep.': '中非共和国',
+        'CAR': '中非共和国',
+        'DRC': '刚果民主共和国',
+        'Congo-Kinshasa': '刚果民主共和国',
+        'Congo-Brazzaville': '刚果共和国',
+        'Ivory Coast': '科特迪瓦',
+        'Cote dIvoire': '科特迪瓦',
+        'Sao Tome and Principe': '圣多美和普林西比',
+        'St. Kitts and Nevis': '圣基茨和尼维斯',
+        'St. Lucia': '圣卢西亚',
+        'St. Vincent': '圣文森特和格林纳丁斯',
+        'Antigua': '安提瓜和巴布达',
+        'Barbados': '巴巴多斯',
+        'Trinidad': '特立尼达和多巴哥',
+        'Tobago': '特立尼达和多巴哥',
+        'Dominican Rep.': '多米尼加共和国',
+        'EI Salvador': '萨尔瓦多',
+        'Equatorial Guinea': '赤道几内亚',
+        'Bosnia': '波斯尼亚和黑塞哥维那',
+        'Herzegovina': '波斯尼亚和黑塞哥维那',
+        'FYR Macedonia': '北马其顿',
+        'Macedonia': '北马其顿',
+        'Slovak Republic': '斯洛伐克',
+        'Czechia': '捷克',
+        'Timor-Leste': '东帝汶',
+        'Burma': '缅甸',
+        'Kampuchea': '柬埔寨',
+        'DPRK': '朝鲜',
+        'ROK': '韩国',
+        'Taiwan': '台湾',
+        'Hong Kong': '香港',
+        'Macau': '澳门',
+        'Palestine': '巴勒斯坦',
+        'UAE': '阿联酋',
+        'Tajikistan': '塔吉克斯坦',
+        'Sikkim': '锡金',
+        'Reunion': '留尼汪',
+        'Western Sahara': '西撒哈拉',
+        'Chad': '乍得',
+        'Comoros': '科摩罗',
+        'Congo': '刚果',
+        'Congo Democratic Republic': '刚果民主共和国',
+        'Cote dIvoire': '科特迪瓦',
+        'Djibouti': '吉布提',
+        'Equatorial Guinea': '赤道几内亚',
+        'Eritrea': '厄立特里亚',
+        'Gabon': '加蓬',
+        'Gambia': '冈比亚',
+        'Ghana': '加纳',
+        'Guinea': '几内亚',
+        'Guinea-Bissau': '几内亚比绍',
+        'Lesotho': '莱索托',
+        'Liberia': '利比里亚',
+        'Libya': '利比亚',
+        'Madagascar': '马达加斯加',
+        'Malawi': '马拉维',
+        'Mali': '马里',
+        'Mauritania': '毛里塔尼亚',
+        'Mauritius': '毛里求斯',
+        'Mozambique': '莫桑比克',
+        'Namibia': '纳米比亚',
+        'Niger': '尼日尔',
+        'Rwanda': '卢旺达',
+        'Sao Tome and Principe': '圣多美和普林西比',
+        'Senegal': '塞内加尔',
+        'Seychelles': '塞舌尔',
+        'Sierra Leone': '塞拉利昂',
+        'Somalia': '索马里',
+        'South Sudan': '南苏丹',
+        'Swaziland': '斯威士兰',
+        'Togo': '多哥',
+        'Tunisia': '突尼斯',
+        'Zambia': '赞比亚',
+        'Zimbabwe': '津巴布韦',
+        'Angola': '安哥拉',
+        'Botswana': '博茨瓦纳',
+        'Burkina Faso': '布基纳法索',
+        'Cape Verde': '佛得角',
+        'Central African Republic': '中非共和国',
+        'Central African Rep.': '中非共和国',
+        'CAR': '中非共和国',
+        'DRC': '刚果民主共和国',
+        'Congo-Kinshasa': '刚果民主共和国',
+        'Congo-Brazzaville': '刚果共和国',
+        'Ivory Coast': '科特迪瓦',
+        'Cote dIvoire': '科特迪瓦',
+        'Sao Tome and Principe': '圣多美和普林西比',
+        'St. Kitts and Nevis': '圣基茨和尼维斯',
+        'St. Lucia': '圣卢西亚',
+        'St. Vincent': '圣文森特和格林纳丁斯',
+        'Antigua': '安提瓜和巴布达',
+        'Barbados': '巴巴多斯',
+        'Trinidad': '特立尼达和多巴哥',
+        'Tobago': '特立尼达和多巴哥',
+        'Dominican Rep.': '多米尼加共和国',
+        'EI Salvador': '萨尔瓦多',
+        'Equatorial Guinea': '赤道几内亚',
+        'Bosnia': '波斯尼亚和黑塞哥维那',
+        'Herzegovina': '波斯尼亚和黑塞哥维那',
+        'FYR Macedonia': '北马其顿',
+        'Macedonia': '北马其顿',
+        'Slovak Republic': '斯洛伐克',
+        'Czechia': '捷克',
+        'Timor-Leste': '东帝汶',
+        'Burma': '缅甸',
+        'Kampuchea': '柬埔寨',
+        'DPRK': '朝鲜',
+        'ROK': '韩国',
+        'Taiwan': '台湾',
+        'Hong Kong': '香港',
+        'Macau': '澳门',
+        'Palestine': '巴勒斯坦',
+        'UAE': '阿联酋',
+        'Tajikistan': '塔吉克斯坦',
+        'Sikkim': '锡金',
+        'Reunion': '留尼汪',
+        'Western Sahara': '西撒哈拉',
+        'Chad': '乍得',
+        'Comoros': '科摩罗',
+        'Congo': '刚果',
+        'Democratic Republic of the Congo': '刚果民主共和国',
+        'Djibouti': '吉布提',
+        'Egypt': '埃及',
+        'Equatorial Guinea': '赤道几内亚',
+        'Eritrea': '厄立特里亚',
+        'Ethiopia': '埃塞俄比亚',
+        'Gabon': '加蓬',
+        'Gambia': '冈比亚',
+        'Ghana': '加纳',
+        'Guinea': '几内亚',
+        'Guinea-Bissau': '几内亚比绍',
+        'Ivory Coast': '科特迪瓦',
+        'Kenya': '肯尼亚',
+        'Lesotho': '莱索托',
+        'Liberia': '利比里亚',
+        'Libya': '利比亚',
+        'Madagascar': '马达加斯加',
+        'Malawi': '马拉维',
+        'Mali': '马里',
+        'Mauritania': '毛里塔尼亚',
+        'Mauritius': '毛里求斯',
+        'Mayotte': '马约特',
+        'Morocco': '摩洛哥',
+        'Mozambique': '莫桑比克',
+        'Namibia': '纳米比亚',
+        'Niger': '尼日尔',
+        'Nigeria': '尼日利亚',
+        'Rwanda': '卢旺达',
+        'Sao Tome and Principe': '圣多美和普林西比',
+        'Senegal': '塞内加尔',
+        'Seychelles': '塞舌尔',
+        'Sierra Leone': '塞拉利昂',
+        'Somalia': '索马里',
+        'South Africa': '南非',
+        'South Sudan': '南苏丹',
+        'Sudan': '苏丹',
+        'Swaziland': '斯威士兰',
+        'Tanzania': '坦桑尼亚',
+        'Togo': '多哥',
+        'Tunisia': '突尼斯',
+        'Uganda': '乌干达',
+        'Zambia': '赞比亚',
+        'Zimbabwe': '津巴布韦',
+        'Albania': '阿尔巴尼亚',
+        'Andorra': '安道尔',
+        'Armenia': '亚美尼亚',
+        'Austria': '奥地利',
+        'Azerbaijan': '阿塞拜疆',
+        'Belarus': '白俄罗斯',
+        'Belgium': '比利时',
+        'Bosnia and Herzegovina': '波斯尼亚和黑塞哥维那',
+        'Bulgaria': '保加利亚',
+        'Croatia': '克罗地亚',
+        'Cyprus': '塞浦路斯',
+        'Czech Republic': '捷克共和国',
+        'Denmark': '丹麦',
+        'Estonia': '爱沙尼亚',
+        'Finland': '芬兰',
+        'France': '法国',
+        'Georgia': '格鲁吉亚',
+        'Germany': '德国',
+        'Greece': '希腊',
+        'Hungary': '匈牙利',
+        'Iceland': '冰岛',
+        'Ireland': '爱尔兰',
+        'Italy': '意大利',
+        'Kazakhstan': '哈萨克斯坦',
+        'Kosovo': '科索沃',
+        'Latvia': '拉脱维亚',
+        'Liechtenstein': '列支敦士登',
+        'Lithuania': '立陶宛',
+        'Luxembourg': '卢森堡',
+        'Malta': '马耳他',
+        'Moldova': '摩尔多瓦',
+        'Monaco': '摩纳哥',
+        'Montenegro': '黑山',
+        'Netherlands': '荷兰',
+        'North Macedonia': '北马其顿',
+        'Norway': '挪威',
+        'Poland': '波兰',
+        'Portugal': '葡萄牙',
+        'Romania': '罗马尼亚',
+        'Russia': '俄罗斯',
+        'San Marino': '圣马力诺',
+        'Serbia': '塞尔维亚',
+        'Slovakia': '斯洛伐克',
+        'Slovenia': '斯洛文尼亚',
+        'Spain': '西班牙',
+        'Sweden': '瑞典',
+        'Switzerland': '瑞士',
+        'Turkey': '土耳其',
+        'Ukraine': '乌克兰',
+        'United Kingdom': '英国',
+        'Vatican City': '梵蒂冈',
+        'Antigua and Barbuda': '安提瓜和巴布达',
+        'Bahamas': '巴哈马',
+        'Barbados': '巴巴多斯',
+        'Belize': '伯利兹',
+        'Costa Rica': '哥斯达黎加',
+        'Cuba': '古巴',
+        'Dominica': '多米尼克',
+        'Dominican Republic': '多米尼加共和国',
+        'El Salvador': '萨尔瓦多',
+        'Grenada': '格林纳达',
+        'Guatemala': '危地马拉',
+        'Haiti': '海地',
+        'Honduras': '洪都拉斯',
+        'Jamaica': '牙买加',
+        'Mexico': '墨西哥',
+        'Nicaragua': '尼加拉瓜',
+        'Panama': '巴拿马',
+        'Saint Kitts and Nevis': '圣基茨和尼维斯',
+        'Saint Lucia': '圣卢西亚',
+        'Saint Vincent and the Grenadines': '圣文森特和格林纳丁斯',
+        'Trinidad and Tobago': '特立尼达和多巴哥',
+        'United States': '美国',
+        'Canada': '加拿大',
+        'Argentina': '阿根廷',
+        'Bolivia': '玻利维亚',
+        'Brazil': '巴西',
+        'Chile': '智利',
+        'Colombia': '哥伦比亚',
+        'Ecuador': '厄瓜多尔',
+        'Guyana': '圭亚那',
+        'Paraguay': '巴拉圭',
+        'Peru': '秘鲁',
+        'Suriname': '苏里南',
+        'Uruguay': '乌拉圭',
+        'Venezuela': '委内瑞拉',
+        'Antarctica': '南极洲',
+        'Greenland': '格陵兰',
+        'Bermuda': '百慕大',
+        'Cayman Islands': '开曼群岛',
+        'Falkland Islands': '福克兰群岛',
+        'Gibraltar': '直布罗陀',
+        'Guernsey': '根西岛',
+        'Isle of Man': '马恩岛',
+        'Jersey': '泽西岛',
+        'Montserrat': '蒙特塞拉特',
+        'Puerto Rico': '波多黎各',
+        'Turks and Caicos Islands': '特克斯和凯科斯群岛',
+        'Virgin Islands': '维尔京群岛',
+        'American Samoa': '美属萨摩亚',
+        'Christmas Island': '圣诞岛',
+        'Cocos Islands': '科科斯群岛',
+        'Cook Islands': '库克群岛',
+        'Fiji': '斐济',
+        'French Polynesia': '法属波利尼西亚',
+        'Guam': '关岛',
+        'Kiribati': '基里巴斯',
+        'Marshall Islands': '马绍尔群岛',
+        'Micronesia': '密克罗尼西亚',
+        'Nauru': '瑙鲁',
+        'New Caledonia': '新喀里多尼亚',
+        'New Zealand': '新西兰',
+        'Niue': '纽埃',
+        'Northern Mariana Islands': '北马里亚纳群岛',
+        'Palau': '帕劳',
+        'Papua New Guinea': '巴布亚新几内亚',
+        'Pitcairn': '皮特凯恩',
+        'Samoa': '萨摩亚',
+        'Solomon Islands': '所罗门群岛',
+        'Tokelau': '托克劳',
+        'Tonga': '汤加',
+        'Tuvalu': '图瓦卢',
+        'Vanuatu': '瓦努阿图',
+        'Wallis and Futuna': '瓦利斯和富图纳'
+    };
+
+    var option = {
+        tooltip: {
+            trigger: 'item',
+            formatter: function(params) {
+                var name = countryNames[params.name] || params.name;
+                return name + ': ' + (params.value || 0) + '%';
+            }
+        },
+        visualMap: {
+            min: 0,
+            max: 100,
+            left: 'left',
+            bottom: '10px',
+            text: ['高', '低'],
+            textStyle: {
+                fontSize: 10,
+                color: '#666'
+            },
+            calculable: true,
+            color: ['#1890ff', '#E8F4FD']
+        },
+        series: [{
+            name: '流量分布',
+            type: 'map',
+            map: 'world',
+            roam: false,
+            mapLabel: {
+                show: true,
+                formatter: function(params) {
+                    return countryNames[params.name] || '';
+                },
+                color: '#333',
+                fontSize: 11
+            },
+            itemStyle: {
+                borderColor: '#e0e0e0',
+                emphasis: {
+                    label: {
+                        show: true,
+                        formatter: function(params) {
+                            return countryNames[params.name] || params.name;
+                        }
+                    },
+                    itemStyle: {
+                        areaColor: '#1890ff'
+                    }
+                }
+            },
+            data: [
+                {name: 'China', value: 99.53},
+                {name: 'United States', value: 0.12},
+                {name: 'Japan', value: 0.1},
+                {name: 'Korea', value: 0.08},
+                {name: 'Singapore', value: 0.05},
+                {name: 'Germany', value: 0.03},
+                {name: 'United Kingdom', value: 0.03},
+                {name: 'France', value: 0.02},
+                {name: 'Canada', value: 0.02}
+            ]
+        }]
+    };
+    chart.setOption(option);
+}
+</script>
+
+{[template "backend/common/footer.tmpl" .]}

@@ -1,0 +1,66 @@
+app_name: mgo
+brand_name: mgo
+run_user: mgo
+run_mode: prod
+
+general:
+  menu_file: "menu.json"
+
+admin:
+  user: admin
+  pass: admin
+
+log:
+  format: "text"
+  root_path: "logs"
+
+session:
+  provider: memory
+  provider_config: "data/sessions"
+  cookie_name: mgo_web
+  cookie_secure: false
+  gc_interval: 3600
+  max_life_time: 86400
+  csrf_cookie_name: _csrf
+
+web:
+  protocol: http
+  http_addr: "0.0.0.0"
+  http_port: 9292
+  admin_path: "mgo"
+  tls_min_version: TLS12
+  unix_socket_permission: 666
+  local_root_url: "http://0.0.0.0:9292/"
+  disable_router_log: true
+  enable_gzip: true
+  load_assets_from_disk: false
+  landing_url: /
+  access_control_allow_origin: "*"
+  ip_white: "*"
+
+
+database:
+  # Database type: sqlite3, mysql, postgres
+  type: sqlite3
+  # SQLite database path
+  path: data/mgo.db
+  # Database table prefix
+  table_prefix: mgo_
+  # MySQL/PostgreSQL settings (only used if type is mysql or postgres)
+  hostname: 127.0.0.1
+  hostport: 3306
+  name: mgo
+  user: root
+  password: ""
+  ssl_mode: "false"
+
+
+security:
+  install_lock: false
+  secret_key: "!#@FDEWREWR&*("
+  login_remember_days: 7
+  cookie_remember_name: mgo_incredible
+  cookie_username: mgo_awesome
+  cookie_secure: false
+  enable_login_status_cookie: true
+  login_status_cookie_name: login_status

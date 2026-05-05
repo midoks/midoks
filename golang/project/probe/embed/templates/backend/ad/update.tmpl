@@ -1,0 +1,120 @@
+{[template "backend/common/header.tmpl" .]}
+
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-card-header">
+            <a href="{[.admin_path]}/ad/index" class="layui-btn layui-btn-sm"><i class="layui-icon layui-icon-return"></i>返回列表</a>
+        </div>
+        <div class="layui-card-body">
+            <form class="layui-form" lay-filter="ad-form">
+                <input type="hidden" name="id" value="{[.Ad.ID]}">
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">广告标题</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="title" lay-verify="required" placeholder="请输入广告标题" class="layui-input" style="width:500px;" value="{[.Ad.Title]}">
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">广告位置</label>
+                    <div class="layui-input-block">
+                        <select name="position" lay-verify="required">
+                            <option value="">请选择位置</option>
+                            <option value="home_banner" {[if eq .Ad.Position "home_banner"]}selected{[(end)]}>首页横幅</option>
+                            <option value="sidebar" {[if eq .Ad.Position "sidebar"]}selected{[(end)]}>侧边栏</option>
+                            <option value="footer" {[if eq .Ad.Position "footer"]}selected{[(end)]}>底部</option>
+                            <option value="popup" {[if eq .Ad.Position "popup"]}selected{[(end)]}>弹窗</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">图片URL</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="image_url" placeholder="请输入图片地址" class="layui-input" style="width:500px;" value="{[.Ad.ImageURL]}">
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">链接地址</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="link" placeholder="请输入跳转链接" class="layui-input" style="width:500px;" value="{[.Ad.Link]}">
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">排序</label>
+                    <div class="layui-input-inline">
+                        <input type="number" name="sort" placeholder="数值越大越靠前" class="layui-input" value="{[.Ad.Sort]}">
+                    </div>
+                    <div class="layui-form-mid">数值越大越靠前</div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">生效时间</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="start_time" id="start_time" placeholder="开始时间" class="layui-input" value="{[.Ad.StartTime]}">
+                    </div>
+                    <div class="layui-input-inline">
+                        <input type="text" name="end_time" id="end_time" placeholder="结束时间" class="layui-input" value="{[.Ad.EndTime]}">
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">广告内容</label>
+                    <div class="layui-input-block">
+                        <textarea name="content" placeholder="请输入广告内容（可选）" class="layui-textarea" style="width:600px;height:150px;">{[.Ad.Content]}</textarea>
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">状态</label>
+                    <div class="layui-input-block">
+                        <input type="checkbox" name="status" lay-skin="switch" lay-text="启用|禁用" {[if .Ad.Status]}checked{[(end)]}>
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <button class="layui-btn" lay-submit lay-filter="ad-submit"><i class="layui-icon layui-icon-ok"></i>提交</button>
+                        <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+layui.use(['form', 'laydate'], function(){
+    var $ = layui.$,
+        form = layui.form,
+        laydate = layui.laydate;
+
+    laydate.render({
+        elem: '#start_time',
+        type: 'datetime'
+    });
+
+    laydate.render({
+        elem: '#end_time',
+        type: 'datetime'
+    });
+
+    form.on('submit(ad-submit)', function(data){
+        $.post('{[.admin_path]}/ad/update', data.field, function(res){
+            if (res.code === 0) {
+                layer.msg('更新成功', function(){
+                    location.href = '{[.admin_path]}/ad/index';
+                });
+            } else {
+                layer.msg(res.msg);
+            }
+        });
+        return false;
+    });
+});
+</script>
+
+{[template "backend/common/footer.tmpl"]}

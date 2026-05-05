@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>本地网络 - AIProbe</title>
+    <link rel="stylesheet" href="/static/layuiadmin/layui/css/layui.css">
+    <link rel="stylesheet" href="/static/common/css/common.css">
+    <style>
+        .tool-container { max-width: 900px; margin: 0 auto; padding: 20px; }
+        .tool-header { text-align: center; margin-bottom: 30px; }
+        .tool-header h1 { font-size: 28px; color: #333; margin-bottom: 10px; }
+        .tool-header p { color: #666; }
+        .tool-form { background: #fff; padding: 25px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 20px; }
+        .info-item { background: #f5f5f5; padding: 15px; border-radius: 4px; }
+        .info-item .label { font-size: 12px; color: #666; margin-bottom: 5px; }
+        .info-item .value { font-size: 16px; color: #333; font-weight: 500; }
+        .btn-primary { background: #1890ff; color: #fff; padding: 12px 30px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; margin-right: 10px; }
+        .btn-primary:hover { background: #40a9ff; }
+        .result-box { margin-top: 20px; background: #f5f5f5; padding: 15px; border-radius: 4px; min-height: 200px; max-height: 400px; overflow-y: auto; font-family: monospace; font-size: 13px; white-space: pre-wrap; word-break: break-all; }
+        .result-box:empty { display: none; }
+        .nav-tools { background: #fff; padding: 15px 0; border-bottom: 1px solid #e8e8e8; margin-bottom: 20px; }
+        .nav-tools ul { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; }
+        .nav-tools li a { display: block; padding: 8px 20px; color: #666; text-decoration: none; border-radius: 4px; transition: all 0.3s; }
+        .nav-tools li a:hover, .nav-tools li a.active { background: #1890ff; color: #fff; }
+    </style>
+</head>
+<body>
+    <div class="nav-tools">
+        <ul>
+            <li><a href="/frontend/ping">在线Ping</a></li>
+            <li><a href="/frontend/tcping">在线Tcping</a></li>
+            <li><a href="/frontend/speedtest">网站测速</a></li>
+            <li><a href="/frontend/traceroute">路由追踪</a></li>
+            <li><a href="/frontend/dns">DNS查询</a></li>
+            <li><a href="/frontend/findping">FindPing</a></li>
+            <li><a href="/frontend/network" class="active">本地网络</a></li>
+            <li><a href="/frontend/batch">批量检测</a></li>
+            <li><a href="/frontend/help">帮助支持</a></li>
+            <li><a href="/frontend/settings">习惯设置</a></li>
+        </ul>
+    </div>
+
+    <div class="tool-container">
+        <div class="tool-header">
+            <h1>本地网络信息</h1>
+            <p>查看本地网络配置和连接信息</p>
+        </div>
+
+        <div class="tool-form">
+            <div id="networkInfo" class="info-grid"></div>
+
+            <div>
+                <button class="btn-primary" onclick="refreshNetwork()">刷新信息</button>
+                <button class="btn-primary" style="background:#52c41a;" onclick="checkLocalPing()">本地Ping测试</button>
+            </div>
+
+            <div id="result" class="result-box"></div>
+        </div>
+    </div>
+
+    <script src="/static/common/js/jquery-1.10.2.min.js"></script>
+    <script src="/static/layuiadmin/layui/layui.js"></script>
+    <script>
+    $(document).ready(function() {
+        loadNetworkInfo();
+    });
+
+    function loadNetworkInfo() {
+        $.ajax({
+            url: '/api/frontend/network/info',
+            type: 'GET',
+            dataType: 'json',
+            success: function(res) {
+                if (res.code === 0) {
+                    var html = '';
+                    var data = res.data;
+                    if (data.local_ip) {
+                        html += '<div class="info-item"><div class="label">本地IP</div><div class="value">' + data.local_ip + '</div></div>';
+                    }
+                    if (data.public_ip) {
+                        html += '<div class="info-item"><div class="label">公网IP</div><div class="value">' + data.public_ip + '</div></div>';
+                    }
+                    if (data.gateway) {
+                        html += '<div class="info-item"><div class="label">网关</div><div class="value">' + data.gateway + '</div></div>';
+                    }
+                    if (data.dns) {
+                        html += '<div class="info-item"><div class="label">DNS服务器</div><div class="value">' + data.dns + '</div></div>';
+                    }
+                    if (data.hostname) {
+                        html += '<div class="info-item"><div class="label">主机名</div><div class="value">' + data.hostname + '</div></div>';
+                    }
+                    if (data.os) {
+                        html += '<div class="info-item"><div class="label">操作系统</div><div class="value">' + data.os + '</div></div>';
+                    }
+                    $('#networkInfo').html(html);
+                }
+            }
+        });
+    }
+
+    function refreshNetwork() {
+        loadNetworkInfo();
+        layer.msg('已刷新', {icon: 1});
+    }
+
+    function checkLocalPing() {
+        $('#result').text('正在测试...');
+        $.ajax({
+            url: '/api/frontend/ping',
+            type: 'POST',
+            data: {host: '127.0.0.1'},
+            dataType: 'json',
+            success: function(res) {
+                if (res.code === 0) {
+                    $('#result').text(res.data);
+                } else {
+                    $('#result').text('错误: ' + res.msg);
+                }
+            }
+        });
+    }
+
+    layui.use('layer', function(){
+        window.layer = layui.layer;
+    });
+    </script>
+</body>
+</html>

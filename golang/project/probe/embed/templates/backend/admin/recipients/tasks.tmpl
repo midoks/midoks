@@ -1,0 +1,85 @@
+{[template "backend/common/header_nonav.tmpl" .]}
+
+<div class="layui-fluid">
+    <div class="layui-col-md12" style="padding: 5px;">
+        <div class="layui-card">
+            <div class="layui-card-body">
+
+                <div class="layui-tab layui-tab-brief">
+                    <ul class="layui-tab-title" id="status">
+                        {[range $menu := .submenu]}
+                            <li data-status="{[$menu.Number]}" {[if eq (print "/" $.admin_path "/" $menu.Link) $.CurrentPath]}class="layui-this"{[end]}><a href="/{[$.admin_path]}/{[$menu.Link]}">{[$menu.Name]}</a></li>
+                        {[end]}
+                    </ul>
+                </div>
+
+                <div class="layui-form toolbar" style="margin-top: 10px;margin-bottom: 10px;">
+                <form class="layui-form" action="" id="comic_form" onclick="return false;">
+                    <div class="layui-inline mr0" >
+                        <button class="layui-btn layui-btn-sm layui-btn-normal" onclick="Admin.open('创建接收人','recipients/add?id=0',700,650)">创建接收人</button>
+                    </div>
+                </form>
+                </div>
+                <div id="list"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+layui.config({base: '/static/layuiadmin/'}).use(['table','jquery'], function(){
+///
+var admin = layui.admin
+,$ = layui.$
+,form = layui.form
+,table = layui.table;
+
+
+table.render({
+    elem: '#list',
+    url: '/{[.admin_path]}/admin/recipients/list',
+    title: '数据表',
+    cols: [[
+        {field:'username', title:'系统管理员'},
+        {field:'tel', title:'媒介类型'},
+        {field:'recipient_id', title:'接收人标识'},
+        {field:'email', title:'所属分组'},
+        {field:'mark', title:'备注'},
+        {field:'status', title:'状态', width:80, toolbar:"#statusTpl"},
+        {title:'操作', toolbar: '#cmdTpl', width:120, fixed: 'right'}
+     ]],
+    page: true
+});
+
+
+table.on('tool(list)', function(obj){
+    switch(obj.event){
+    };
+});
+
+table.on('toolbar', function(obj){
+    switch(obj.event){
+    };
+});
+
+
+///
+});
+</script>
+
+<script type="text/html" id="statusTpl">
+{{# if (d.status){ }}
+<span style="color:#16b777;">已启用</span>
+{{# } else { }}
+<span style="color:#ff5722;">已停用</span>
+{{# } }}
+</script>
+
+
+<script type="text/html" id="cmdTpl">
+<a class="layui-btn layui-btn-xs" lay-event='edit' onclick="Admin.open('【{{d.username}}】'+'详情','edit?id={{d.id}}',700,650)">详情</a>
+<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event='delete' onclick="Admin.del(this, 'delete','{{d.id}}')">删除</a>
+</script>
+
+{[template "backend/common/footer.tmpl" .]}
