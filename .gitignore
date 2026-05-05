@@ -54,3 +54,4 @@ target
 /python/woff2txt
 /golang/project/probe/vendor
 /golang/project/probe/custom
+/golang/project/probe/.*.sh

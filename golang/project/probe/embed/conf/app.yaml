@@ -17,7 +17,7 @@ log:
 session:
   provider: memory
   provider_config: "data/sessions"
-  cookie_name: mgo_web
+  cookie_name: probe_web
   cookie_secure: false
   gc_interval: 3600
   max_life_time: 86400
@@ -43,13 +43,13 @@ database:
   # Database type: sqlite3, mysql, postgres
   type: sqlite3
   # SQLite database path
-  path: data/mgo.db
+  path: data/probe.db
   # Database table prefix
-  table_prefix: mgo_
+  table_prefix: probe_
   # MySQL/PostgreSQL settings (only used if type is mysql or postgres)
   hostname: 127.0.0.1
   hostport: 3306
-  name: mgo
+  name: probe
   user: root
   password: ""
   ssl_mode: "false"
@@ -59,8 +59,8 @@ security:
   install_lock: false
   secret_key: "!#@FDEWREWR&*("
   login_remember_days: 7
-  cookie_remember_name: mgo_incredible
-  cookie_username: mgo_awesome
+  cookie_remember_name: probe_web_incredible
+  cookie_username: probe_web_awesome
   cookie_secure: false
   enable_login_status_cookie: true
   login_status_cookie_name: login_status
