@@ -15,7 +15,10 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"aiprobe/embed"
-	"aiprobe/internal/app/handles"
+	"aiprobe/internal/app/handles/install"
+	"aiprobe/internal/app/middleware"
+	"aiprobe/internal/conf"
+
 	api_logs "aiprobe/internal/app/handles/api/logs"
 	api_tools "aiprobe/internal/app/handles/api/tools"
 	backend "aiprobe/internal/app/handles/backend"
@@ -26,9 +29,6 @@ import (
 	backend_system "aiprobe/internal/app/handles/backend/system"
 
 	frontend "aiprobe/internal/app/handles/frontend"
-	"aiprobe/internal/app/handles/install"
-	"aiprobe/internal/app/middleware"
-	"aiprobe/internal/conf"
 )
 
 func initTemp(r *gin.Engine) {
@@ -97,8 +97,8 @@ func initRuoteAdmin(r *gin.Engine) {
 	backstage_admin.GET("/console", backend.ConsoleIndex)
 
 	// 管理员
-	backstage_admin.GET("", backend.HomePage)
-	backstage_admin.GET("/index", handles.Home)
+	backstage_admin.GET("", backend_admin.Home)
+	backstage_admin.GET("/index", backend_admin.Home)
 	backstage_admin.GET("/admin/index", backend_admin.Home)
 
 	backstage_admin.GET("/admin/add", backend_admin.Add)
