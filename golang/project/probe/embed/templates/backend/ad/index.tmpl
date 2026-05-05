@@ -49,13 +49,12 @@
 </script>
 
 <script type="text/html" id="positionTpl">
-    {[(switch .Position)]}
-    {[(case "home_bannel"])}首页横幅{[(end)]}
-    {[(case "sidebar"])}侧边栏{[(end)]}
-    {[(case "footer"])}底部{[(end)]}
-    {[(case "popup"])}弹窗{[(end)]}
-    {[(default)]}{{ .Position }}{[(end)]}
-    {[(end)]}
+    {[switch .Position]}
+    {[case "home_banner"]}首页横幅{[end]}
+    {[case "sidebar"]}侧边栏{[end]}
+    {[case "footer"]}底部{[end]}
+    {[case "popup"]}弹窗{[end]}
+    {[default]}{{ .Position }}{[end]}
 </script>
 
 <script>

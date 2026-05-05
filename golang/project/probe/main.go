@@ -15,7 +15,7 @@ import (
 
 const (
 	Version = "1.0"
-	AppName = "mgo"
+	AppName = "probe"
 	CodeDev = true
 )
 
@@ -31,7 +31,7 @@ func main() {
 	app := cli.NewApp()
 	app.Name = AppName
 	app.Version = Version
-	app.Usage = "a mgo service"
+	app.Usage = "a probe service"
 	app.Commands = []cli.Command{
 		cmd.Web,
 		cmd.Root,
@@ -40,6 +40,6 @@ func main() {
 	}
 
 	if err := app.Run(os.Args); err != nil {
-		log.Fatalf("Failed to start application: %v", err)
+		log.Fatalf("failed to start application: %v", err)
 	}
 }

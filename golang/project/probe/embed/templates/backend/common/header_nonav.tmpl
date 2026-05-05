@@ -53,7 +53,7 @@
         <div class="layui-side layui-side-menu">
             <div class="layui-side-scroll">
                 <div class="layui-logo layui-hide-xs layui-bg-black">
-                    <span>管理</span>
+                    <span>{[if .setting_admin_ui]}{[.setting_admin_ui.GetAdminUIValue.SystemName]}{[else]}管理{[end]}</span>
                 </div>
 
                 <ul class="layui-nav layui-nav-tree" lay-shrink="all" id="LAY-system-side-menu" lay-filter="layadmin-system-side-menu">

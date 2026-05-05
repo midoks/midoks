@@ -56,3 +56,4 @@ target
 /golang/project/probe/custom
 /golang/project/probe/.*.sh
 golang/project/probe/probe
+/golang/project/probe/data

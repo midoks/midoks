@@ -228,6 +228,34 @@
         ]
     },
     {
+        "code": "ad",
+        "name": "广告管理",
+        "icon": "layui-icon-picture",
+        "path": "/ad/index",
+        "subapi":[
+            {
+                "code":"ad",
+                "path": "/ad/list"
+            },
+            {
+                "code":"ad",
+                "path": "/ad/add"
+            },
+            {
+                "code":"ad",
+                "path": "/ad/update"
+            },
+            {
+                "code":"ad",
+                "path": "/ad/delete"
+            },
+            {
+                "code":"ad",
+                "path": "/ad/trigger_status"
+            }
+        ]
+    },
+    {
         "code": "system",
         "name": "系统设置",
         "icon": "layui-icon-set",

@@ -161,6 +161,7 @@ func Init(d *gorm.DB) {
 		new(model.Log),
 		new(model.DbNode),
 		new(model.User),
+		new(model.Ad),
 	)
 	if err != nil {
 		log.Fatalf("failed migrate database: %s", err.Error())
