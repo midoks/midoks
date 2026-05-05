@@ -53,7 +53,7 @@ func ParseAdminId(login_uid interface{}) int64 {
 
 func CommonVer(c *gin.Context) map[string]interface{} {
 	data := map[string]interface{}{
-		"title":   "MGOWEB",
+		"title":   "Web",
 		"version": conf.App.Version,
 	}
 

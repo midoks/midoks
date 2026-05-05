@@ -1,6 +1,7 @@
-package backend_ad
+package ad
 
 import (
+	"fmt"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -13,6 +14,8 @@ import (
 
 func Home(c *gin.Context) {
 	data := common.CommonVer(c)
+
+	fmt.Println("home")
 	data["Positions"] = []string{"home_banner", "sidebar", "footer", "popup"}
 	c.HTML(200, "backend/ad/index.tmpl", data)
 }

@@ -34,7 +34,7 @@
 </div>
 
 <script type="text/html" id="statusTpl">
-    <input type="checkbox" name="status" lay-skin="switch" lay-text="启用|禁用" {[(if .Status)}checked{[(end)]} data-id="{{.ID}}" lay-filter="statusSwitch">
+    <input type="checkbox" name="status" lay-skin="switch" lay-text="启用|禁用" {[(if .Status)]}checked{[(end)]} data-id="{{.ID}}" lay-filter="statusSwitch">
 </script>
 
 <script type="text/html" id="imgTpl">
@@ -130,4 +130,4 @@ layui.use(['table', 'form'], function(){
 });
 </script>
 
-{[template "backend/common/footer.tmpl"]}
+{[template "backend/common/footer.tmpl" .]}
