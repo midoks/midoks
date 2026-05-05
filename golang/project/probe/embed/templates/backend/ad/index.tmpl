@@ -34,13 +34,13 @@
 </div>
 
 <script type="text/html" id="statusTpl">
-    <input type="checkbox" name="status" lay-skin="switch" lay-text="启用|禁用" {[(if .Status)]}checked{[(end)]} data-id="{{.ID}}" lay-filter="statusSwitch">
+    <input type="checkbox" name="status" lay-skin="switch" lay-text="启用|禁用" {[if .Status]}checked{[end]} data-id="{{.ID}}" lay-filter="statusSwitch">
 </script>
 
 <script type="text/html" id="imgTpl">
-    {[(if .ImageURL)]}
+    {[if .ImageURL]}
     <img src="{{.ImageURL}}" style="max-width:80px;max-height:40px;">
-    {[(end)]}
+    {[end]}
 </script>
 
 <script type="text/html" id="actionsTpl">
@@ -49,12 +49,7 @@
 </script>
 
 <script type="text/html" id="positionTpl">
-    {[switch .Position]}
-    {[case "home_banner"]}首页横幅{[end]}
-    {[case "sidebar"]}侧边栏{[end]}
-    {[case "footer"]}底部{[end]}
-    {[case "popup"]}弹窗{[end]}
-    {[default]}{{ .Position }}{[end]}
+    {[if eq .Position "home_banner"]}首页横幅{[else if eq .Position "sidebar"]}侧边栏{[else if eq .Position "footer"]}底部{[else if eq .Position "popup"]}弹窗{[else]}{{ .Position }}{[end]}
 </script>
 
 <script>

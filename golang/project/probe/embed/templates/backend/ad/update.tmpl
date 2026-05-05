@@ -21,10 +21,10 @@
                     <div class="layui-input-block">
                         <select name="position" lay-verify="required">
                             <option value="">请选择位置</option>
-                            <option value="home_banner" {[if eq .Ad.Position "home_banner"]}selected{[(end)]}>首页横幅</option>
-                            <option value="sidebar" {[if eq .Ad.Position "sidebar"]}selected{[(end)]}>侧边栏</option>
-                            <option value="footer" {[if eq .Ad.Position "footer"]}selected{[(end)]}>底部</option>
-                            <option value="popup" {[if eq .Ad.Position "popup"]}selected{[(end)]}>弹窗</option>
+                            <option value="home_banner" {[if eq .Ad.Position "home_banner"]}selected{[end]}>首页横幅</option>
+                            <option value="sidebar" {[if eq .Ad.Position "sidebar"]}selected{[end]}>侧边栏</option>
+                            <option value="footer" {[if eq .Ad.Position "footer"]}selected{[end]}>底部</option>
+                            <option value="popup" {[if eq .Ad.Position "popup"]}selected{[end]}>弹窗</option>
                         </select>
                     </div>
                 </div>
@@ -71,7 +71,7 @@
                 <div class="layui-form-item">
                     <label class="layui-form-label">状态</label>
                     <div class="layui-input-block">
-                        <input type="checkbox" name="status" lay-skin="switch" lay-text="启用|禁用" {[if .Ad.Status]}checked{[(end)]}>
+                        <input type="checkbox" name="status" lay-skin="switch" lay-text="启用|禁用" {[if .Ad.Status]}checked{[end]}>
                     </div>
                 </div>
 

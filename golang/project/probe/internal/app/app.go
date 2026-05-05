@@ -75,6 +75,7 @@ func initTemp(r *gin.Engine) {
 			continue
 		}
 		if _, err := tpl.New(short).Parse(string(content)); err != nil {
+			fmt.Printf("failed to parse template %s: %v\n", short, err)
 			continue
 		}
 	}
