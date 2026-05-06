@@ -21,7 +21,10 @@ fi
 
 ps -ef|grep xyjump
 cat /usr/local/xyjump/port.txt
-cat /tmp/check_gfw.log
+
+if [ -f /tmp/check_gfw.log ];then
+	cat /tmp/check_gfw.log
+fi
 
 if [ -f /tmp/check_gfw_restart.log ];then
 	cat /tmp/check_gfw_restart.log
