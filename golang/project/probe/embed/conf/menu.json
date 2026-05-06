@@ -138,26 +138,6 @@
         ]
     },
     {
-        "code": "log",
-        "name": "日志审计",
-        "icon": "layui-icon-refresh-3",
-        "path": "/log",
-        "subapi":[
-            {
-                "code":"log",
-                "path": "/log/clean"
-            },
-            {
-                "code":"log",
-                "path": "/log/settings"
-            },
-            {
-                "code":"log",
-                "path": "/log/list"
-            }
-        ]
-    },
-    {
         "code": "ad",
         "name": "广告管理",
         "icon": "layui-icon-picture",
@@ -189,6 +169,26 @@
                         "path": "/ad/trigger_status"
                     }
                 ]
+            }
+        ]
+    },
+    {
+        "code": "log",
+        "name": "日志审计",
+        "icon": "layui-icon-refresh-3",
+        "path": "/log",
+        "subapi":[
+            {
+                "code":"log",
+                "path": "/log/clean"
+            },
+            {
+                "code":"log",
+                "path": "/log/settings"
+            },
+            {
+                "code":"log",
+                "path": "/log/list"
             }
         ]
     },
