@@ -20,7 +20,9 @@ else
 fi
 
 ps -ef|grep xyjump
-cat /usr/local/xyjump/port.txt
+if [ -f /usr/local/xyjump/port.txt ];then
+	cat /usr/local/xyjump/port.txt
+fi
 
 if [ -f /tmp/check_gfw.log ];then
 	cat /tmp/check_gfw.log
