@@ -138,6 +138,61 @@
         ]
     },
     {
+        "code": "log",
+        "name": "日志审计",
+        "icon": "layui-icon-refresh-3",
+        "path": "/log",
+        "subapi":[
+            {
+                "code":"log",
+                "path": "/log/clean"
+            },
+            {
+                "code":"log",
+                "path": "/log/settings"
+            },
+            {
+                "code":"log",
+                "path": "/log/list"
+            }
+        ]
+    },
+    {
+        "code": "ad",
+        "name": "广告管理",
+        "icon": "layui-icon-picture",
+        "path": "/ad",
+        "children": [
+            {
+                "code": "ad",
+                "name": "广告列表",
+                "path": "/ad/index",
+                "subapi":[
+                    {
+                        "code":"ad",
+                        "path": "/ad/list"
+                    },
+                    {
+                        "code":"ad",
+                        "path": "/ad/add"
+                    },
+                    {
+                        "code":"ad",
+                        "path": "/ad/update"
+                    },
+                    {
+                        "code":"ad",
+                        "path": "/ad/delete"
+                    },
+                    {
+                        "code":"ad",
+                        "path": "/ad/trigger_status"
+                    }
+                ]
+            }
+        ]
+    },
+    {
         "code": "admin",
         "name": "管理员",
         "icon": "layui-icon-user",
@@ -204,54 +259,6 @@
                         "path": "/admin/recipients/tasks"
                     }
                 ]
-            }
-        ]
-    },
-    {
-        "code": "log",
-        "name": "日志审计",
-        "icon": "layui-icon-refresh-3",
-        "path": "/log",
-        "subapi":[
-            {
-                "code":"log",
-                "path": "/log/clean"
-            },
-            {
-                "code":"log",
-                "path": "/log/settings"
-            },
-            {
-                "code":"log",
-                "path": "/log/list"
-            }
-        ]
-    },
-    {
-        "code": "ad",
-        "name": "广告管理",
-        "icon": "layui-icon-picture",
-        "path": "/ad/index",
-        "subapi":[
-            {
-                "code":"ad",
-                "path": "/ad/list"
-            },
-            {
-                "code":"ad",
-                "path": "/ad/add"
-            },
-            {
-                "code":"ad",
-                "path": "/ad/update"
-            },
-            {
-                "code":"ad",
-                "path": "/ad/delete"
-            },
-            {
-                "code":"ad",
-                "path": "/ad/trigger_status"
             }
         ]
     },
