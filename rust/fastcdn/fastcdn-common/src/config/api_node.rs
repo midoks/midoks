@@ -69,7 +69,14 @@ impl ApiNode {
 
     /// 从默认路径加载API节点配置
     pub fn load_default() -> Result<Self, Box<dyn std::error::Error>> {
-        load_default(CONF_YAML)
+        let exec_path = std::env::current_exe()?;
+        let root_path = exec_path.parent().and_then(|p| p.parent());
+
+        let api_node_file = match root_path {
+            Some(path) => path.join(CONF_YAML).to_string_lossy().to_string(),
+            None => CONF_YAML.to_string(),
+        };
+        load_default(&api_node_file)
     }
 
     /// 验证API节点配置是否有效

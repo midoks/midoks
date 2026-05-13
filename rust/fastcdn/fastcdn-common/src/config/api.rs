@@ -82,7 +82,14 @@ impl Api {
 
     /// 将当前配置写入/覆盖到本地YAML文件
     pub fn write(&self) -> Result<(), Box<dyn std::error::Error>> {
-        self.write_to_file(CONF_YAML)
+        let exec_path = std::env::current_exe()?;
+        let root_path = exec_path.parent().and_then(|p| p.parent());
+
+        let api_file = match root_path {
+            Some(path) => path.join(CONF_YAML).to_string_lossy().to_string(),
+            None => CONF_YAML.to_string(),
+        };
+        self.write_to_file(&api_file)
     }
 
     /// 将当前配置写入/覆盖到指定路径的YAML文件

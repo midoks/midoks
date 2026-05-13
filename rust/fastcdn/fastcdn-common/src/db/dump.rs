@@ -26,6 +26,44 @@ pub struct TableColumns {
     pub comment: String,
 }
 
+/// 数据库表-索引信息数据结构体
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct TableIndexColumns {
+    pub collation: String,
+    pub name: String,
+    pub seq_in_index: u32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct TableIndexes {
+    pub name: String,
+    pub index_type: String,
+    pub unique: bool,
+    pub columns: Vec<TableIndexColumns>,
+}
+
+/// 数据库表-分区信息数据结构体
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct TablePartitions {
+    pub name: String,
+    pub method: String,
+    pub expression: String,
+    pub description: String,
+    pub rows: i64,
+    pub data_length: i64,
+    pub index_length: i64,
+}
+
+/// 数据库表信息数据结构体
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct TableInfo {
+    pub table_name: String,
+    pub create_statement: String,
+    pub columns: Vec<TableColumns>,
+    pub indexes: Vec<TableIndexes>,
+    pub partitions: Vec<TablePartitions>,
+}
+
 impl TableColumns {
     pub async fn definition(&self) -> String {
         let mut definition = String::new();
@@ -63,6 +101,7 @@ impl TableColumns {
 
     pub async fn eq_definition(&self, def: &str) -> bool {
         let local_def = self.definition().await;
+
         if local_def == def {
             return true;
         }
@@ -74,22 +113,6 @@ impl TableColumns {
         }
         false
     }
-}
-
-/// 数据库表-索引信息数据结构体
-#[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct TableIndexColumns {
-    pub collation: String,
-    pub name: String,
-    pub seq_in_index: u32,
-}
-
-#[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct TableIndexes {
-    pub name: String,
-    pub index_type: String,
-    pub unique: bool,
-    pub columns: Vec<TableIndexColumns>,
 }
 
 impl TableIndexes {
@@ -121,28 +144,6 @@ impl TableIndexes {
     }
 }
 
-/// 数据库表-分区信息数据结构体
-#[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct TablePartitions {
-    pub name: String,
-    pub method: String,
-    pub expression: String,
-    pub description: String,
-    pub rows: i64,
-    pub data_length: i64,
-    pub index_length: i64,
-}
-
-/// 数据库表信息数据结构体
-#[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct TableInfo {
-    pub table_name: String,
-    pub create_statement: String,
-    pub columns: Vec<TableColumns>,
-    pub indexes: Vec<TableIndexes>,
-    pub partitions: Vec<TablePartitions>,
-}
-
 impl TableInfo {
     pub async fn eq_definition(&self, def: &str) -> bool {
         let db_sql = self
@@ -151,9 +152,19 @@ impl TableInfo {
 
         // print!("embed_sql: {:?}\n", def);
         // print!("dbxxx_sql: {:?}\n", db_sql);
+        // println!(
+        //     "compare table def: {:?} -> {:?}",
+        //     self.table_name,
+        //     db_sql == def
+        // );
         if db_sql == def {
             return true;
+        } else {
+            // if self.table_name == "fastcdn_admin" {
+            //     print!("embed_sql: {:?}\nlocdb_sql: {:?}\n", def, db_sql);
+            // }
         }
+
         false
     }
 
@@ -219,7 +230,13 @@ impl pool::Manager {
     /// 返回包含所有表名的字符串向量
     pub async fn table_names(&self) -> Result<Vec<String>, Box<dyn std::error::Error>> {
         let query = "SHOW TABLES";
-        let rows = sqlx::query(query).fetch_all(self.pool.as_ref()).await?;
+        let pool = self.get_pool().ok_or_else(|| {
+            Box::new(std::io::Error::new(
+                std::io::ErrorKind::NotConnected,
+                "database connection pool is not initialized",
+            )) as Box<dyn std::error::Error>
+        })?;
+        let rows = sqlx::query(query).fetch_all(pool.as_ref()).await?;
 
         let mut table_names = Vec::new();
         for row in rows {
@@ -237,9 +254,13 @@ impl pool::Manager {
     ) -> Result<TableInfo, Box<dyn std::error::Error>> {
         // 获取表的创建语句
         let create_query = format!("SHOW CREATE TABLE `{}`", table_name);
-        let create_row = sqlx::query(&create_query)
-            .fetch_one(self.pool.as_ref())
-            .await?;
+        let pool = self.get_pool().ok_or_else(|| {
+            Box::new(std::io::Error::new(
+                std::io::ErrorKind::NotConnected,
+                "database connection pool is not initialized",
+            )) as Box<dyn std::error::Error>
+        })?;
+        let create_row = sqlx::query(&create_query).fetch_one(pool.as_ref()).await?;
 
         let create_statement: String = create_row.try_get(1)?; // 第二列是 Create Table
 
@@ -257,9 +278,15 @@ impl pool::Manager {
         WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ?
         ORDER BY ORDINAL_POSITION";
 
+        let pool = self.get_pool().ok_or_else(|| {
+            Box::new(std::io::Error::new(
+                std::io::ErrorKind::NotConnected,
+                "database connection pool is not initialized",
+            )) as Box<dyn std::error::Error>
+        })?;
         let column_rows = sqlx::query(columns_query)
             .bind(table_name)
-            .fetch_all(self.pool.as_ref())
+            .fetch_all(pool.as_ref())
             .await?;
 
         let mut columns = Vec::new();
@@ -291,9 +318,15 @@ impl pool::Manager {
         WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ?
         ORDER BY INDEX_NAME, SEQ_IN_INDEX";
 
+        let pool = self.get_pool().ok_or_else(|| {
+            Box::new(std::io::Error::new(
+                std::io::ErrorKind::NotConnected,
+                "database connection pool is not initialized",
+            )) as Box<dyn std::error::Error>
+        })?;
         let index_rows = sqlx::query(indexes_query)
             .bind(table_name)
-            .fetch_all(self.pool.as_ref())
+            .fetch_all(pool.as_ref())
             .await?;
 
         let mut indexes_map: HashMap<String, TableIndexes> = HashMap::new();
@@ -341,9 +374,15 @@ impl pool::Manager {
         FROM INFORMATION_SCHEMA.PARTITIONS 
         WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? AND PARTITION_NAME IS NOT NULL";
 
+        let pool = self.get_pool().ok_or_else(|| {
+            Box::new(std::io::Error::new(
+                std::io::ErrorKind::NotConnected,
+                "database connection pool is not initialized",
+            )) as Box<dyn std::error::Error>
+        })?;
         let partition_rows = sqlx::query(partitions_query)
             .bind(table_name)
-            .fetch_all(self.pool.as_ref())
+            .fetch_all(pool.as_ref())
             .await?;
 
         let mut partitions = Vec::new();

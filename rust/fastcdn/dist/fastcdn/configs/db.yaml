@@ -1,0 +1,4 @@
+user: root
+password: root
+database: fastcdn
+host: 127.0.0.1:3306

@@ -67,7 +67,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             port,
         }) => match setup::Setup::instance().await {
             Ok(cmd_setup) => match cmd_setup.install(protocol, host, *port).await {
-                Ok(_) => Ok("setup completed successfully!"),
+                Ok(_) => Ok(""),
                 Err(e) => Err(e),
             },
             Err(e) => Err(e),
@@ -109,10 +109,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     };
 
     match result {
-        Ok(message) => {
-            println!("{}", message);
-            Ok(())
-        }
+        Ok(_) => Ok(()),
         Err(error) => {
             println!("{}", error);
             Ok(())

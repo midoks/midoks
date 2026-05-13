@@ -1,0 +1,5 @@
+rpc.endpoints:
+- http://127.0.0.1:10001
+rpc.disableUpdate: false
+nodeId: cebab34da61984f7af19cecb78e55f0a
+secret: cxdhvM2MLT0NVZShw27sfh7zwEZTCJFj

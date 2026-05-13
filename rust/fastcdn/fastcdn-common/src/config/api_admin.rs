@@ -1,6 +1,8 @@
+use super::{load_default, load_from_file};
+use lazy_static::lazy_static;
 use serde::{Deserialize, Serialize};
 use std::path::Path;
-use super::{load_from_file, load_default};
+use std::sync::{Arc, Mutex};
 
 /// 默认服务器配置文件路径
 const CONF_YAML: &str = "configs/api_admin.yaml";
@@ -17,7 +19,31 @@ pub struct ApiAdmin {
     pub secret: String,
 }
 
+// 使用 lazy_static 实现线程安全的单例
+lazy_static! {
+    static ref INSTANCE: Arc<Mutex<Option<ApiAdmin>>> = Arc::new(Mutex::new(None));
+}
+
 impl ApiAdmin {
+    /// 获取单例实例
+    pub fn instance() -> Result<Arc<Mutex<ApiAdmin>>, Box<dyn std::error::Error>> {
+        let mut instance_guard = INSTANCE.lock().unwrap();
+
+        if instance_guard.is_none() {
+            let api_admin = Self::load_default()?;
+
+            println!("{:?}", api_admin);
+            api_admin
+                .validate()
+                .map_err(|e| Box::new(std::io::Error::new(std::io::ErrorKind::InvalidData, e)))?;
+            *instance_guard = Some(api_admin);
+        }
+
+        // 创建一个新的 Arc<Mutex<ApiAdmin>> 包装实际的 ApiAdmin 实例
+        let api_admin = instance_guard.as_ref().unwrap().clone();
+        Ok(Arc::new(Mutex::new(api_admin)))
+    }
+
     /// 从YAML文件加载API管理员配置
     pub fn load_from_file<P: AsRef<Path>>(path: P) -> Result<Self, Box<dyn std::error::Error>> {
         load_from_file(path)
@@ -25,27 +51,33 @@ impl ApiAdmin {
 
     /// 从默认路径加载API管理员配置
     pub fn load_default() -> Result<Self, Box<dyn std::error::Error>> {
-        load_default(CONF_YAML)
+        let exec_path = std::env::current_exe()?;
+        let root_path = exec_path.parent().and_then(|p| p.parent());
+
+        let api_admin_file = match root_path {
+            Some(path) => path.join(CONF_YAML).to_string_lossy().to_string(),
+            None => CONF_YAML.to_string(),
+        };
+        load_default(&api_admin_file)
     }
 
     /// 验证API管理员配置是否有效
     pub fn validate(&self) -> Result<(), String> {
         if self.rpc_endpoints.is_empty() {
-            return Err("RPC端点列表不能为空".to_string());
+            return Err("rpc endpoint list cannot be empty!".to_string());
         }
 
         if self.node_id.is_empty() {
-            return Err("节点ID不能为空".to_string());
+            return Err("node_id cannot be empty!".to_string());
         }
 
         if self.secret.is_empty() {
-            return Err("密钥不能为空".to_string());
+            return Err("secret cannot be empty!".to_string());
         }
 
-        // 验证RPC端点格式
         for endpoint in &self.rpc_endpoints {
             if !endpoint.starts_with("http://") && !endpoint.starts_with("https://") {
-                return Err(format!("无效的RPC端点格式: {}", endpoint));
+                return Err(format!("invalid rpc endpoint format: {}", endpoint));
             }
         }
 
@@ -75,57 +107,28 @@ impl ApiAdmin {
             vec![]
         }
     }
-}
 
-/// 配置管理器
-pub struct Manager {
-    api_admin: ApiAdmin,
-}
+    /// 将当前配置写入/覆盖到本地YAML文件
+    pub fn write(&self) -> Result<(), Box<dyn std::error::Error>> {
+        let exec_path = std::env::current_exe()?;
+        let root_path = exec_path.parent().and_then(|p| p.parent());
 
-impl Manager {
-    /// 创建新的配置管理器
-    pub fn new() -> Result<Self, Box<dyn std::error::Error>> {
-        let api_admin = ApiAdmin::load_default()?;
-        api_admin
-            .validate()
-            .map_err(|e| Box::new(std::io::Error::new(std::io::ErrorKind::InvalidData, e)))?;
-
-        Ok(Manager { api_admin })
+        let api_admin_file = match root_path {
+            Some(path) => path.join(CONF_YAML).to_string_lossy().to_string(),
+            None => CONF_YAML.to_string(),
+        };
+        self.write_to_file(&api_admin_file)
     }
 
-    /// 创建包含API管理员配置的配置管理器
-    pub fn new_with_api_admin() -> Result<Self, Box<dyn std::error::Error>> {
-        let api_admin = ApiAdmin::load_default()?;
-        api_admin
-            .validate()
-            .map_err(|e| Box::new(std::io::Error::new(std::io::ErrorKind::InvalidData, e)))?;
-
-        Ok(Manager { api_admin })
-    }
-
-    /// 加载API管理员配置
-    pub fn load_api_admin(&mut self) -> Result<(), Box<dyn std::error::Error>> {
-        let api_admin = ApiAdmin::load_default()?;
-        api_admin
-            .validate()
-            .map_err(|e| Box::new(std::io::Error::new(std::io::ErrorKind::InvalidData, e)))?;
-        self.api_admin = api_admin;
+    /// 将当前配置写入/覆盖到指定路径的YAML文件
+    pub fn write_to_file<P: AsRef<Path>>(&self, path: P) -> Result<(), Box<dyn std::error::Error>> {
+        let yaml_content = serde_yaml::to_string(self)?;
+        std::fs::write(path, yaml_content)?;
         Ok(())
     }
 
-    /// 获取API管理员配置
-    pub fn api_admin(&self) -> &ApiAdmin {
-        &self.api_admin
-    }
-
-    /// 重新加载API管理员配置
-    pub fn reload(&mut self) -> Result<(), Box<dyn std::error::Error>> {
-        let new_api_admin = ApiAdmin::load_default()?;
-        new_api_admin
-            .validate()
-            .map_err(|e| Box::new(std::io::Error::new(std::io::ErrorKind::InvalidData, e)))?;
-        self.api_admin = new_api_admin;
-
-        Ok(())
+    /// 验证请求的nodeId和secret是否匹配
+    pub fn verify_credentials(&self, node_id: &str, secret: &str) -> bool {
+        self.node_id == node_id && self.secret == secret
     }
 }

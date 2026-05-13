@@ -149,7 +149,7 @@ pub async fn add(
         &secret,
     )
     .await?;
-    println!("unique_id:{:?}", unique_id);
-    println!("secret:{:?}", secret);
+    // println!("unique_id:{:?}", unique_id);
+    // println!("secret:{:?}", secret);
     Ok(id)
 }

@@ -1,6 +1,7 @@
 use crate::config::ConfigDb;
 use crate::db::query_builder::{DeleteBuilder, InsertBuilder, QueryBuilder, UpdateBuilder};
 use lazy_static::lazy_static;
+use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use sqlx::{Column, MySqlPool, Row, TypeInfo};
 use std::collections::HashMap;
@@ -12,11 +13,29 @@ lazy_static! {
 
 #[derive(Debug)]
 pub struct Manager {
-    pub pool: Arc<MySqlPool>,
+    pub pool: Option<Arc<MySqlPool>>,
     pub table_prefix: String,
 }
 
+#[derive(Debug, Serialize, Deserialize, Clone)] // 接收JSON请求的结构体
+pub struct DbConfig {
+    pub hostname: String,
+    pub port: u16,
+    pub dbname: String,
+    pub username: String,
+    pub password: String,
+}
+
 impl Manager {
+    pub async fn new() -> Result<Arc<Self>, Box<dyn std::error::Error>> {
+        // 创建空的单例，不初始化MySQL连接
+        let manager = Arc::new(Manager {
+            pool: None,
+            table_prefix: "fastcdn_".to_string(),
+        });
+        Ok(manager)
+    }
+
     pub async fn instance() -> Result<Arc<Self>, Box<dyn std::error::Error>> {
         // 首先检查是否已经初始化
         {
@@ -38,7 +57,7 @@ impl Manager {
 
         let pool = MySqlPool::connect(&database_url).await?;
         let manager = Arc::new(Manager {
-            pool: Arc::new(pool),
+            pool: Some(Arc::new(pool)),
             table_prefix: "fastcdn_".to_string(),
         });
 
@@ -52,7 +71,7 @@ impl Manager {
     }
 
     /// 获取数据库连接池
-    pub fn get_pool(&self) -> Arc<MySqlPool> {
+    pub fn get_pool(&self) -> Option<Arc<MySqlPool>> {
         self.pool.clone()
     }
 
@@ -78,12 +97,33 @@ impl Manager {
         }
     }
 
+    /// 获取连接池引用，如果未初始化则返回错误
+    pub fn get_pool_ref(&self) -> Result<&Arc<MySqlPool>, Box<dyn std::error::Error>> {
+        self.pool.as_ref().ok_or_else(|| {
+            Box::new(std::io::Error::new(
+                std::io::ErrorKind::NotConnected,
+                "database connection pool has not been initialized. Please call the instance() method first"
+            )) as Box<dyn std::error::Error>
+        })
+    }
+
     /// 测试数据库连接
-    pub async fn test_connection(&self) -> Result<(), Box<dyn std::error::Error>> {
-        let row: (i32,) = sqlx::query_as("SELECT 1")
-            .fetch_one(self.pool.as_ref())
-            .await?;
-        println!("✓ 数据库连接测试成功，返回值: {}", row.0);
+    pub async fn test_connection(
+        &self,
+        config: &DbConfig,
+    ) -> Result<(), Box<dyn std::error::Error>> {
+        let database_url = {
+            format!(
+                "mysql://{}:{}@{}/{}",
+                config.username, config.password, config.hostname, config.dbname
+            )
+        };
+
+        let pool = MySqlPool::connect(&database_url).await?;
+        let row: (i32,) = sqlx::query_as("SELECT 1").fetch_one(&pool).await?;
+        if row.0 != 1 {
+            return Err("link failed!".into());
+        }
         Ok(())
     }
 
@@ -95,13 +135,25 @@ impl Manager {
 
     /// 执行 SQL 语句
     pub async fn exec(&self, sql: &str) -> Result<(), sqlx::Error> {
-        sqlx::query(sql).execute(self.pool.as_ref()).await?;
+        let pool = self.get_pool_ref().map_err(|e| {
+            sqlx::Error::Io(std::io::Error::new(
+                std::io::ErrorKind::NotConnected,
+                e.to_string(),
+            ))
+        })?;
+        sqlx::query(sql).execute(pool.as_ref()).await?;
         Ok(())
     }
 
     /// 创建表的 SQL 语句
     pub async fn create_sql(&self, sql: &str) -> Result<(), sqlx::Error> {
-        sqlx::query(sql).execute(self.pool.as_ref()).await?;
+        let pool = self.get_pool_ref().map_err(|e| {
+            sqlx::Error::Io(std::io::Error::new(
+                std::io::ErrorKind::NotConnected,
+                e.to_string(),
+            ))
+        })?;
+        sqlx::query(sql).execute(pool.as_ref()).await?;
         Ok(())
     }
 
@@ -150,7 +202,13 @@ impl Manager {
             }
         }
 
-        let result = query.execute(&*self.pool).await?;
+        let pool = self.get_pool_ref().map_err(|e| {
+            Box::new(std::io::Error::new(
+                std::io::ErrorKind::NotConnected,
+                e.to_string(),
+            )) as Box<dyn std::error::Error>
+        })?;
+        let result = query.execute(pool.as_ref()).await?;
         Ok(result.last_insert_id())
     }
 
@@ -190,7 +248,13 @@ impl Manager {
             }
         }
 
-        let rows = query.fetch_all(&*self.pool).await?;
+        let pool = self.get_pool_ref().map_err(|e| {
+            Box::new(std::io::Error::new(
+                std::io::ErrorKind::NotConnected,
+                e.to_string(),
+            )) as Box<dyn std::error::Error>
+        })?;
+        let rows = query.fetch_all(pool.as_ref()).await?;
         let mut results = Vec::new();
 
         for row in rows {
@@ -316,7 +380,13 @@ impl Manager {
                 query = query.bind(param);
             }
 
-            let result = query.execute(self.pool.as_ref()).await?;
+            let pool = self.get_pool_ref().map_err(|e| {
+                Box::new(std::io::Error::new(
+                    std::io::ErrorKind::NotConnected,
+                    e.to_string(),
+                )) as Box<dyn std::error::Error>
+            })?;
+            let result = query.execute(pool.as_ref()).await?;
             Ok(result.rows_affected())
         } else {
             Err("数据格式错误，必须是 JSON 对象".into())
@@ -358,7 +428,13 @@ impl Manager {
             query = query.bind(param);
         }
 
-        let result = query.execute(self.pool.as_ref()).await?;
+        let pool = self.get_pool_ref().map_err(|e| {
+            Box::new(std::io::Error::new(
+                std::io::ErrorKind::NotConnected,
+                e.to_string(),
+            )) as Box<dyn std::error::Error>
+        })?;
+        let result = query.execute(pool.as_ref()).await?;
         Ok(result.rows_affected())
     }
 
@@ -383,7 +459,13 @@ impl Manager {
             .unwrap_or_default();
         let sql = format!("SELECT COUNT(*) FROM {}{}", table_name, where_clause);
 
-        let row: (i64,) = sqlx::query_as(&sql).fetch_one(self.pool.as_ref()).await?;
+        let pool = self.get_pool_ref().map_err(|e| {
+            Box::new(std::io::Error::new(
+                std::io::ErrorKind::NotConnected,
+                e.to_string(),
+            )) as Box<dyn std::error::Error>
+        })?;
+        let row: (i64,) = sqlx::query_as(&sql).fetch_one(pool.as_ref()).await?;
 
         Ok(row.0)
     }
@@ -404,7 +486,13 @@ impl Manager {
             query = query.bind(param);
         }
 
-        let result = query.fetch_optional(self.pool.as_ref()).await?;
+        let pool = self.get_pool_ref().map_err(|e| {
+            Box::new(std::io::Error::new(
+                std::io::ErrorKind::NotConnected,
+                e.to_string(),
+            )) as Box<dyn std::error::Error>
+        })?;
+        let result = query.fetch_optional(pool.as_ref()).await?;
         Ok(result.is_some())
     }
 
@@ -425,7 +513,13 @@ impl Manager {
         for param in params {
             query = query.bind(param);
         }
-        let rows = query.fetch_all(&*self.pool).await?;
+        let pool = self.get_pool_ref().map_err(|e| {
+            Box::new(std::io::Error::new(
+                std::io::ErrorKind::NotConnected,
+                e.to_string(),
+            )) as Box<dyn std::error::Error>
+        })?;
+        let rows = query.fetch_all(pool.as_ref()).await?;
 
         let mut results = Vec::new();
         for row in rows {

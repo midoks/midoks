@@ -1,8 +1,8 @@
-use serde::{Deserialize, Serialize};
-use std::sync::{Arc, Mutex};
-use std::path::Path;
+use super::{load_default, load_from_file};
 use lazy_static::lazy_static;
-use super::{load_from_file, load_default};
+use serde::{Deserialize, Serialize};
+use std::path::Path;
+use std::sync::{Arc, Mutex};
 
 /// 默认服务器配置文件路径
 const CONF_YAML: &str = "configs/db.yaml";
@@ -25,14 +25,14 @@ impl Db {
     /// 获取单例实例
     pub fn instance() -> Result<Arc<Mutex<Db>>, Box<dyn std::error::Error>> {
         let mut instance_guard = INSTANCE.lock().unwrap();
-        
+
         if instance_guard.is_none() {
             let db = Self::load_default()?;
             db.validate()
                 .map_err(|e| Box::new(std::io::Error::new(std::io::ErrorKind::InvalidData, e)))?;
             *instance_guard = Some(db);
         }
-        
+
         // 创建一个新的 Arc<Mutex<Db>> 包装实际的 Db 实例
         let db = instance_guard.as_ref().unwrap().clone();
         Ok(Arc::new(Mutex::new(db)))
@@ -41,9 +41,10 @@ impl Db {
     /// 重新加载配置（更新单例实例）
     pub fn reload() -> Result<(), Box<dyn std::error::Error>> {
         let new_db = Self::load_default()?;
-        new_db.validate()
+        new_db
+            .validate()
             .map_err(|e| Box::new(std::io::Error::new(std::io::ErrorKind::InvalidData, e)))?;
-        
+
         let mut instance_guard = INSTANCE.lock().unwrap();
         *instance_guard = Some(new_db);
         Ok(())
@@ -56,7 +57,16 @@ impl Db {
 
     /// 从默认路径加载配置
     pub fn load_default() -> Result<Self, Box<dyn std::error::Error>> {
-        load_default(CONF_YAML)
+        let exec_path = std::env::current_exe()?;
+        let root_path = exec_path.parent().and_then(|p| p.parent());
+
+        let db_file = match root_path {
+            Some(path) => path.join(CONF_YAML).to_string_lossy().to_string(),
+            None => CONF_YAML.to_string(),
+        };
+
+        // println!("db_file:{:?}", db_file);
+        load_default(&db_file)
     }
 
     /// 验证配置是否有效
@@ -79,35 +89,21 @@ impl Db {
 
         Ok(())
     }
-}
 
-/// 配置管理器
-pub struct Manager {
-    // 不再直接持有db实例，而是通过单例获取
-}
-
-impl Manager {
-    /// 创建新的配置管理器
-    pub fn new() -> Result<Self, Box<dyn std::error::Error>> {
-        // 确保单例已初始化
-        Db::instance()?;
-        Ok(Manager {})
+    /// 将当前配置写入/覆盖到本地YAML文件
+    pub fn write(&self) -> Result<(), Box<dyn std::error::Error>> {
+        self.write_to_file(CONF_YAML)
     }
 
-    /// 创建包含API管理员配置的配置管理器
-    pub fn new_db() -> Result<Self, Box<dyn std::error::Error>> {
-        // 确保单例已初始化
-        Db::instance()?;
-        Ok(Manager {})
+    /// 将当前配置写入/覆盖到本地YAML文件[api]配置写入
+    pub fn write_api(&self) -> Result<(), Box<dyn std::error::Error>> {
+        self.write_to_file(format!("fastcdn-api/{}", CONF_YAML))
     }
 
-    /// 获取服务器配置
-    pub fn db(&self) -> Result<Arc<Mutex<Db>>, Box<dyn std::error::Error>> {
-        Db::instance()
-    }
-
-    /// 重新加载服务器配置
-    pub fn reload(&mut self) -> Result<(), Box<dyn std::error::Error>> {
-        Db::reload()
+    /// 将当前配置写入/覆盖到指定路径的YAML文件
+    pub fn write_to_file<P: AsRef<Path>>(&self, path: P) -> Result<(), Box<dyn std::error::Error>> {
+        let yaml_content = serde_yaml::to_string(self)?;
+        std::fs::write(path, yaml_content)?;
+        Ok(())
     }
 }

@@ -121,6 +121,7 @@ impl Setup {
             return Err("can not find admin node token, please run the setup again".into());
         }
 
+        // println!("api_token_data:{:?}", api_token_data);
         let mut api_node_id = fastcdn_common::orm::api_node::find_enabled_id_with_addr(
             protocol,
             host,
@@ -128,7 +129,6 @@ impl Setup {
         )
         .await?;
 
-        println!("api_node_id:{:?}", api_node_id);
         if api_node_id == 0 {
             let addr = NetworkAddressConfig {
                 protocal: protocol.to_string(),
@@ -138,7 +138,7 @@ impl Setup {
                 max_port: 0,
                 host_has_variables: false,
             };
-            println!("{:?}", addr);
+            // println!("{:?}", addr);
 
             let access_addrs = serde_json::to_string(&[addr])?;
 
@@ -147,8 +147,8 @@ impl Setup {
 
             let https_json = "{}";
 
-            println!("http_json:{:?}", http_json);
-            println!("https_json:{:?}", https_json);
+            // println!("http_json:{:?}", http_json);
+            // println!("https_json:{:?}", https_json);
 
             api_node_id = fastcdn_common::orm::api_node::add(
                 "默认API节点",
@@ -160,21 +160,49 @@ impl Setup {
             .await?;
         }
 
-        let data = fastcdn_common::orm::api_node::find_enabled_with_id(api_node_id).await?;
-        let api_config = fastcdn_common::config::api::Api {
-            node_id: data[0]
+        let node_data = fastcdn_common::orm::api_node::find_enabled_with_id(api_node_id).await?;
+        let api_yaml = fastcdn_common::config::api::Api {
+            node_id: node_data[0]
                 .get("unique_id")
                 .and_then(|v| v.as_str())
                 .unwrap_or_default()
                 .to_string(),
-            secret: data[0]
+            secret: node_data[0]
                 .get("secret")
                 .and_then(|v| v.as_str())
                 .unwrap_or_default()
                 .to_string(),
         };
 
-        api_config.write()?;
+        // 先写入配置文件
+        api_yaml.write()?;
+
+        // 然后创建用于打印的数据
+        let mut data = std::collections::HashMap::<String, serde_json::Value>::new();
+        data.insert(
+            "node_id".to_string(),
+            serde_json::Value::String(
+                api_token_data[0]
+                    .get("node_id")
+                    .and_then(|v| v.as_str())
+                    .unwrap_or_default()
+                    .to_string(),
+            ),
+        );
+
+        data.insert(
+            "secret".to_string(),
+            serde_json::Value::String(
+                api_token_data[0]
+                    .get("secret")
+                    .and_then(|v| v.as_str())
+                    .unwrap_or_default()
+                    .to_string(),
+            ),
+        );
+        data.insert("is_ok".to_string(), serde_json::Value::Bool(true));
+
+        println!("{}", serde_json::to_string_pretty(&data)?);
         Ok(())
     }
 
@@ -194,7 +222,7 @@ impl Setup {
         self.check_user().await?;
         self.check_iplist().await?;
         self.check_dns().await?;
-        self.check_api().await?;
+        // self.check_api().await?;
         self.check_version().await?;
         Ok(())
     }

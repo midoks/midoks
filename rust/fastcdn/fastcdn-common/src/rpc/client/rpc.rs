@@ -1,10 +1,14 @@
+use crate::config::api_admin::ApiAdmin;
 use crate::rpc::auth::AuthMiddleware;
-use crate::rpc::fastcdn::{
-    AdminCreateRequest, AdminCreateResponse, AdminLoginRequest, AdminLoginResponse,
-};
-use tonic::codegen::*;
+use lazy_static::lazy_static;
+use std::sync::{Arc, Mutex};
 use tonic::transport::Channel;
 use tonic::{Request, metadata::MetadataValue};
+use tonic::{Status, codegen::*};
+
+lazy_static! {
+    static ref INSTANCE: Arc<Mutex<Option<Arc<CommonRpc>>>> = Arc::new(Mutex::new(None));
+}
 
 pub struct CommonRpc {
     channel: Channel,
@@ -18,13 +22,45 @@ pub enum RequestAuth {
 }
 
 impl CommonRpc {
+    pub async fn instance() -> Result<Arc<Self>, Box<dyn std::error::Error>> {
+        {
+            let instance = INSTANCE.lock().unwrap();
+            if let Some(rpc) = instance.as_ref() {
+                return Ok(rpc.clone());
+            }
+        }
+
+        // Create new instance if none exists
+        let rpc = Self::admin_rpc().await?;
+        {
+            let mut instance = INSTANCE.lock().unwrap();
+            if instance.is_none() {
+                *instance = Some(rpc.clone());
+            }
+        }
+        Ok(rpc)
+    }
+
+    pub async fn admin_rpc() -> Result<Arc<Self>, Box<dyn std::error::Error>> {
+        let api_admin = ApiAdmin::instance()
+            .map_err(|e| Status::internal(format!("api_admin loading failed: {}", e)))?;
+
+        let config = api_admin.lock().unwrap();
+
+        let channel = Channel::from_shared(config.rpc_endpoints[0].to_string())?
+            .connect()
+            .await?;
+        let rpc = Arc::new(CommonRpc { channel });
+        Ok(rpc)
+    }
+
     pub async fn connect(addr: &str) -> Result<Self, Box<dyn std::error::Error>> {
         let channel = Channel::from_shared(addr.to_string())?.connect().await?;
         Ok(CommonRpc { channel })
     }
 
     /// 统一的 metadata 处理方法
-    fn prepare_request_with_metadata<T>(
+    pub fn prepare_request_with_metadata<T>(
         &self,
         req: T,
         request_type: RequestAuth,
@@ -68,7 +104,7 @@ impl CommonRpc {
         }
 
         println!(
-            "准备请求 - 类型: {:?}, metadata: {:?}",
+            "request: {:?}, metadata: {:?}",
             request_type,
             request.metadata()
         );
@@ -77,7 +113,7 @@ impl CommonRpc {
     }
 
     /// 统一的 gRPC 调用方法
-    async fn make_grpc_call<T, R>(
+    pub async fn make_grpc_call<T, R>(
         &mut self,
         request: Request<T>,
         url: &str,
@@ -94,20 +130,5 @@ impl CommonRpc {
 
         let response = client.unary(request, path, codec).await?;
         Ok(response.into_inner())
-    }
-
-    pub async fn login(
-        &mut self,
-        req: AdminLoginRequest,
-    ) -> Result<AdminLoginResponse, Box<dyn std::error::Error>> {
-        let request = self.prepare_request_with_metadata(req, RequestAuth::ADMIN)?;
-        self.make_grpc_call(request, "/fastcdn.Admin/login").await
-    }
-    pub async fn create(
-        &mut self,
-        req: AdminCreateRequest,
-    ) -> Result<AdminCreateResponse, Box<dyn std::error::Error>> {
-        let request = self.prepare_request_with_metadata(req, RequestAuth::ADMIN)?;
-        self.make_grpc_call(request, "/fastcdn.Admin/create").await
     }
 }
