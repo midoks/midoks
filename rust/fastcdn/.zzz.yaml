@@ -19,19 +19,22 @@ action:
   before:
   - echo "before"
   after:
-  - ./build_web.sh
+  # - ./build_web.sh
+  - ./build_dist.sh
   # - ./target/release/fastcdn-api setup --protocol=http --host=127.0.0.1 --port 10001
-  - ./target/release/fastcdn-api start -d
-  - ./target/release/fastcdn start &
-  - ./target/release/fastcdn test
-  # - ./target/release/fastcdn-node start -d
+  # - cd ./dist/fastcdn/fastcdn-api && ./bin/fastcdn-api setup --protocol=http --host=127.0.0.1 --port 10001
+  # - cd ./dist/fastcdn/fastcdn-api && ./bin/fastcdn-api start -d
+  # - cd ./dist/fastcdn && ./bin/fastcdn start -d
+  # - cd ./dist/fastcdn-node && ./bin/fastcdn-node start -d
+  # - cd ./dist/fastcdn && ./bin/fastcdn test
+  
   exit:
-  - ./target/release/fastcdn stop
-  - ./target/release/fastcdn-api stop
-  # - ./target/release/fastcdn-node stop
-  - rm -rf ./target/release/fastcdn
-  - rm -rf ./target/release/fastcdn-api
-  - rm -rf ./target/release/fastcdn-node
+  - cd ./dist/fastcdn && ./bin/fastcdn stop
+  - cd ./dist/fastcdn/fastcdn-api && ./bin/fastcdn-api stop
+  # - cd ./dist/fastcdn-node && ./bin/fastcdn-node stop
+  # - rm -rf ./target/release/fastcdn
+  # - rm -rf ./target/release/fastcdn-api
+  # - rm -rf ./target/release/fastcdn-node
   # 生成工作空间文档
   # cargo doc --workspace --open
 link: https://github.com/midoks/zzz
