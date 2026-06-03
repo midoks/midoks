@@ -6,6 +6,8 @@ import (
 	"os/exec"
 	"path/filepath"
 	"time"
+
+	"github.com/Eyevinn/mp4ff/mp4"
 )
 
 // FFmpegCLISplitter 使用 FFmpeg CLI (-ss) 进行视频分片
@@ -132,24 +134,22 @@ func (s *FFmpegCLISplitter) SplitToMultiple(input, outputDir string, segmentDura
 
 // getVideoDuration 获取视频总时长
 func (s *FFmpegCLISplitter) getVideoDuration(input string) (float64, error) {
-	// 使用 ffprobe 获取视频时长
-	cmd := exec.Command(
-		"ffprobe",
-		"-i", input,
-		"-show_entries", "format=duration",
-		"-v", "quiet",
-		"-of", "csv=p=0",
-	)
-
-	output, err := cmd.Output()
+	// 使用 mp4ff 解析 MP4 文件获取时长
+	inFile, err := os.Open(input)
 	if err != nil {
-		return 0, fmt.Errorf("获取视频时长失败: %w", err)
+		return 0, fmt.Errorf("打开文件失败: %w", err)
+	}
+	defer inFile.Close()
+
+	mp4File, err := mp4.DecodeFile(inFile)
+	if err != nil {
+		return 0, fmt.Errorf("解析 MP4 文件失败: %w", err)
 	}
 
-	var duration float64
-	if _, err := fmt.Sscanf(string(output), "%f", &duration); err != nil {
-		return 0, fmt.Errorf("解析视频时长失败: %w", err)
+	if mp4File.Moov == nil {
+		return 0, fmt.Errorf("MP4 文件缺少 moov box")
 	}
 
+	duration := float64(mp4File.Moov.Mvhd.Duration) / float64(mp4File.Moov.Mvhd.Timescale)
 	return duration, nil
 }

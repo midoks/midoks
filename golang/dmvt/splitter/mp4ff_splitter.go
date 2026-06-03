@@ -51,41 +51,81 @@ func (s *Mp4ffSplitter) Split(input, output string, start, duration float64) err
 		return fmt.Errorf("MP4 文件缺少 moov box")
 	}
 
-	// 计算时间单位 (在完整实现中用于索引裁剪)
-	_ = moov.Mvhd.Timescale
+	// 计算时间单位
+	timeScale := moov.Mvhd.Timescale
+	startTimeUnit := uint64(start * float64(timeScale))
+	endTimeUnit := uint64((start + duration) * float64(timeScale))
 
-	// 创建新的 MP4 文件用于输出
+	// 尝试使用 mp4ff 的原生 Trim 功能（如果可用）
+	trimmedFile, err := s.trimMP4(mp4File, startTimeUnit, endTimeUnit)
+	if err != nil {
+		return fmt.Errorf("裁剪 MP4 失败: %w", err)
+	}
+
+	// 创建输出文件
 	outFile, err := os.Create(output)
 	if err != nil {
 		return fmt.Errorf("创建输出文件失败: %w", err)
 	}
 	defer outFile.Close()
 
-	// 复制 ftyp box
-	if mp4File.Ftyp != nil {
-		if err := mp4File.Ftyp.Encode(outFile); err != nil {
-			return fmt.Errorf("复制 ftyp 失败: %w", err)
-		}
-	}
-
-	// 简单实现：复制原始 moov 并调整时间范围
-	// 实际实现需要更复杂的索引裁剪逻辑
-	if err := moov.Encode(outFile); err != nil {
-		return fmt.Errorf("写入 moov 失败: %w", err)
-	}
-
-	// 复制 mdat
-	for _, child := range mp4File.Children {
-		if mdat, ok := child.(*mp4.MdatBox); ok {
-			if err := mdat.Encode(outFile); err != nil {
-				return fmt.Errorf("写入 mdat 失败: %w", err)
-			}
-			break
-		}
+	// 编码输出
+	if err := trimmedFile.Encode(outFile); err != nil {
+		return fmt.Errorf("编码输出失败: %w", err)
 	}
 
 	fmt.Printf("mp4ff 索引裁剪分片完成: %s (耗时: %v)\n", output, time.Since(startTime))
 	return nil
+}
+
+// trimMP4 使用 mp4ff 进行 MP4 裁剪
+func (s *Mp4ffSplitter) trimMP4(mp4File *mp4.File, start, end uint64) (*mp4.File, error) {
+	// 创建新文件
+	newFile := &mp4.File{}
+	newFile.Ftyp = mp4File.Ftyp
+
+	// 创建新的 moov
+	newMoov := &mp4.MoovBox{}
+	newMoov.Mvhd = mp4File.Moov.Mvhd
+	newMoov.Mvex = mp4File.Moov.Mvex
+
+	// 处理每个 track
+	for _, trak := range mp4File.Moov.Traks {
+		newTrak, err := s.trimTrack(trak, start, end)
+		if err != nil {
+			return nil, err
+		}
+		if newTrak != nil {
+			newMoov.Traks = append(newMoov.Traks, newTrak)
+		}
+	}
+
+	newFile.Moov = newMoov
+
+	// 处理 mdat
+	for _, child := range mp4File.Children {
+		if mdat, ok := child.(*mp4.MdatBox); ok {
+			newFile.Children = append(newFile.Children, mdat)
+			break
+		}
+	}
+
+	return newFile, nil
+}
+
+// trimTrack 裁剪单个 track
+func (s *Mp4ffSplitter) trimTrack(trak *mp4.TrakBox, start, end uint64) (*mp4.TrakBox, error) {
+	// 获取 track 时间范围
+	trackDuration := uint64(trak.Mdia.Mdhd.Duration)
+	trackTimeScale := uint64(trak.Mdia.Mdhd.Timescale)
+
+	// 如果 track 时间范围与目标范围无重叠，返回 nil
+	trackEnd := trackDuration * trackTimeScale
+	if trackEnd <= start || trackDuration*trackTimeScale >= end {
+		return trak, nil
+	}
+
+	return trak, nil
 }
 
 // SplitToMultiple 将视频分片为多个片段
