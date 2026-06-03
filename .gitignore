@@ -59,3 +59,4 @@ golang/project/probe/probe
 /golang/project/probe/data
 *.tmp
 /golang/dmvt/demo
+/golang/dmvt/output

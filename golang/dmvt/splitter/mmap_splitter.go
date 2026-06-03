@@ -44,7 +44,9 @@ func munmap(data []byte) error {
 // output: 输出视频文件路径
 // start: 开始字节位置
 // size: 分片大小 (字节)
-func (s *MmapSplitter) Split(input, output string, start, size int64) error {
+func (s *MmapSplitter) Split(input, output string, start, size float64) error {
+	startInt := int64(start)
+	sizeInt := int64(size)
 	startTime := time.Now()
 
 	// 确保输出目录存在
@@ -67,13 +69,13 @@ func (s *MmapSplitter) Split(input, output string, start, size int64) error {
 	}
 
 	fileSize := fileInfo.Size()
-	if start >= fileSize {
+	if startInt >= fileSize {
 		return fmt.Errorf("开始位置超出文件大小")
 	}
 
 	// 调整大小，确保不超出文件
-	if start+size > fileSize {
-		size = fileSize - start
+	if startInt+sizeInt > fileSize {
+		sizeInt = fileSize - startInt
 	}
 
 	// 创建输出文件
@@ -87,19 +89,19 @@ func (s *MmapSplitter) Split(input, output string, start, size int64) error {
 	data, err := mmap(inFile, fileSize)
 	if err != nil {
 		// 如果 mmap 失败，回退到普通 io.CopyN
-		return s.splitWithCopyN(inFile, outFile, start, size)
+		return s.splitWithCopyN(inFile, outFile, startInt, sizeInt)
 	}
 	defer munmap(data)
 
 	// 直接写入指定范围的数据
 	// 使用 unsafe 转换避免额外的内存分配
-	segmentData := data[start : start+size]
-	
+	segmentData := data[startInt : startInt+sizeInt]
+
 	if _, err := outFile.Write(segmentData); err != nil {
 		return fmt.Errorf("写入数据失败: %w", err)
 	}
 
-	fmt.Printf("mmap 分片完成: %s (大小: %d bytes, 耗时: %v)\n", output, size, time.Since(startTime))
+	fmt.Printf("mmap 分片完成: %s (大小: %d bytes, 耗时: %v)\n", output, sizeInt, time.Since(startTime))
 	return nil
 }
 
@@ -186,12 +188,12 @@ func (s *MmapSplitter) SplitByTime(input, output string, timeRanges []TimeRange)
 		if tr.Start >= fileSize {
 			continue
 		}
-		
+
 		end := tr.End
 		if end > fileSize {
 			end = fileSize
 		}
-		
+
 		if end <= tr.Start {
 			continue
 		}
@@ -260,7 +262,8 @@ func (s *MmapSplitter) splitByTimeWithCopyN(inFile *os.File, output string, time
 }
 
 // SplitToMultiple 将文件分片为多个固定大小的片段
-func (s *MmapSplitter) SplitToMultiple(input, outputDir string, segmentSize int64) ([]string, error) {
+func (s *MmapSplitter) SplitToMultiple(input, outputDir string, segmentSize float64) ([]string, error) {
+	segmentSizeInt := int64(segmentSize)
 	if err := os.MkdirAll(outputDir, 0755); err != nil {
 		return nil, fmt.Errorf("创建输出目录失败: %w", err)
 	}
@@ -277,21 +280,21 @@ func (s *MmapSplitter) SplitToMultiple(input, outputDir string, segmentSize int6
 	}
 
 	fileSize := fileInfo.Size()
-	segmentCount := int(fileSize / segmentSize)
-	if fileSize%segmentSize > 0 {
+	segmentCount := int(fileSize / segmentSizeInt)
+	if fileSize%segmentSizeInt > 0 {
 		segmentCount++
 	}
 
 	var outputs []string
 	for i := 0; i < segmentCount; i++ {
-		start := int64(i) * segmentSize
-		size := segmentSize
+		start := int64(i) * segmentSizeInt
+		size := segmentSizeInt
 		if start+size > fileSize {
 			size = fileSize - start
 		}
 
 		output := filepath.Join(outputDir, fmt.Sprintf("segment_%04d.bin", i))
-		if err := s.Split(input, output, start, size); err != nil {
+		if err := s.Split(input, output, float64(start), float64(size)); err != nil {
 			return outputs, fmt.Errorf("分片 %d 失败: %w", i, err)
 		}
 		outputs = append(outputs, output)

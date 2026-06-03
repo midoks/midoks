@@ -42,11 +42,11 @@ func (s *FFmpegCLISplitter) Split(input, output string, start, duration float64)
 	cmd := exec.Command(
 		s.ffmpegPath,
 		"-ss", fmt.Sprintf("%.3f", start), // 快速定位到开始时间
-		"-i", input,                       // 输入文件
+		"-i", input, // 输入文件
 		"-t", fmt.Sprintf("%.3f", duration), // 持续时间
-		"-c", "copy",                      // 直接复制流，不重新编码
+		"-c", "copy", // 直接复制流，不重新编码
 		"-avoid_negative_ts", "make_zero", // 避免负时间戳
-		"-y",                              // 覆盖输出文件
+		"-y", // 覆盖输出文件
 		output,
 	)
 
@@ -132,8 +132,9 @@ func (s *FFmpegCLISplitter) SplitToMultiple(input, outputDir string, segmentDura
 
 // getVideoDuration 获取视频总时长
 func (s *FFmpegCLISplitter) getVideoDuration(input string) (float64, error) {
+	// 使用 ffprobe 获取视频时长
 	cmd := exec.Command(
-		s.ffmpegPath,
+		"ffprobe",
 		"-i", input,
 		"-show_entries", "format=duration",
 		"-v", "quiet",
