@@ -60,3 +60,4 @@ golang/project/probe/probe
 *.tmp
 /golang/dmvt/demo
 /golang/dmvt/output
+/golang/traceroute/vendor
