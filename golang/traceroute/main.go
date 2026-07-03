@@ -1,62 +1,87 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
+	"os"
 
 	"github.com/0ne-zero/goTraceroute/pkg/core/hop"
 	"github.com/0ne-zero/goTraceroute/pkg/core/options"
 	"github.com/0ne-zero/goTraceroute/pkg/core/traceroute"
 )
 
+func usage() {
+	fmt.Fprintf(os.Stderr, "Usage: %s [options] <target>\n", os.Args[0])
+	fmt.Fprintf(os.Stderr, "\nOptions:\n")
+	flag.PrintDefaults()
+	fmt.Fprintf(os.Stderr, "\nExample:\n")
+	fmt.Fprintf(os.Stderr, "  %s google.com\n", os.Args[0])
+	fmt.Fprintf(os.Stderr, "  %s -maxhops 20 -protocol udp example.com\n", os.Args[0])
+}
+
 func main() {
-	// Create traceroute options with defaults (max hops, timeouts, etc.)
+	help := flag.Bool("h", false, "Show this help message")
+	flag.BoolVar(help, "help", false, "Show this help message")
+
+	protocol := flag.String("protocol", "tcp", "Protocol to use (tcp, udp)")
+	firstHop := flag.Int("firsthop", 1, "First TTL value")
+	maxHops := flag.Int("maxhops", 30, "Maximum TTL value")
+	timeoutMs := flag.Int("timeout", 5000, "Timeout per probe in milliseconds")
+	delayMs := flag.Int("delay", 100, "Delay between probes in milliseconds")
+	retries := flag.Int("retries", 1, "Number of retries per probe")
+	maxNoReply := flag.Int("maxnoreply", 5, "Max consecutive no-replies before stopping")
+
+	flag.Usage = usage
+	flag.Parse()
+
+	if *help {
+		flag.Usage()
+		os.Exit(0)
+	}
+
+	if flag.NArg() == 0 {
+		fmt.Fprintf(os.Stderr, "Error: target host is required\n")
+		flag.Usage()
+		os.Exit(1)
+	}
+
+	target := flag.Arg(0)
+
 	opts := options.NewTracerouteOptions()
 
-	// Customize options as needed, (they've default value)
-	opts.SetProbeProtocol(options.PROTOCOL_TCP) // Use TCP instead of default UDP
-	opts.SetFirstHop(1)                         // Start from TTL=1
-	opts.SetMaxHops(30)                         // Limit max TTL to 30 hops
-	opts.SetTimeoutMs(5000)                     // 2 seconds timeout per probe
-	opts.SetDelayMs(100)                        // 100 ms delay between probes
-	opts.SetRetries(1)                          // Retry once if probe fails
-	opts.SetMaxConsecutiveNoReplies(5)          // Stop early if 5 consecutive TTL probes get no replies (no ICMP or TCP response)
-
-	// --- Synchronous traceroute ---
-
-	// We pass a buffered channel sized to max hops, so traceroute can send results without blocking
-	resChan := make(chan hop.TracerouteHop, opts.MaxHops())
-
-	// Start traceroute and wait until it completes
-	if err := traceroute.Traceroute("google.com", opts, resChan); err != nil {
-		log.Fatal(err)
+	switch *protocol {
+	case "tcp":
+		opts.SetProbeProtocol(options.PROTOCOL_TCP)
+	case "udp":
+		opts.SetProbeProtocol(options.PROTOCOL_UDP)
+	default:
+		fmt.Fprintf(os.Stderr, "Error: invalid protocol %q\n", *protocol)
+		os.Exit(1)
 	}
 
-	// Read results from the channel
-	for h := range resChan {
-		fmt.Printf("TTL %d\t%s\t%v\n", h.TTL, h.Address, h.ElapsedTime)
-	}
+	opts.SetFirstHop(*firstHop)
+	opts.SetMaxHops(*maxHops)
+	opts.SetTimeoutMs(*timeoutMs)
+	opts.SetDelayMs(*delayMs)
+	opts.SetRetries(*retries)
+	opts.SetMaxConsecutiveNoReplies(*maxNoReply)
 
-	// --- Asynchronous traceroute ---
-
-	// Useful if you want to show hops live or do other work concurrently
-	resChan = make(chan hop.TracerouteHop)
+	resChan := make(chan hop.TracerouteHop)
 	errChan := make(chan error)
 
-	// Run traceroute in a separate goroutine, send any error to errChan
 	go func() {
-		if err := traceroute.Traceroute("google.com", opts, resChan); err != nil {
+		if err := traceroute.Traceroute(target, opts, resChan); err != nil {
 			errChan <- err
 		}
 	}()
 
-	// Collect results as they arrive, or exit if an error occurs
 	for {
 		select {
 		case hop, ok := <-resChan:
 			if !ok {
 				fmt.Println("Traceroute completed successfully")
-				return // Channel closed → traceroute finished
+				return
 			}
 			fmt.Printf("TTL %d\t%s\t%v\n", hop.TTL, hop.Address, hop.ElapsedTime)
 		case err := <-errChan:
