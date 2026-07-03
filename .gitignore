@@ -61,3 +61,4 @@ golang/project/probe/probe
 /golang/dmvt/demo
 /golang/dmvt/output
 /golang/traceroute/vendor
+golang/traceroute/gotraceroute
