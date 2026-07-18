@@ -384,7 +384,7 @@ systemctl restart systemd-resolved
 
 # openssl测试
 ```
-openssl s_client -connect 12:9999 -servername www.qq.com
+openssl s_client -connect 127.0.0.1:9999 -servername www.qq.com
 ```
 
 ### pip
