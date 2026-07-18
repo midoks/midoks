@@ -382,6 +382,11 @@ journalctl -u nginx -f
 systemctl restart systemd-resolved
 ```
 
+# openssl测试
+```
+openssl s_client -connect 12:9999 -servername www.qq.com
+```
+
 ### pip
 ```
 pip install urllib3==1.23 -i https://pypi.tuna.tsinghua.edu.cn/simple
