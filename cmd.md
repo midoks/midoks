@@ -393,6 +393,17 @@ curl --resolve "example.com:80:192.168.1.100" http://example.com
 pip install urllib3==1.23 -i https://pypi.tuna.tsinghua.edu.cn/simple
 ```
 
+### nezha tsdb
+```
+tsdb:
+  data_path: "data/tsdb"                # 数据存储目录（相对或绝对路径）
+  retention_days: 30                    # 保留天数（默认30）
+  min_free_disk_space_gb: 1             # 磁盘剩余少于该值(GB)停止写入
+  max_memory_mb: 256                    # 最大内存使用（MB）
+  write_buffer_size: 512                # 写入缓冲区大小
+  write_buffer_flush_interval: 5        # 缓冲区刷新间隔（秒）
+```
+
 ## golang
 ```
 export GOROOT=/usr/lib/golang
