@@ -3,45 +3,13 @@
 # cmd
 # curl -fsSL https://raw.githubusercontent.com/midoks/midoks/refs/heads/master/shell/seaweedfs/seaweedfs.sh | bash
 
-
-# cd /tmp
-
-# if [ ! -f linux_amd64_large_disk.tar.gz ];then
-# 	wget -O linux_amd64_large_disk.tar.gz https://github.com/seaweedfs/seaweedfs/releases/download/4.44/linux_amd64_large_disk.tar.gz
-# fi
-
-# weed master -ip=192.168.1.10 -port=9333 -mdir=/data/seaweedfs/master -peers=192.168.1.10:9333,192.168.1.11:9333,192.168.1.12:9333
-
-
-#!/bin/bash
-# seaweedfs_single.sh - SeaweedFS 单机快速部署脚本
-
-#!/bin/bash
-# seaweedfs_cluster_node.sh - SeaweedFS 集群节点部署脚本 (基于官方GitHub)
-# 使用方式: NODE_ROLE=<role> ./seaweedfs_cluster_node.sh
-# 角色可选: master, volume
-
-set -e
-
-# --- 配置变量 ---
-INSTALL_DIR="/usr/local/bin"
-DATA_DIR="/data/seaweedfs"
-MASTER_IP="<MASTER_IP>:9333"  # 替换为你的 Master 节点 IP
-THIS_IP=$(hostname -I | awk '{print $1}')
-VERSION="latest"
-
-# --- 参数检查 ---
-if [ -z "$NODE_ROLE" ]; then
-    echo "错误: 请设置 NODE_ROLE 环境变量 (master/volume)"
-    exit 1
-fi
-
 # --- 函数：获取最新版本号 ---
 get_latest_version() {
-    curl -s https://api.github.com/repos/chrislusf/seaweedfs/releases/latest | \
+    curl -s https://api.github.com/repos/seaweedfs/seaweedfs/releases/latest | \
     grep '"tag_name"' | \
     sed -E 's/.*"([^"]+)".*/\1/'
 }
+
 
 # --- 1. 下载 SeaweedFS (与单机版相同) ---
 echo ">>> 1. 开始下载 SeaweedFS..."
@@ -50,13 +18,40 @@ if [ "$VERSION" == "latest" ]; then
     echo "    获取到最新版本: $VERSION"
 fi
 
-DOWNLOAD_URL="https://github.com/seaweedfs/seaweedfs/releases/download/${VERSION}/linux_amd64.tar.gz"
-TARBALL="linux_amd64.tar.gz"
+# --- 配置变量 ---
+INSTALL_DIR="/usr/local/bin"
+DATA_DIR="/data/seaweedfs"
+MASTER_IP="<MASTER_IP>:9333"  # 替换为你的 Master 节点 IP
+THIS_IP=$(hostname -I | awk '{print $1}')
+VERSION="latest"
+
+
+cd /tmp
+
+TARBALL="linux_amd64_large_disk.tar.gz"
+
+if [ ! -f linux_amd64_large_disk.tar.gz ];then
+	wget -O linux_amd64_large_disk.tar.gz https://github.com/seaweedfs/seaweedfs/releases/download/${VERSION}/linux_amd64_large_disk.tar.gz
+fi
+
+# weed master -ip=192.168.1.10 -port=9333 -mdir=/data/seaweedfs/master -peers=192.168.1.10:9333,192.168.1.11:9333,192.168.1.12:9333
 
 wget -q --show-progress "$DOWNLOAD_URL" -O "$TARBALL"
 sudo tar -xzf "$TARBALL" -C "$INSTALL_DIR" weed
 sudo chmod +x "$INSTALL_DIR/weed"
 rm -f "$TARBALL"
+
+
+# --- 参数检查 ---
+if [ -z "$NODE_ROLE" ]; then
+    echo "错误: 请设置 NODE_ROLE 环境变量 (master/volume)"
+    exit 1
+fi
+
+
+DOWNLOAD_URL="https://github.com/seaweedfs/seaweedfs/releases/download/${VERSION}/linux_amd64.tar.gz"
+
+
 
 echo ">>> 2. 验证安装..."
 weed version
