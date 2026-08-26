@@ -16,13 +16,25 @@
 #!/bin/bash
 # seaweedfs_single.sh - SeaweedFS 单机快速部署脚本
 
-set -e  # 遇到错误立即退出
+#!/bin/bash
+# seaweedfs_cluster_node.sh - SeaweedFS 集群节点部署脚本 (基于官方GitHub)
+# 使用方式: NODE_ROLE=<role> ./seaweedfs_cluster_node.sh
+# 角色可选: master, volume
+
+set -e
 
 # --- 配置变量 ---
 INSTALL_DIR="/usr/local/bin"
 DATA_DIR="/data/seaweedfs"
-MASTER_IP=$(hostname -I | awk '{print $1}')  # 自动获取本机IP
-VERSION="latest"  # 可指定版本，如 "3.92"
+MASTER_IP="<MASTER_IP>:9333"  # 替换为你的 Master 节点 IP
+THIS_IP=$(hostname -I | awk '{print $1}')
+VERSION="latest"
+
+# --- 参数检查 ---
+if [ -z "$NODE_ROLE" ]; then
+    echo "错误: 请设置 NODE_ROLE 环境变量 (master/volume)"
+    exit 1
+fi
 
 # --- 函数：获取最新版本号 ---
 get_latest_version() {
@@ -31,39 +43,51 @@ get_latest_version() {
     sed -E 's/.*"([^"]+)".*/\1/'
 }
 
-# --- 1. 下载 SeaweedFS ---
+# --- 1. 下载 SeaweedFS (与单机版相同) ---
 echo ">>> 1. 开始下载 SeaweedFS..."
 if [ "$VERSION" == "latest" ]; then
     VERSION=$(get_latest_version)
     echo "    获取到最新版本: $VERSION"
 fi
 
-DOWNLOAD_URL="https://github.com/chrislusf/seaweedfs/releases/download/${VERSION}/linux_amd64.tar.gz"
+DOWNLOAD_URL="https://github.com/seaweedfs/seaweedfs/releases/download/${VERSION}/linux_amd64.tar.gz"
 TARBALL="linux_amd64.tar.gz"
 
 wget -q --show-progress "$DOWNLOAD_URL" -O "$TARBALL"
-echo "    下载完成."
-
-# --- 2. 解压并安装 ---
-echo ">>> 2. 解压并安装到 $INSTALL_DIR ..."
 sudo tar -xzf "$TARBALL" -C "$INSTALL_DIR" weed
 sudo chmod +x "$INSTALL_DIR/weed"
 rm -f "$TARBALL"
 
-# --- 3. 验证安装 ---
-echo ">>> 3. 验证安装..."
+echo ">>> 2. 验证安装..."
 weed version
 
-# --- 4. 创建数据目录 ---
-echo ">>> 4. 创建数据目录 $DATA_DIR ..."
-sudo mkdir -p "$DATA_DIR"/{master,volume,filer}
+# --- 3. 根据角色启动服务 ---
+echo ">>> 3. 以 '$NODE_ROLE' 角色启动服务..."
 
-# --- 5. 启动服务 (后台运行) ---
-echo ">>> 5. 启动 SeaweedFS 服务 (使用 'weed server' 命令)..."
-# 'weed server' 命令会同时启动 master, volume, 和 filer[reference:2][reference:3]
-nohup weed server -dir="$DATA_DIR" -ip="$MASTER_IP" -filer -s3 > /tmp/seaweedfs.log 2>&1 &
+sudo mkdir -p "$DATA_DIR"
 
-echo ">>> 部署完成！"
-echo "    Master 管理界面: http://$MASTER_IP:9333"
-echo "    S3 API 端点: http://$MASTER_IP:8333"
-echo "    日志文件: /tmp/seaweedfs.log"
+case $NODE_ROLE in
+    master)
+        echo "    启动 Master 节点..."
+        nohup weed master -ip="$THIS_IP" -port=9333 -mdir="$DATA_DIR/master" \
+            > /tmp/seaweedfs-master.log 2>&1 &
+        ;;
+
+    volume)
+        echo "    启动 Volume 节点..."
+        nohup weed volume -ip="$THIS_IP" -port=8080 \
+            -dir="$DATA_DIR/volume" \
+            -master="$MASTER_IP" \
+            -max=0 \
+            > /tmp/seaweedfs-volume.log 2>&1 &
+        ;;
+
+    *)
+        echo "错误: 不支持的 NODE_ROLE: $NODE_ROLE"
+        exit 1
+        ;;
+esac
+
+echo ">>> 节点部署完成！"
+echo "    角色: $NODE_ROLE"
+echo "    日志文件: /tmp/seaweedfs-${NODE_ROLE}.log"
