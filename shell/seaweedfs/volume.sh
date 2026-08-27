@@ -3,6 +3,8 @@
 # cmd
 # curl -fsSL https://raw.githubusercontent.com/midoks/midoks/refs/heads/master/shell/seaweedfs/volume.sh | bash
 
+mkdir -p /opt/seaweedfs/data/volume
+chmod 755 /opt/seaweedfs/data/volume
 
 tee /etc/systemd/system/seaweedfs-volume.service << 'EOF'
 [Unit]
