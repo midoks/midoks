@@ -1,0 +1,41 @@
+#!/bin/bash
+
+# cmd
+# curl -fsSL https://raw.githubusercontent.com/midoks/midoks/refs/heads/master/shell/seaweedfs/volume.sh | bash
+
+
+tee /etc/systemd/system/seaweedfs-volume.service << 'EOF'
+[Unit]
+Description=SeaweedFS Volume
+After=network.target seaweedfs-volume.service
+Wants=network.target
+
+[Service]
+Type=simple
+User=root
+Group=root
+WorkingDirectory=/opt/seaweedfs
+ExecStart=/usr/local/bin/weed volume \
+    -dir=/opt/seaweedfs/data/volume \
+    -mserver=127.0.0.1:9333 \
+    -port=8080 \
+    -max=0
+Restart=always
+RestartSec=5
+LimitNOFILE=65536
+StandardOutput=append:/var/log/seaweedfs/volume.log
+StandardError=append:/var/log/seaweedfs/volume.log
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+
+systemctl daemon-reload
+systemctl enable seaweedfs-volume
+systemctl start seaweedfs-volume
+
+# systemctl restart seaweedfs-volume
+
+# systemctl status seaweedfs-volume
+# journalctl -u seaweedfs-volume -f
