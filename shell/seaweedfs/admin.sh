@@ -69,5 +69,6 @@ systemctl start seaweedfs-admin
 #   -masters="localhost:9333" \
 #   -dataDir="/var/lib/seaweedfs-admin" \
 #   -adminUser=admin \
-#   -adminPassword=I0K4GMMv8mS9
+#   -adminPassword=I0K4GMMv8mS9 \
+#   -urlPrefix=weed99
 
