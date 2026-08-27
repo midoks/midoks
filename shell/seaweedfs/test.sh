@@ -15,7 +15,7 @@ curl -L -O https://dl.min.io/client/mc/release/linux-amd64/mc
 chmod +x mc
 
 
-# ./mc alias set src http://38.246.114.74:9090 admin I0K4GMMv8mS9
+# ./mc alias set src http://38.246.114.74:9000 admin I0K4GMMv8mS9
 
 # ./mc alias set dst http://154.12.53.22:8333 app I0K4GMMv8mS9
 
