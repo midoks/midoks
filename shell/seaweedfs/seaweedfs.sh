@@ -29,9 +29,9 @@ VERSION="latest"
 cd /tmp
 
 TARBALL="linux_amd64_large_disk.tar.gz"
-
+DOWNLOAD_URL="https://github.com/seaweedfs/seaweedfs/releases/download/${VERSION}/freebsd_amd64_large_disk.tar.gz"
 if [ ! -f linux_amd64_large_disk.tar.gz ];then
-	wget -O linux_amd64_large_disk.tar.gz https://github.com/seaweedfs/seaweedfs/releases/download/${VERSION}/linux_amd64_large_disk.tar.gz
+	wget -O linux_amd64_large_disk.tar.gz $DOWNLOAD_URL
 fi
 
 # weed master -ip=192.168.1.10 -port=9333 -mdir=/data/seaweedfs/master -peers=192.168.1.10:9333,192.168.1.11:9333,192.168.1.12:9333
@@ -48,8 +48,6 @@ if [ -z "$NODE_ROLE" ]; then
     exit 1
 fi
 
-
-DOWNLOAD_URL="https://github.com/seaweedfs/seaweedfs/releases/download/${VERSION}/linux_amd64.tar.gz"
 
 
 
