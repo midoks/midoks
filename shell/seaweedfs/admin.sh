@@ -14,7 +14,7 @@ ADMIN_USER="admin"
 ADMIN_PASSWORD="I0K4GMMv8mS9"
 URL_PREFIX="/weed99"
 EOF
-
+chmod 600 /etc/seaweedfs/admin.env
 
 tee /etc/systemd/system/seaweedfs-admin.service << 'EOF'
 [Unit]
@@ -61,11 +61,12 @@ systemctl enable seaweedfs-admin
 systemctl start seaweedfs-admin
 
 # systemctl status seaweedfs-admin
+# journalctl -u seaweedfs-admin -f
 
-weed admin \
-  -port=23646 \
-  -masters="localhost:9333" \
-  -dataDir="/var/lib/seaweedfs-admin" \
-  -adminUser=admin \
-  -adminPassword=I0K4GMMv8mS9
+# weed admin \
+#   -port=23646 \
+#   -masters="localhost:9333" \
+#   -dataDir="/var/lib/seaweedfs-admin" \
+#   -adminUser=admin \
+#   -adminPassword=I0K4GMMv8mS9
 
