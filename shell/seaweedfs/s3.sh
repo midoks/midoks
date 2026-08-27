@@ -21,7 +21,7 @@ tee /etc/seaweedfs/s3config.json << 'EOF'
       "name": "app-user",
       "credentials": [
         {
-          "accessKey": "admin",
+          "accessKey": "app",
           "secretKey": "I0K4GMMv8mS9"
         }
       ],
@@ -76,8 +76,8 @@ systemctl daemon-reload
 systemctl enable seaweedfs-s3
 systemctl start seaweedfs-s3
 
-# systemctl restart seaweedfs-s3
-# systemctl status seaweedfs-s3
+systemctl restart seaweedfs-s3
+systemctl status seaweedfs-s3
 # journalctl -u seaweedfs-s3 -f
 
 
