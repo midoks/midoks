@@ -57,6 +57,7 @@ LimitNOFILE=65536
 WantedBy=multi-user.target
 EOF
 
+systemctl daemon-reload
 systemctl enable seaweedfs-admin
 systemctl start seaweedfs-admin
 
