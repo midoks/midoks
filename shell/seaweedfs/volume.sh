@@ -19,7 +19,7 @@ Group=root
 WorkingDirectory=/opt/seaweedfs
 ExecStart=/usr/local/bin/weed volume \
     -dir=/opt/seaweedfs/data/volume \
-    -mserver=127.0.0.1:9333 \
+    -mserver=154.12.53.22:9333 \
     -port=8080 \
     -max=0
 Restart=always
@@ -43,8 +43,8 @@ systemctl start seaweedfs-volume
 
 
 # echo "volume.grow -collection=m3u8 -count=1" | weed shell
-# systemctl stop seaweedfs-volume
-# systemctl daemon-reload
-# systemctl restart seaweedfs-volume
-# systemctl status seaweedfs-volume
+systemctl stop seaweedfs-volume
+systemctl daemon-reload
+systemctl restart seaweedfs-volume
+systemctl status seaweedfs-volume
 # journalctl -u seaweedfs-volume -f

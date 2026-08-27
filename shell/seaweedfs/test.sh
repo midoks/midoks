@@ -2,6 +2,9 @@
 
 # apt install -y rclone
 
+curl http://127.0.0.1:9333/dir/assign  
+
+
 curl -F "file=@/Users/midoks/Desktop/a.ping" http://154.12.53.22:8888/test/
 
 curl -F "file=@/tmp/test.txt" "http://127.0.0.1:8888/test/"

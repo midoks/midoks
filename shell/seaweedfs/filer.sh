@@ -16,7 +16,7 @@ User=root
 Group=root
 WorkingDirectory=/opt/seaweedfs
 ExecStart=/usr/local/bin/weed filer \
-    -master=127.0.0.1:9333 \
+    -master=154.12.53.22:9333 \
     -port=8888
 Restart=always
 RestartSec=5
@@ -33,9 +33,9 @@ systemctl daemon-reload
 systemctl enable seaweedfs-filer
 systemctl start seaweedfs-filer
 
-# systemctl daemon-reload
-# systemctl restart seaweedfs-filer
-# systemctl status seaweedfs-filer
+systemctl daemon-reload
+systemctl restart seaweedfs-filer
+systemctl status seaweedfs-filer
 # journalctl -u seaweedfs-filer -f
 
 
