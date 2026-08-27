@@ -33,8 +33,10 @@ systemctl daemon-reload
 systemctl enable seaweedfs-filer
 systemctl start seaweedfs-filer
 
+# systemctl daemon-reload
 # systemctl restart seaweedfs-filer
-
 # systemctl status seaweedfs-filer
 # journalctl -u seaweedfs-filer -f
 
+
+# curl http://127.0.0.1:9333/vol/status | jq .
