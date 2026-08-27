@@ -27,7 +27,7 @@ fi
 cd /tmp
 
 TARBALL="linux_amd64_large_disk.tar.gz"
-DOWNLOAD_URL="https://github.com/seaweedfs/seaweedfs/releases/download/${VERSION}/freebsd_amd64_large_disk.tar.gz"
+DOWNLOAD_URL="https://github.com/seaweedfs/seaweedfs/releases/download/${VERSION}/linux_amd64_full_large_disk.tar.gz"
 if [ ! -f linux_amd64_large_disk.tar.gz ];then
 	wget -O linux_amd64_large_disk.tar.gz $DOWNLOAD_URL
 fi
@@ -45,9 +45,6 @@ if [ -z "$NODE_ROLE" ]; then
     echo "错误: 请设置 NODE_ROLE 环境变量 (master/volume)"
     exit 1
 fi
-
-
-
 
 echo ">>> 2. 验证安装..."
 weed version
