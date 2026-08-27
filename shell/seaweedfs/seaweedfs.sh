@@ -3,6 +3,8 @@
 # cmd
 # curl -fsSL https://raw.githubusercontent.com/midoks/midoks/refs/heads/master/shell/seaweedfs/seaweedfs.sh | bash
 
+# rm -rf /usr/local/bin/weed
+
 # --- 函数：获取最新版本号 ---
 get_latest_version() {
     curl -s https://api.github.com/repos/seaweedfs/seaweedfs/releases/latest | \
@@ -26,10 +28,10 @@ fi
 
 cd /tmp
 
-TARBALL="linux_amd64_large_disk.tar.gz"
+TARBALL="linux_amd64_full_large_disk.tar.gz"
 DOWNLOAD_URL="https://github.com/seaweedfs/seaweedfs/releases/download/${VERSION}/linux_amd64_full_large_disk.tar.gz"
-if [ ! -f linux_amd64_large_disk.tar.gz ];then
-	wget -O linux_amd64_large_disk.tar.gz $DOWNLOAD_URL
+if [ ! -f linux_amd64_full_large_disk.tar.gz ];then
+	wget -O linux_amd64_full_large_disk.tar.gz $DOWNLOAD_URL
 fi
 
 # weed master -ip=192.168.1.10 -port=9333 -mdir=/data/seaweedfs/master -peers=192.168.1.10:9333,192.168.1.11:9333,192.168.1.12:9333
