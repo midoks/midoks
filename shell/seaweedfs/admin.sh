@@ -6,8 +6,6 @@
 # rm -rf /usr/local/bin/weed
 
 
-
-
 tee /etc/seaweedfs/admin.env << 'EOF'
 ADMIN_PORT=23646
 MASTER_ADDRS=localhost:9333
@@ -59,6 +57,7 @@ LimitNOFILE=65536
 WantedBy=multi-user.target
 EOF
 
+systemctl enable seaweedfs-admin
 systemctl start seaweedfs-admin
 # weed admin \
 #   -port=23646 \
