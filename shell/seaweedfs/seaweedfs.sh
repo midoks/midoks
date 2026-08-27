@@ -10,14 +10,6 @@ get_latest_version() {
     sed -E 's/.*"([^"]+)".*/\1/'
 }
 
-
-# --- 1. 下载 SeaweedFS (与单机版相同) ---
-echo ">>> 1. 开始下载 SeaweedFS..."
-if [ "$VERSION" == "latest" ]; then
-    VERSION=$(get_latest_version)
-    echo "    获取到最新版本: $VERSION"
-fi
-
 # --- 配置变量 ---
 INSTALL_DIR="/usr/local/bin"
 DATA_DIR="/data/seaweedfs"
@@ -25,6 +17,12 @@ MASTER_IP="<MASTER_IP>:9333"  # 替换为你的 Master 节点 IP
 THIS_IP=$(hostname -I | awk '{print $1}')
 VERSION="latest"
 
+# --- 1. 下载 SeaweedFS (与单机版相同) ---
+echo ">>> 1. 开始下载 SeaweedFS..."
+if [ "$VERSION" == "latest" ]; then
+    VERSION=$(get_latest_version)
+    echo "    获取到最新版本: $VERSION"
+fi
 
 cd /tmp
 
