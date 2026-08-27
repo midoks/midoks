@@ -15,7 +15,8 @@ tee /etc/seaweedfs/s3config.json << 'EOF'
           "secretKey": "I0K4GMMv8mS9"
         }
       ],
-      "actions": ["Read", "Write", "List", "Admin"]
+      "actions": ["Read", "Write", "List", "Admin"],
+      "buckets": ["m3u8"]
     },
     {
       "name": "app-user",
@@ -76,13 +77,16 @@ systemctl daemon-reload
 systemctl enable seaweedfs-s3
 systemctl start seaweedfs-s3
 
+systemctl stop seaweedfs-s3
+
+systemctl daemon-reload
 systemctl restart seaweedfs-s3
 systemctl status seaweedfs-s3
 # journalctl -u seaweedfs-s3 -f
 
 
-
-# /usr/local/bin/weed s3 \
-# -filer=127.0.0.1:8888 \
-# -port=8333 \
-# -domainName=s3.example.com
+export AWS_ACCESS_KEY_ID=WS32CSKSBZRTN5UXYD50
+export AWS_SECRET_ACCESS_KEY=BhTky6gXKLgmb3xUQx5OPqKKDPoC97ofpZyF5jimbv
+/usr/local/bin/weed s3 \
+-filer=127.0.0.1:8888 \
+-port=8333

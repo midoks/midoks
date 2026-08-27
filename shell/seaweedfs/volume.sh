@@ -33,11 +33,18 @@ WantedBy=multi-user.target
 EOF
 
 
+# curl http://127.0.0.1:9333/dir/status | jq .
+
+# weed shell -master=127.0.0.1:9333
+
 systemctl daemon-reload
 systemctl enable seaweedfs-volume
 systemctl start seaweedfs-volume
 
-# systemctl restart seaweedfs-volume
 
+# echo "volume.grow -collection=m3u8 -count=1" | weed shell
+# systemctl stop seaweedfs-volume
+# systemctl daemon-reload
+# systemctl restart seaweedfs-volume
 # systemctl status seaweedfs-volume
 # journalctl -u seaweedfs-volume -f
