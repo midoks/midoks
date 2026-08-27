@@ -6,14 +6,13 @@
 # rm -rf /usr/local/bin/weed
 
 mkdir -p /etc/seaweedfs
-touch /etc/seaweedfs/admin.env
 tee /etc/seaweedfs/admin.env << 'EOF'
 ADMIN_PORT=23646
-MASTER_ADDRS=localhost:9333
-DATA_DIR=/var/lib/seaweedfs-admin
-ADMIN_USER=admin
-ADMIN_PASSWORD=I0K4GMMv8mS9
-URL_PREFIX=weed99
+MASTER_ADDRS="localhost:9333"
+DATA_DIR="/var/lib/seaweedfs-admin"
+ADMIN_USER="admin"
+ADMIN_PASSWORD="I0K4GMMv8mS9"
+URL_PREFIX="/weed99"
 EOF
 
 
@@ -63,10 +62,10 @@ systemctl start seaweedfs-admin
 
 # systemctl status seaweedfs-admin
 
-# weed admin \
-#   -port=23646 \
-#   -masters="localhost:9333" \
-#   -dataDir="/var/lib/seaweedfs-admin" \
-#   -adminUser=admin \
-#   -adminPassword=I0K4GMMv8mS9
+weed admin \
+  -port=23646 \
+  -masters="localhost:9333" \
+  -dataDir="/var/lib/seaweedfs-admin" \
+  -adminUser=admin \
+  -adminPassword=I0K4GMMv8mS9
 
