@@ -34,3 +34,6 @@ EOF
 systemctl daemon-reload
 systemctl enable seaweedfs-master
 systemctl start seaweedfs-master
+
+# systemctl status seaweedfs-master
+# journalctl -u seaweedfs-master -f
