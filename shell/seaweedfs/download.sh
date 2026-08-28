@@ -31,10 +31,10 @@ cd /tmp
 TARBALL="linux_amd64_full_large_disk.tar.gz"
 DOWNLOAD_URL="https://github.com/seaweedfs/seaweedfs/releases/download/${VERSION}/linux_amd64_full_large_disk.tar.gz"
 if [ ! -f linux_amd64_full_large_disk.tar.gz ];then
-	wget -O linux_amd64_full_large_disk.tar.gz $DOWNLOAD_URL
+	# wget -O linux_amd64_full_large_disk.tar.gz $DOWNLOAD_URL
+    wget -q --show-progress "$DOWNLOAD_URL" -O "$TARBALL"
 fi
 
-wget -q --show-progress "$DOWNLOAD_URL" -O "$TARBALL"
 sudo tar -xzf "$TARBALL" -C "$INSTALL_DIR" weed
 sudo chmod +x "$INSTALL_DIR/weed"
 rm -f "$TARBALL"
