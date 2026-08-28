@@ -4,8 +4,7 @@
 # curl -fsSL https://raw.githubusercontent.com/midoks/midoks/refs/heads/master/shell/seaweedfs/filer.sh | bash
 
 # tail -f /var/log/seaweedfs/filer.log
-# mkdir -p /opt/seaweedfs/filer
-
+mkdir -p /opt/seaweedfs/filer
 tee /etc/systemd/system/seaweedfs-filer.service << 'EOF'
 [Unit]
 Description=SeaweedFS Filer
