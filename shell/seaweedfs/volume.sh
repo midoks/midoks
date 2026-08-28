@@ -22,7 +22,6 @@ ExecStart=/usr/local/bin/weed volume \
     -mserver=154.12.53.22:9333 \
     -port=8080 \
     -index=leveldb \
-    -volumeSizeLimitMB=2048000 \
     -max=0 \
     -minFreeSpacePercent=7 \     # 预留 7% 空间
     -volumePreallocate=true     # 启用预分配
