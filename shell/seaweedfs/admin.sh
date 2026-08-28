@@ -10,7 +10,7 @@ mkdir -p /var/log/seaweedfs
 
 tee /etc/seaweedfs/admin.env << 'EOF'
 ADMIN_PORT=23646
-MASTER_ADDRS="localhost:9333"
+MASTER_ADDRS="10.210.0.14:9333,10.210.0.12:9333,10.210.0.13:9333"
 DATA_DIR="/var/lib/seaweedfs-admin"
 ADMIN_USER="admin"
 ADMIN_PASSWORD="I0K4GMMv8mS9"

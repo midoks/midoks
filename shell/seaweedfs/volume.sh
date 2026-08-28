@@ -6,8 +6,12 @@
 # mkdir -p /var/log/seaweedfs
 # tail -f /var/log/seaweedfs/volume.log
 
+# ps -ef | grep "weed filer"
+
 mkdir -p /data/seaweedfs/data/volume
 chmod 755 /data/seaweedfs/data/volume
+
+# telnet 10.210.0.11 19333
 
 # 预留 7% 空间
 # 增加文件描述符限制，对高并发场景很重要
@@ -24,7 +28,7 @@ User=root
 Group=root
 ExecStart=/usr/local/bin/weed volume \
     -dir=/data/seaweedfs/data/volume \
-    -mserver=10.210.0.11:9333,10.210.0.12:9333,10.210.0.13:9333 \
+    -mserver=10.210.0.14:9333,10.210.0.12:9333,10.210.0.13:9333 \
     -port=8080 \
     -index=leveldb \
     -max=0 \
