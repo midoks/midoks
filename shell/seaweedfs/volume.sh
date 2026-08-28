@@ -19,7 +19,7 @@ chmod 755 /data/seaweedfs/data/volume
 tee /etc/systemd/system/seaweedfs-volume.service << 'EOF'
 [Unit]
 Description=SeaweedFS Volume
-After=network.target seaweedfs-volume.service
+After=network.target
 Wants=network.target
 
 [Service]
@@ -27,6 +27,7 @@ Type=simple
 User=root
 Group=root
 ExecStart=/usr/local/bin/weed volume \
+    -ip=10.210.0.15 \
     -dir=/data/seaweedfs/data/volume \
     -mserver=10.210.0.14:9333,10.210.0.12:9333,10.210.0.13:9333 \
     -port=8080 \

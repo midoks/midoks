@@ -17,6 +17,7 @@ User=root
 Group=root
 WorkingDirectory=/opt/seaweedfs
 ExecStart=/usr/local/bin/weed filer \
+    -ip=10.210.0.11 \
     -master=10.210.0.14:9333,10.210.0.12:9333,10.210.0.13:9333 \
     -port=8888
 Restart=always

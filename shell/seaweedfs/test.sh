@@ -6,6 +6,26 @@
 # cat /usr/lib/systemd/system/minio.service
 # cat /etc/default/minio
 
+apt install wrk -y
+
+# wrk -t4 -c5000 -d30s http://38.190.177.102:9000/m3u8/video/m3u8/202306/26/001fac37ee02/000000000.ts
+# wrk -t4 -c5000 -d30s http://38.190.177.102:8333/m3u8/a.png
+# wrk -t4 -c5000 -d30s http://10.210.0.15:8333/m3u8/a.png
+
+
+
+# wrk -t4 -c5000 -d30s http://38.190.177.102:8333/m3u8/a.png
+# wrk -t4 -c5000 -d30s http://10.210.0.15:8333/m3u8/000000000.ts
+
+
+# wrk -t4 -c100 -d30s http://38.190.177.102:9000/m3u8/video/m3u8/202306/26/001fac37ee02/000000000.ts
+# wrk -t4 -c100 -d30s http://38.190.177.102:8333/m3u8/000000000.ts
+
+
+wrk -t4 -c300 -d30s http://10.210.0.15:9000/m3u8/video/m3u8/202306/26/001fac37ee02/000000000.ts
+wrk -t4 -c2000 -d30s http://10.210.0.15:8333/m3u8/000000000.ts
+
+
 curl http://127.0.0.1:9333/dir/assign  
 
 

@@ -4,6 +4,9 @@
 # curl -fsSL https://raw.githubusercontent.com/midoks/midoks/refs/heads/master/shell/seaweedfs/s3.sh | bash
 
 
+# tail -f /var/log/seaweedfs/s3.log
+
+mkdir -p /etc/seaweedfs
 tee /etc/seaweedfs/s3config.json << 'EOF'
 {
   "identities": [
@@ -19,7 +22,7 @@ tee /etc/seaweedfs/s3config.json << 'EOF'
       "buckets": ["m3u8"]
     },
     {
-      "name": "app-user",
+      "name": "app",
       "credentials": [
         {
           "accessKey": "app",
@@ -41,7 +44,7 @@ EOF
 tee /etc/seaweedfs/s3.env << 'EOF'
 # S3 Gateway 配置
 # Filer 地址列表（支持 HA 故障转移）
-FILER_ADDRS="127.0.0.1:8888"
+FILER_ADDRS="10.210.0.11:8888,10.210.0.12:8888,10.210.0.13:8888,10.210.0.14:8888,10.210.0.15:8888"
 S3_PORT=8333
 # 可选，S3 服务域名
 DOMAIN_NAME=s3.example.com
@@ -61,7 +64,6 @@ Wants=network.target
 Type=simple
 User=root
 Group=root
-WorkingDirectory=/opt/seaweedfs
 EnvironmentFile=/etc/seaweedfs/s3.env
 ExecStart=/usr/local/bin/weed s3 \
     -filer=${FILER_ADDRS} \
@@ -76,7 +78,9 @@ StandardError=append:/var/log/seaweedfs/s3.log
 [Install]
 WantedBy=multi-user.target
 EOF
-
+systemctl daemon-reload
+systemctl restart seaweedfs-s3
+systemctl status seaweedfs-s3
 
 systemctl daemon-reload
 systemctl enable seaweedfs-s3
@@ -90,8 +94,7 @@ systemctl status seaweedfs-s3
 # journalctl -u seaweedfs-s3 -f
 
 
-export AWS_ACCESS_KEY_ID=WS32CSKSBZRTN5UXYD50
-export AWS_SECRET_ACCESS_KEY=BhTky6gXKLgmb3xUQx5OPqKKDPoC97ofpZyF5jimbv
 /usr/local/bin/weed s3 \
--filer=127.0.0.1:8888 \
--port=8333
+-filer="10.210.0.11:8888,10.210.0.12:8888,10.210.0.13:8888,10.210.0.14:8888,10.210.0.15:8888" \
+-port=8333 \
+-config=/etc/seaweedfs/s3config.json 
