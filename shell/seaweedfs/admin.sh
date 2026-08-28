@@ -18,6 +18,13 @@ URL_PREFIX="/weed99"
 EOF
 chmod 600 /etc/seaweedfs/admin.env
 
+
+# 如果使用专用用户，修改为：
+# User=seaweedfs
+# Group=seaweedfs
+# 日志管理：输出到 systemd journal 和文件（可选）
+# 如果不想保留文件，使用 StandardOutput=journal 即可
+
 tee /etc/systemd/system/seaweedfs-admin.service << 'EOF'
 [Unit]
 Description=SeaweedFS Admin UI
@@ -31,13 +38,8 @@ Wants=network.target
 Type=simple
 User=root
 Group=root
-# 如果使用专用用户，修改为：
-# User=seaweedfs
-# Group=seaweedfs
 
-WorkingDirectory=/opt/seaweedfs
 EnvironmentFile=/etc/seaweedfs/admin.env
-
 ExecStart=/usr/local/bin/weed admin \
     -port=${ADMIN_PORT} \
     -masters=${MASTER_ADDRS} \
@@ -46,20 +48,19 @@ ExecStart=/usr/local/bin/weed admin \
     -adminPassword=${ADMIN_PASSWORD} \
     ${URL_PREFIX:+-urlPrefix=${URL_PREFIX}}
 
-# 日志管理：输出到 systemd journal 和文件（可选）
 StandardOutput=append:/var/log/seaweedfs/admin.log
 StandardError=append:/var/log/seaweedfs/admin.log
-# 如果不想保留文件，使用 StandardOutput=journal 即可
-
 Restart=always
 RestartSec=10
 LimitNOFILE=65536
-
 [Install]
 WantedBy=multi-user.target
 EOF
-
 systemctl daemon-reload
+systemctl enable seaweedfs-admin
+systemctl restart seaweedfs-admin
+systemctl status seaweedfs-admin
+
 systemctl enable seaweedfs-admin
 systemctl start seaweedfs-admin
 

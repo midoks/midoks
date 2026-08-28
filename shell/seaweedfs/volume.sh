@@ -3,8 +3,11 @@
 # cmd
 # curl -fsSL https://raw.githubusercontent.com/midoks/midoks/refs/heads/master/shell/seaweedfs/volume.sh | bash
 
-mkdir -p /opt/seaweedfs/data/volume
-chmod 755 /opt/seaweedfs/data/volume
+# mkdir -p /var/log/seaweedfs
+# tail -f /var/log/seaweedfs/volume.log
+
+mkdir -p /data/seaweedfs/data/volume
+chmod 755 /data/seaweedfs/data/volume
 
 tee /etc/systemd/system/seaweedfs-volume.service << 'EOF'
 [Unit]
@@ -18,13 +21,12 @@ User=root
 Group=root
 WorkingDirectory=/opt/seaweedfs
 ExecStart=/usr/local/bin/weed volume \
-    -dir=/opt/seaweedfs/data/volume \
-    -mserver=154.12.53.22:9333 \
+    -dir=/data/seaweedfs/data/volume \
+    -mserver=10.210.0.13:9333 \
     -port=8080 \
     -index=leveldb \
     -max=0 \
-    -minFreeSpacePercent=7 \     # 预留 7% 空间
-    -volumePreallocate=true     # 启用预分配
+    -minFreeSpacePercent=7     # 预留 7% 空间
 
 Restart=always
 RestartSec=5
@@ -53,3 +55,14 @@ systemctl daemon-reload
 systemctl restart seaweedfs-volume
 systemctl status seaweedfs-volume
 # journalctl -u seaweedfs-volume -f
+
+
+
+
+/usr/local/bin/weed volume \
+    -dir=/data/seaweedfs/data/volume \
+    -mserver=10.210.0.11:9333 \
+    -port=8080 \
+    -index=leveldb \
+    -max=0 \
+    -minFreeSpacePercent=7
