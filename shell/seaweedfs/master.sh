@@ -18,11 +18,12 @@ WorkingDirectory=/opt/seaweedfs
 ExecStart=/usr/local/bin/weed master \
     -ip=154.12.53.22 \
     -port=9333 \
+    -volumeSizeLimitMB=2048000 \ # 例如 2TB（2048 * 1024 MB）
     -mdir=/opt/seaweedfs/data/master \
-    -defaultReplication=000
+    -defaultReplication=000 
 Restart=always
 RestartSec=5
-LimitNOFILE=65536
+LimitNOFILE=1000000
 StandardOutput=append:/var/log/seaweedfs/master.log
 StandardError=append:/var/log/seaweedfs/master.log
 

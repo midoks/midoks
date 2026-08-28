@@ -15,7 +15,6 @@ get_latest_version() {
 # --- 配置变量 ---
 INSTALL_DIR="/usr/local/bin"
 DATA_DIR="/data/seaweedfs"
-MASTER_IP="<MASTER_IP>:9333"  # 替换为你的 Master 节点 IP
 THIS_IP=$(hostname -I | awk '{print $1}')
 VERSION="latest"
 NODE_ROLE="master"
