@@ -31,7 +31,7 @@ tee /etc/seaweedfs/s3config.json << 'EOF'
     },
     {
       "name": "anonymous",
-      "actions": ["Read","List"],
+      "actions": ["Read"],
       "buckets": ["m3u8"]
     }
   ]
