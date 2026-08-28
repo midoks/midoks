@@ -21,12 +21,16 @@ ExecStart=/usr/local/bin/weed volume \
     -dir=/opt/seaweedfs/data/volume \
     -mserver=154.12.53.22:9333 \
     -port=8080 \
+    -index=leveldb \
+    -volumeSizeLimitMB=2048000 \
     -max=0 \
     -minFreeSpacePercent=7 \     # 预留 7% 空间
-    -volumePreallocate=true      # 启用预分配
+    -volumePreallocate=true     # 启用预分配
+
 Restart=always
 RestartSec=5
-LimitNOFILE=65536
+# 增加文件描述符限制，对高并发场景很重要
+LimitNOFILE=1000000
 StandardOutput=append:/var/log/seaweedfs/volume.log
 StandardError=append:/var/log/seaweedfs/volume.log
 
