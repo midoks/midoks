@@ -3,6 +3,7 @@
 # cmd
 # curl -fsSL https://raw.githubusercontent.com/midoks/midoks/refs/heads/master/shell/seaweedfs/filer.sh | bash
 
+# tail -f /var/log/seaweedfs/filer.log
 
 tee /etc/systemd/system/seaweedfs-filer.service << 'EOF'
 [Unit]
@@ -14,9 +15,8 @@ Wants=network.target
 Type=simple
 User=root
 Group=root
-WorkingDirectory=/opt/seaweedfs
 ExecStart=/usr/local/bin/weed filer \
-    -master=154.12.53.22:9333 \
+    -master=10.210.0.11:9333,10.210.0.12:9333,10.210.0.13:9333 \
     -port=8888
 Restart=always
 RestartSec=5
@@ -27,15 +27,13 @@ StandardError=append:/var/log/seaweedfs/filer.log
 [Install]
 WantedBy=multi-user.target
 EOF
-
+systemctl daemon-reload
+systemctl restart seaweedfs-filer
+systemctl status seaweedfs-filer
 
 systemctl daemon-reload
 systemctl enable seaweedfs-filer
 systemctl start seaweedfs-filer
-
-systemctl daemon-reload
-systemctl restart seaweedfs-filer
-systemctl status seaweedfs-filer
 # journalctl -u seaweedfs-filer -f
 
 

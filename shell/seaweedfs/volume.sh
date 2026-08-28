@@ -9,6 +9,9 @@
 mkdir -p /data/seaweedfs/data/volume
 chmod 755 /data/seaweedfs/data/volume
 
+# 预留 7% 空间
+# 增加文件描述符限制，对高并发场景很重要
+
 tee /etc/systemd/system/seaweedfs-volume.service << 'EOF'
 [Unit]
 Description=SeaweedFS Volume
@@ -19,18 +22,16 @@ Wants=network.target
 Type=simple
 User=root
 Group=root
-WorkingDirectory=/opt/seaweedfs
 ExecStart=/usr/local/bin/weed volume \
     -dir=/data/seaweedfs/data/volume \
-    -mserver=10.210.0.13:9333 \
+    -mserver=10.210.0.11:9333,10.210.0.12:9333,10.210.0.13:9333 \
     -port=8080 \
     -index=leveldb \
     -max=0 \
-    -minFreeSpacePercent=7     # 预留 7% 空间
+    -minFreeSpacePercent=7
 
 Restart=always
 RestartSec=5
-# 增加文件描述符限制，对高并发场景很重要
 LimitNOFILE=1000000
 StandardOutput=append:/var/log/seaweedfs/volume.log
 StandardError=append:/var/log/seaweedfs/volume.log
@@ -38,6 +39,10 @@ StandardError=append:/var/log/seaweedfs/volume.log
 [Install]
 WantedBy=multi-user.target
 EOF
+systemctl daemon-reload
+systemctl enable seaweedfs-volume
+systemctl restart seaweedfs-volume
+systemctl status seaweedfs-volume
 
 
 # curl http://127.0.0.1:9333/dir/status | jq .
@@ -51,9 +56,7 @@ systemctl start seaweedfs-volume
 
 # echo "volume.grow -collection=m3u8 -count=1" | weed shell
 systemctl stop seaweedfs-volume
-systemctl daemon-reload
-systemctl restart seaweedfs-volume
-systemctl status seaweedfs-volume
+
 # journalctl -u seaweedfs-volume -f
 
 
