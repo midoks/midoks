@@ -2,6 +2,10 @@
 
 # apt install -y rclone
 
+# systemctl status minio
+# cat /usr/lib/systemd/system/minio.service
+# cat /etc/default/minio
+
 curl http://127.0.0.1:9333/dir/assign  
 
 
