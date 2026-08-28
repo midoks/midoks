@@ -35,8 +35,8 @@ if [ ! -f linux_amd64_full_large_disk.tar.gz ];then
     wget -q --show-progress "$DOWNLOAD_URL" -O "$TARBALL"
 fi
 
-sudo tar -xzf "$TARBALL" -C "$INSTALL_DIR" weed
-sudo chmod +x "$INSTALL_DIR/weed"
+tar -xzf "$TARBALL" -C "$INSTALL_DIR" weed
+chmod +x "$INSTALL_DIR/weed"
 rm -f "$TARBALL"
 
 
