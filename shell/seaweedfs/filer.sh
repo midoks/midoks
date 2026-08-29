@@ -3,7 +3,10 @@
 # cmd
 # curl -fsSL https://raw.githubusercontent.com/midoks/midoks/refs/heads/master/shell/seaweedfs/filer.sh | bash
 
+
 # tail -f /var/log/seaweedfs/filer.log
+rm -rf /opt/seaweedfs/filerldb2
+
 mkdir -p /opt/seaweedfs/filer
 tee /etc/systemd/system/seaweedfs-filer.service << 'EOF'
 [Unit]
