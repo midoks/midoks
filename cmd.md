@@ -107,6 +107,9 @@ find ./app/ -name "*.php" | xargs -n 1 /usr/local/product/php-5.5.18/bin/php -l
 ps -A -o stat,ppid,pid,cmd | grep -e '^[Zz]' | awk '{print $2}' | xargs kill -9
 
 ps -A | grep defunct | awk '{print $1}' | xargs kill -9
+
+ps -ef | grep "sync.sh" | grep -v grep | awk '{print $2}' | xargs kill -9
+ps -ef | grep copyto | grep -v grep | awk '{print $2}' | xargs kill -9
 ```
 
 ### PHPINFO
@@ -385,8 +388,40 @@ systemctl restart systemd-resolved
 
 # openssl测试
 ```
+ nc -vz 103.156.25.63 443
+
 openssl s_client -connect 127.0.0.1:9999 -servername www.qq.com
 curl --resolve "example.com:80:192.168.1.100" http://example.com
+
+
+curl --resolve "www.xjaaa.cc:443:103.215.77.136" https://www.xjaaa.cc
+
+
+curl -v https://www.xjaaa.cc --resolve www.xjaaa.cc:443:103.215.77.132
+
+
+openssl s_client -connect 103.156.25.63:1234 -servername www.kms57.cc
+
+
+curl -v https://www.kms57.cc:1234 --resolve www.kms57.cc:1234:122.10.110.179
+curl -v https://www.kms57.cc --resolve www.kms57.cc:1234:103.156.25.63
+
+
+curl -v --compressed https://www.kms57.cc:1234 --connect-to www.kms57.cc:1234:122.10.69.145:1234
+
+curl -v --compressed https://www.hag69.cc:5200 --connect-to www.hjt55.cc:5200:155.117.98.223:5200
+
+curl -v -k https://www.baidu.com:443 --resolve www.baidu.com:443:155.117.98.223
+
+
+curl -v --compressed https://www.hag69.cc:5200 --resolve www.hag69.cc:5200:155.117.98.223
+curl -v --compressed https://www.hag69.cc:5200 --resolve www.hag69.cc:5200:155.117.98.214
+
+
+curl -v --compressed https://www.cachecha.com --resolve www.cachecha.com:443:104.21.93.113
+
+155.117.98.214
+
 ```
 
 ### pip
@@ -411,4 +446,28 @@ export GOROOT=/usr/lib/golang
 export GOPATH=/usr/local/go
 export PATH=$PATH:$GOROOT/bin:$GOPATH/bin
 export GO111MODULE=on
+```
+
+
+# 创建服务文件
+```
+cat > /etc/systemd/system/disable-thp.service << 'EOF'
+[Unit]
+Description=Disable Transparent Huge Pages (THP)
+After=local-fs.target
+Before=sysinit.target
+
+[Service]
+Type=oneshot
+ExecStart=/bin/sh -c 'echo never > /sys/kernel/mm/transparent_hugepage/enabled'
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+# 启用服务
+systemctl daemon-reload
+systemctl enable --now disable-thp
+
 ```
