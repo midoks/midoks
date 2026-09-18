@@ -449,7 +449,7 @@ export GO111MODULE=on
 ```
 
 
-# 创建服务文件
+# 创建服务文件 (禁用THP)
 ```
 cat > /etc/systemd/system/disable-thp.service << 'EOF'
 [Unit]
