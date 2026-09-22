@@ -107,8 +107,7 @@ find ./app/ -name "*.php" | xargs -n 1 /usr/local/product/php-5.5.18/bin/php -l
 ps -A -o stat,ppid,pid,cmd | grep -e '^[Zz]' | awk '{print $2}' | xargs kill -9
 
 ps -A | grep defunct | awk '{print $1}' | xargs kill -9
-
-ps -ef | grep "sync.sh" | grep -v grep | awk '{print $2}' | xargs kill -9
+ps -ef | grep "top" | grep -v grep | awk '{print $2}' | xargs kill -9
 ps -ef | grep copyto | grep -v grep | awk '{print $2}' | xargs kill -9
 ```
 
