@@ -489,3 +489,9 @@ for i in $(smartctl --scan | grep -oP 'megaraid,\K\d+'); do
   smartctl -i -d megaraid,$i /dev/bus/0 | grep -E "Device Model|Rotation Rate|Solid State"
 done
 ```
+
+## 自动临时目录
+```
+export TMPDIR=/data/tmp
+mkdir -p $TMPDIR
+```
