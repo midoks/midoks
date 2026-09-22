@@ -473,6 +473,11 @@ systemctl enable --now disable-thp
 
 ## 系统HHD和SSD查看
 ```
+文件。如果值为 0，表示是非旋转设备（SSD）；如果为 1，则是旋转设备（HDD）
+/sys/block/<device>/queue/rotational
+如:
+cat /sys/block/vda/queue/rotational
+
 
 apt install smartmontools -y
 
