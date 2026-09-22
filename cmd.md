@@ -470,3 +470,17 @@ systemctl daemon-reload
 systemctl enable --now disable-thp
 
 ```
+
+## 系统HHD和SSD查看
+```
+
+apt install smartmontools -y
+
+lsblk -d -o NAME,ROTA,SIZE,TYPE,MODEL
+
+
+for i in $(smartctl --scan | grep -oP 'megaraid,\K\d+'); do
+  echo "--- megaraid,$i ---"
+  smartctl -i -d megaraid,$i /dev/bus/0 | grep -E "Device Model|Rotation Rate|Solid State"
+done
+```
