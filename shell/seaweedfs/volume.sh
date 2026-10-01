@@ -17,6 +17,8 @@ chmod 755 /data/seaweedfs/data/volume
 # 预留 7% 空间
 # 增加文件描述符限制，对高并发场景很重要
 
+mkdir -p /data/seaweedfs/data/volume
+chmod 755 /data/seaweedfs/data/volume
 tee /etc/systemd/system/seaweedfs-volume.service << 'EOF'
 [Unit]
 Description=SeaweedFS Volume
@@ -28,11 +30,11 @@ Type=simple
 User=root
 Group=root
 ExecStart=/usr/local/bin/weed volume \
-    -ip=10.210.0.11 \
+    -ip=10.210.0.12 \
     -dir=/data/seaweedfs/data/volume \
     -mserver=10.210.0.14:9333,10.210.0.12:9333,10.210.0.13:9333 \
     -port=8080 \
-    -index=leveldb \
+    -index=memory \
     -max=0 \
     -dataCenter=DefaultDataCenter \
     -rack=DefaultRack \
@@ -61,6 +63,10 @@ systemctl daemon-reload
 systemctl enable seaweedfs-volume
 systemctl start seaweedfs-volume
 
+systemctl restart seaweedfs-volume
+
+systemctl status seaweedfs-volume
+
 
 # echo "volume.grow -collection=m3u8 -count=1" | weed shell
 systemctl stop seaweedfs-volume
@@ -72,8 +78,11 @@ systemctl stop seaweedfs-volume
 
 /usr/local/bin/weed volume \
     -dir=/data/seaweedfs/data/volume \
-    -mserver=10.210.0.11:9333 \
+    -mserver=10.210.0.14:9333,10.210.0.12:9333,10.210.0.13:9333 \
     -port=8080 \
-    -index=leveldb \
+    -index=leveldbLarge \
     -max=0 \
-    -minFreeSpacePercent=7
+    -dataCenter=DefaultDataCenter \
+    -rack=DefaultRack \
+    -minFreeSpacePercent=7 \
+    -enableErasureCoding=true
