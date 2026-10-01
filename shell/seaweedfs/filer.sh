@@ -3,9 +3,10 @@
 # cmd
 # curl -fsSL https://raw.githubusercontent.com/midoks/midoks/refs/heads/master/shell/seaweedfs/filer.sh | bash
 
-
+ls /opt/seaweedfs/filerldb2
+systemctl restart seaweedfs-filer
 # tail -f /var/log/seaweedfs/filer.log
-rm -rf /opt/seaweedfs/filerldb2
+# rm -rf /opt/seaweedfs/filerldb2
 
 mkdir -p /opt/seaweedfs/filer
 tee /etc/systemd/system/seaweedfs-filer.service << 'EOF'
@@ -20,7 +21,7 @@ User=root
 Group=root
 WorkingDirectory=/opt/seaweedfs
 ExecStart=/usr/local/bin/weed filer \
-    -ip=10.210.0.11 \
+    -ip=10.210.0.15 \
     -master=10.210.0.14:9333,10.210.0.12:9333,10.210.0.13:9333 \
     -port=8888
 Restart=always
