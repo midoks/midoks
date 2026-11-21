@@ -26,7 +26,7 @@ fail() {
 [ "$(uname -s)" = "Linux" ] || fail "当前安装包仅支持 Linux。"
 [ "$(id -u)" -eq 0 ] || fail "请使用 root 用户或 sudo 执行安装脚本。"
 
-for command_name in curl tar sha256sum install mktemp; do
+for command_name in curl tar sha256sum install mktemp od tr; do
     command -v "${command_name}" >/dev/null 2>&1 || fail "缺少必要命令：${command_name}"
 done
 
@@ -52,6 +52,13 @@ trap 'rm -rf -- "${WORK_DIR}"' EXIT
 
 ARCHIVE_PATH="${WORK_DIR}/${ASSET_NAME}"
 EXTRACT_DIR="${WORK_DIR}/extract"
+
+# 使用系统加密随机源生成 256 位初始化令牌，避免远程安装无需鉴权。
+SETUP_TOKEN="$(od -An -N32 -tx1 /dev/urandom | tr -d ' \n')"
+[ "${#SETUP_TOKEN}" -eq 64 ] || fail "初始化令牌生成失败。"
+readonly SETUP_TOKEN
+SETUP_ENV_FILE="${WORK_DIR}/setup-token.conf"
+printf '[Service]\nEnvironment=MDSSH_SETUP_TOKEN=%s\n' "${SETUP_TOKEN}" >"${SETUP_ENV_FILE}"
 
 log "下载 ${ASSET_NAME}..."
 curl --fail --location --silent --show-error \
@@ -90,17 +97,22 @@ ln -sfn "${INSTALL_DIR}/mdssh" "${BINARY_LINK}"
 
 if command -v systemctl >/dev/null 2>&1 && [ -d /run/systemd/system ]; then
     log "注册并启动 systemd 服务..."
+    # 在主服务启动前放入 override，确保首次启动即携带初始化令牌。
+    SERVICE_OVERRIDE_DIR="/etc/systemd/system/${SERVICE_NAME}.d"
+    install -d -m 0700 "${SERVICE_OVERRIDE_DIR}"
+    install -m 0600 "${SETUP_ENV_FILE}" "${SERVICE_OVERRIDE_DIR}/setup-token.conf"
     (
         cd "${INSTALL_DIR}"
         "${INSTALL_DIR}/mdssh" -c "${CONFIG_PATH}" install
     )
 else
     log "未检测到 systemd，已跳过服务注册。"
-    log "可手动启动：cd ${INSTALL_DIR} && ./mdssh -c ${CONFIG_PATH} web"
+    log "可手动启动：cd ${INSTALL_DIR} && MDSSH_SETUP_TOKEN=${SETUP_TOKEN} ./mdssh -c ${CONFIG_PATH} web"
 fi
 
 log "安装完成。"
 log "程序目录：${INSTALL_DIR}"
 log "配置文件：${CONFIG_PATH}"
-log "首次使用请访问：http://服务器地址:9696/setup"
+log "初始化令牌：${SETUP_TOKEN}"
+log "首次使用请访问：http://服务器地址:9696/setup?token=${SETUP_TOKEN}"
 log "查看安全登录地址：${BINARY_LINK} -c ${CONFIG_PATH} default"
