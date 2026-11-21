@@ -93,7 +93,7 @@ log "安装到 ${INSTALL_DIR}..."
 install -d -m 0755 "${INSTALL_DIR}"
 install -d -m 0700 "${INSTALL_DIR}/custom" "${INSTALL_DIR}/custom/conf" "${INSTALL_DIR}/custom/data"
 install -m 0755 "${BINARY_SOURCE}" "${INSTALL_DIR}/mdssh"
-ln -sfn "${INSTALL_DIR}/mdssh" "${BINARY_LINK}"
+ln -sf "${INSTALL_DIR}/mdssh" "${BINARY_LINK}"
 
 if command -v systemctl >/dev/null 2>&1 && [ -d /run/systemd/system ]; then
     log "注册并启动 systemd 服务..."
