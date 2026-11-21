@@ -33,11 +33,11 @@ done
 case "$(uname -m)" in
     x86_64 | amd64)
         ARCH="amd64"
-        ARCHIVE_SHA256="e782be3bb6ba6a87f34702df38435bf0ae621787c49bffbc4a5e6097eb9a8245"
+        ARCHIVE_SHA256="f8c9172e2fbf9ed4f49c695b7865b86f299046e717aeb0f4d7675530c6c6e6c0"
         ;;
     aarch64 | arm64)
         ARCH="arm64"
-        ARCHIVE_SHA256="b3c3b4f923175cbed9172b3630e40b07168a189bee1b52a6e58dc1a422b5e031"
+        ARCHIVE_SHA256="fdabd981d808c5e8c68c08603019a213e4b9f562ab3cf3965fd474e18b16e9c5"
         ;;
     *)
         fail "暂不支持 $(uname -m) 架构，仅支持 x86_64 和 ARM64。"
