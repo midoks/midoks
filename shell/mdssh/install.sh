@@ -93,7 +93,11 @@ log "安装到 ${INSTALL_DIR}..."
 install -d -m 0755 "${INSTALL_DIR}"
 install -d -m 0700 "${INSTALL_DIR}/custom" "${INSTALL_DIR}/custom/conf" "${INSTALL_DIR}/custom/data"
 install -m 0755 "${BINARY_SOURCE}" "${INSTALL_DIR}/mdssh"
-ln -sf "${INSTALL_DIR}/mdssh" "${BINARY_LINK}"
+# 全局命令使用启动器而不是软链接：固定工作目录和配置，避免在调用目录生成另一份 custom。
+WRAPPER_FILE="${WORK_DIR}/mdssh-wrapper"
+printf '#!/bin/sh\ncd "%s" || exit 1\nexec "%s" -c "%s" "$@"\n' \
+    "${INSTALL_DIR}" "${INSTALL_DIR}/mdssh" "${CONFIG_PATH}" >"${WRAPPER_FILE}"
+install -m 0755 "${WRAPPER_FILE}" "${BINARY_LINK}"
 
 if command -v systemctl >/dev/null 2>&1 && [ -d /run/systemd/system ]; then
     log "注册并启动 systemd 服务..."
@@ -115,4 +119,4 @@ log "程序目录：${INSTALL_DIR}"
 log "配置文件：${CONFIG_PATH}"
 log "初始化令牌：${SETUP_TOKEN}"
 log "首次使用请访问：http://服务器地址:9696/setup?token=${SETUP_TOKEN}"
-log "查看安全登录地址：${BINARY_LINK} -c ${CONFIG_PATH} default"
+log "查看安全登录地址：${BINARY_LINK} default"
