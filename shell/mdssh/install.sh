@@ -7,7 +7,7 @@ umask 022
 # 使用：sudo bash scripts/install.sh
 
 readonly RELEASE_TAG="init"
-readonly RELEASE_VERSION="v1.1"
+readonly RELEASE_VERSION="v1.2"
 readonly REPOSITORY="midoks/midoks"
 readonly INSTALL_DIR="/opt/mdssh"
 readonly CONFIG_PATH="${INSTALL_DIR}/custom/conf/app.yaml"
