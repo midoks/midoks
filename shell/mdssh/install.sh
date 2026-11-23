@@ -7,7 +7,7 @@ umask 022
 # 使用：sudo bash scripts/install.sh
 
 readonly RELEASE_TAG="init"
-readonly RELEASE_VERSION="v1.2"
+readonly RELEASE_VERSION="v1.3"
 readonly REPOSITORY="midoks/midoks"
 readonly INSTALL_DIR="/opt/mdssh"
 readonly CONFIG_PATH="${INSTALL_DIR}/custom/conf/app.yaml"
@@ -33,11 +33,11 @@ done
 case "$(uname -m)" in
     x86_64 | amd64)
         ARCH="amd64"
-        ARCHIVE_SHA256="201f117424c56b2edfa517667f4f1d55f99f2281842ebd8f59a539f589f7851f"
+        ARCHIVE_SHA256="5e447bae35256f4ae1261fbbc70439c87935cc65497c2983a47becc88633ce71"
         ;;
     aarch64 | arm64)
         ARCH="arm64"
-        ARCHIVE_SHA256="90baf358c8f3dc617882fc7f803433ae31a4c75f1f739d9281aa5699fe45f252"
+        ARCHIVE_SHA256="22a340e4efdaa21acbee21d2b3488acfa59926dad5373cdd2e2e0c55a1bf8dd7"
         ;;
     *)
         fail "暂不支持 $(uname -m) 架构，仅支持 x86_64 和 ARM64。"
