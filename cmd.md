@@ -274,6 +274,11 @@ iptables -A INPUT -p tcp -s 218.247.181.51 -j ACCEPT
 #删除规则
 iptables -D INPUT 2 
 
+
+------------------------------------
+iptables -nvL OUTPUT --line-numbers
+nft -a list ruleset |grep "80"
+
 ```
 
 ### 磁盘读写测速
