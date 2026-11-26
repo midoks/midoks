@@ -279,6 +279,9 @@ iptables -D INPUT 2
 iptables -nvL OUTPUT --line-numbers
 nft -a list ruleset |grep "80"
 
+#清空
+nft flush ruleset
+
 ```
 
 ### 磁盘读写测速
